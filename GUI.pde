@@ -1075,7 +1075,6 @@ class DropTargetSVG extends DropListener {
   }
   
   void dropEvent(DropEvent theDropEvent) {
-    println(theDropEvent.file());
     ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
     File droppedFile = theDropEvent.file();
   

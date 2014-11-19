@@ -2,6 +2,7 @@ import java.util.LinkedList;
 
 public class Memento {
   
+  
   private int capacity;
   private ControlP5 gui;
   private LinkedList <String>deque;
