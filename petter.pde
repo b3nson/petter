@@ -5,6 +5,7 @@ import sojamo.drop.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
+
 static int ROT = 0;
 static int TRA = 1;
 static int SCA = 2;
