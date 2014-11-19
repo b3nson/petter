@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
+
 public class Memento {
-  
   
   private int capacity;
   private ControlP5 gui;
@@ -28,7 +28,6 @@ public class Memento {
       gui.getProperties().getSnapshot(deque.get(index));
     }
   }
-
 
   public void setUndoStep() {
     //when not on head of undo-list, remove head-elements when new Action is triggered
