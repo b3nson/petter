@@ -1,7 +1,9 @@
 import java.util.List;
+import java.awt.Insets;
 
 CallbackListener cb;
 GuiImage imgMap;
+Insets insets;
 
 boolean showMENU = false;
 
@@ -38,6 +40,7 @@ DropdownList penner_rot, penner_sca, penner_tra;
 ListBox settingsFilelist;
 Button currentOver;
 Button imageMapButton, closeImgMapButton;
+Bang bgcolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle;
 Textlabel dragOffset;
 
@@ -119,7 +122,17 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(showGuiExportToggle, "GUIEXP");
+   indentX += h*2;
+ 
+   bgcolorBang = gui.addBang("changebgcolor")
+     .setLabel("BG")
+     .setPosition(indentX, ypos)
+     .setSize(h, h)
+     .setGroup(main)
+     ;
+     styleLabel(bgcolorBang, "BG");
    indentX = 0;
+ 
    
   ypos += sep;
 
@@ -456,7 +469,7 @@ void setupGUI() {
   //cprop.remove(mapTraToggle);  
 
 
-  dragOffset = gui.addTextlabel("sdfg" )
+  dragOffset = gui.addTextlabel("dragoffset" )
      .setPosition(indentX, fheight-31)
      .setText("OFFSET: 0 x 0")
      .setGroup(main)
@@ -643,16 +656,26 @@ void leaveShiftMode() {
   }
 }
 
+void changebgcolor(float i) {
+  if(colpi == null) {
+    colpi = new ColorPicker(this, "colorpicker", 380, 300, bgcolor);
+  } else {
+     colpi.show(); 
+  }
+}
+
+
 // +++++++ MENU and SETTINGS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 void toggleMenu() {
   showMENU = !(gui.group("main").isOpen());
+  insets = frame.getInsets();
   if (showMENU) {
-    frame.setSize(fwidth+guiwidth, fheight);
+    frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.group("main").open();
   } else {
-    frame.setSize(fwidth, fheight);
+    frame.setSize(fwidth, fheight+insets.top);
     gui.group("main").close();
   }
 }

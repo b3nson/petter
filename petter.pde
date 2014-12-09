@@ -23,6 +23,7 @@ DropTargetSVG dropSVGadd;
 DropTargetSVG dropSVGrep;
 DropTargetIMG dropIMG;
 DropTargetNFO dropNFO;
+ColorPicker colpi;
 Memento undo;
 PGraphicsPDF pdf;
 
@@ -80,11 +81,12 @@ boolean exportCurrentFrame = false;
 String timestamp = "";
 String filename = "";
 String formatName = "";
-int pdfSize = CS;
+int pdfSize = A4;
 
 boolean disableStyle = false;
 float strokeWeight = 1.0;
 int fillColor = 128;
+color bgcolor = color(0,0,0);
 
 boolean pageOrientation = true;
 int[][] formats = { 
@@ -101,10 +103,10 @@ int[][] formats = {
     1191, 1684
   }
 };
-//int fwidth = 595;
-//int fheight = 842;
-int fwidth = 600; //ausnahme für customformat von constant
+int fwidth = 595;
 int fheight = 842;
+//int fwidth = 600; //ausnahme für customformat von constant
+//int fheight = 842;
 int guiwidth = 310;
 
 
@@ -132,7 +134,7 @@ void setup() {
   drop.addDropListener(dropSVGrep);
   drop.addDropListener(dropIMG);
   drop.addDropListener(dropNFO);
-  undo = new Memento(gui, 35);
+  undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
   try {
@@ -191,7 +193,7 @@ void draw() {
       pdf = (PGraphicsPDF) createGraphics(formats[pdfSize][pageOrientation?0:1], formats[pdfSize][pageOrientation?1:0], PDF, filename);
     } else {
       filename = outputpath +timestamp +"_" +formatName +"_petter+GUI.pdf";
-      pdf = (PGraphicsPDF) createGraphics(int(formats[pdfSize][pageOrientation?0:1]+(guiwidth*0.75)), formats[pdfSize][pageOrientation?1:0], PDF, filename);
+      pdf = (PGraphicsPDF) createGraphics(int(formats[pdfSize][pageOrientation?0:1]+(guiwidth/**0.75*/)), formats[pdfSize][pageOrientation?1:0], PDF, filename);
     }
     
     beginRecord(pdf); 
@@ -212,16 +214,22 @@ void draw() {
   }
 
   pushStyle();
-  fill(0);
-  noStroke();
-  rect(0, 0, fwidth, fheight);
+    colorMode(RGB);
+    if(colpi != null) {
+       bgcolor=colpi.getColorRGB();
+    }
+    bgcolorBang.setColorForeground(bgcolor);
+    fill(bgcolor);
+    noStroke();
+    rect(0, 0, fwidth, fheight);
+        colorMode(HSB);
   popStyle();
   
   if(!exportCurrentFrame || (exportCurrentFrame && guiExportNow)) {
     pushStyle();
-    fill(50);
-    noStroke();
-    rect(fwidth, 0, guiwidth, fheight);
+      fill(50);
+      noStroke();
+      rect(fwidth, 0, guiwidth, fheight);
     popStyle();
   }
 
