@@ -462,6 +462,7 @@ void setupGUI() {
   
   ControllerProperties cprop = gui.getProperties();
   cprop.remove(closeImgMapButton);
+  cprop.remove(bgcolorBang);
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
   //cprop.remove(mapScaleToggle);
