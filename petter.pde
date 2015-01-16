@@ -5,14 +5,10 @@ import sojamo.drop.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
-
 static int ROT = 0;
 static int TRA = 1;
 static int SCA = 2;
-static int CS = 0;
-static int A4 = 1;
-static int A3 = 2;
-static int A2 = 3;
+
 
 final static int KEYS = 0500;
 final static boolean[] keysDown = new boolean[KEYS];
@@ -29,6 +25,8 @@ PGraphicsPDF pdf;
 
 String settingspath = "i/settings/";
 String outputpath = "o/";
+String[] names;
+String name;
 
 ArrayList<PShape> svg;
 PShape ref;
@@ -36,6 +34,7 @@ PShape nfo;
 PShape s;
 PImage map;
 
+int absPageOffset = 25;
 int pageOffset = 25;
 int manualOffsetX = 0;
 int manualOffsetY = 0;
@@ -49,6 +48,7 @@ float absTransY = 0;
 float absScreenX;
 float absScreenY;
 
+float zoom = 1.0;
 float relTransX = 0;
 float relTransY = 0;
 float absRot = 0;
@@ -81,7 +81,6 @@ boolean exportCurrentFrame = false;
 String timestamp = "";
 String filename = "";
 String formatName = "";
-int pdfSize = A4;
 
 boolean disableStyle = false;
 float strokeWeight = 1.0;
@@ -89,22 +88,17 @@ int fillColor = 128;
 color bgcolor = color(0,0,0);
 
 boolean pageOrientation = true;
-int[][] formats = { 
-  {
-    437, 613
-  }
-  , {
-    595, 842
-  }
-  , {
-    842, 1191
-  }
-  , {
-    1191, 1684
-  }
+String[][] formats = { 
+  { "A5", "437", "613" },
+  { "A4", "595", "842" },
+  { "A3", "842", "1191" },
+  { "A2", "1191", "1684" },
+  { "Q1", "800", "800" }
 };
 int fwidth = 595;
 int fheight = 842;
+int pdfwidth = 595;
+int pdfheight = 842;
 //int fwidth = 600; //ausnahme für customformat von constant
 //int fheight = 842;
 int guiwidth = 310;
@@ -115,7 +109,8 @@ void setup() {
   size(fwidth, fheight);   //A4 595x842   A3 842x1191  A2 1191x1684
   if (frame != null) {
     frame.setResizable(true);
-  }
+  } 
+  
   smooth();
   shapeMode(CENTER);
   
@@ -142,6 +137,7 @@ void setup() {
     ref = loadShape("i/ref.svg");
     nfo = loadShape("i/info.svg");
     //map = loadImage("album.jpg");
+    names = loadStrings("i/names.txt");
   } 
   catch(NullPointerException e) {
   }
@@ -150,11 +146,11 @@ void setup() {
 
   if (ref != null) showRef = true;
   if (nfo != null) showNfo = true;
-  pageOffsetSlider.setValue(pageOffset);
+  pageOffsetSlider.setValue(absPageOffset);
+  formatDropdown.setIndex(2);
   penner_rot.setValue(rotType);
   penner_sca.setValue(scaType);
   penner_tra.setValue(traType);
-  pdfSizeButton.activate(pdfSize);
   showRefToggle.setState(showRef);
   showNfoToggle.setState(showNfo);
   last = null;
@@ -165,6 +161,10 @@ void setup() {
 }
 
 void draw() {
+//println(frame.getSize().height - frame.getInsets().top);
+
+  pageOffset = int(absPageOffset * zoom);
+
   if (keyPressed && key == CODED && keyCode == SHIFT && !shiftPressed) {
     shiftPressed = true;
     enterShiftMode();
@@ -183,17 +183,19 @@ void draw() {
   } 
 
   if (exportCurrentFrame) {
+    formatName = pdfwidth +"x" +pdfheight;
     if(!guiExportNow) {
       timestamp = year() +"" +nf(month(), 2) +"" +nf(day(), 2) +"" +"-" +nf(hour(), 2) +"" +nf(minute(), 2) +"" +nf(second(), 2);
-      saveSettings(timestamp);
+      saveSettings(timestamp +"_" +name);
     }
-    
     if(!guiExportNow) {
-      filename = outputpath +timestamp +"_" +formatName +"_petter.pdf";
-      pdf = (PGraphicsPDF) createGraphics(formats[pdfSize][pageOrientation?0:1], formats[pdfSize][pageOrientation?1:0], PDF, filename);
+      filename = outputpath +timestamp +"_" +formatName +"_" +name +".pdf";//+"_petter.pdf";
+//      pdf = (PGraphicsPDF) createGraphics(formats[pdfSize][pageOrientation?0:1], formats[pdfSize][pageOrientation?1:0], PDF, filename);
+      pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
     } else {
-      filename = outputpath +timestamp +"_" +formatName +"_petter+GUI.pdf";
-      pdf = (PGraphicsPDF) createGraphics(int(formats[pdfSize][pageOrientation?0:1]+(guiwidth/**0.75*/)), formats[pdfSize][pageOrientation?1:0], PDF, filename);
+      filename = outputpath +timestamp +"_" +formatName +"_" +name +"+GUI.pdf";//+"_petter+GUI.pdf";
+//      pdf = (PGraphicsPDF) createGraphics(int(formats[pdfSize][pageOrientation?0:1]+(guiwidth/**0.75*/)), formats[pdfSize][pageOrientation?1:0], PDF, filename);
+      pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);
     }
     
     beginRecord(pdf); 
@@ -204,11 +206,8 @@ void draw() {
       pdf.fill(fillColor);
     }
     pdf.pushMatrix();  
-    if (pdfSize == CS) {
-      pdf.scale(0.7345);
-    } else {
-      pdf.scale((float)Math.pow(1.41, pdfSize-1));
-    }
+    pdf.scale(1f/zoom);
+    //pdf.scale((float)Math.pow(1.41, pdfSize-1));
     
     //saveFrame("frame.png");
   }
@@ -270,7 +269,9 @@ void draw() {
             abscount++;
             continue;
           }
-          mapValue = ( brightness(col) /255);
+          //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
+          mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
+          //mapValue = ( brightness(col) /255);
         } 
         catch(ArrayIndexOutOfBoundsException e) {
           mapValue = 1f;
@@ -344,7 +345,11 @@ void draw() {
   } //for i
   
   if (nfo != null && showNfo) {
-    shape(nfo, fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
+    pushMatrix(); 
+    translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
+    scale(zoom);
+    shape(nfo);
+    popMatrix();
   }
   if(exportCurrentFrame && guiExportNow) {    
     if (ref != null && showRef) {
@@ -384,7 +389,7 @@ void draw() {
   dropIMG.draw();
   dropNFO.draw();
   //dragOffset.draw();
-}
+}//DRAW END
 
 
 void mouseMoved() {
@@ -458,6 +463,13 @@ void keyPressed() {
     xaligndraw = !xaligndraw;
   } else if (keysDown['S']) {
     exportCurrentFrame = true;
+    randomSeed(mouseX*mouseY*frameCount);
+    if(names != null) {
+      name = names[int(random((float)names.length))];
+    } else {
+      name = "petter"; 
+    }
+    randomSeed(seed);
   } else if (keysDown['M']) {
     toggleMenu();
   } else if (keysDown['0']) {
@@ -470,6 +482,10 @@ void keyPressed() {
   } else if (keysDown['N']) {
     showNfo = !showNfo;
     showNfoToggle.setState(showNfo);
+  } else if (keyCode == 93) { //PLUS
+    scaleGUI(true);
+  } else if (keyCode == 47) { //MINUS
+    scaleGUI(false);
   }
 }
 
@@ -486,8 +502,6 @@ void mouseWheel(MouseEvent event) {
   gui.setMouseWheelRotation((int)e);
 }
 
-
-//void dropEvent(DropEvent theDropEvent) {}
 
   void toggleSvgStyle() {
     if (!disableStyle) {

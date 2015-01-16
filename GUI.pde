@@ -34,15 +34,17 @@ Boolean shiftProcessed = false;
 
 Slider last;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider;
-RadioButton pdfSizeButton;
 Group main, style;
-DropdownList penner_rot, penner_sca, penner_tra;
+DropdownList penner_rot, penner_sca, penner_tra, formatDropdown;
 ListBox settingsFilelist;
 Button currentOver;
 Button imageMapButton, closeImgMapButton;
 Bang bgcolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle;
-Textlabel dragOffset;
+Textlabel dragOffset, zoomLabel;
+Numberbox wBox, hBox;
+
+
 
 void setupGUI() {
   gui.setColorActive(c1);
@@ -57,7 +59,7 @@ void setupGUI() {
   
   println("setupGUI");
   main = gui.addGroup("main")
-           .setPosition(width+12,10)
+           .setPosition(fwidth+12,10)
            .hideBar()
            //.setBackgroundHeight(height-38)
            //.setWidth(guiwidth-24)
@@ -65,23 +67,47 @@ void setupGUI() {
            //.setBackgroundColor(color(255,50))
            .close()
            ;
+   
   ypos += 10;
   
-  pdfSizeButton = gui.addRadioButton("pdfSize")
-     .setPosition(indentX, ypos)
-     .setSize(h,h)
-     .setItemsPerRow(4)
-     .setSpacingColumn(h)
-     .addItem("CS",0)
-     .addItem("A4",1)
-     .addItem("A3",2)
-     .addItem("A2",3)
+  formatDropdown = gui.addDropdownList("formats")
+     .setGroup(main)
+     .setPosition(indentX, ypos+21)
+     .setSize(54, 300)
+     .setItemHeight(h)
+     .setBarHeight(h)
+     //.activateEvent(true)
+     .setBackgroundColor(color(190))
+     //.addItems(formatsx)
+     ;
+  addFormatItems(formatDropdown);
+  formatDropdown.captionLabel().style().marginTop = h/4+1;
+
+     
+  wBox = gui.addNumberbox("width")
+     .setPosition(indentX+67, ypos)
+     .setSize(34, h)
+     .setLabel("")
+     .setRange(20,2000)
+     .setDecimalPrecision(0) 
+     //.setMultiplier(0.1) // set the sensitifity of the numberbox
+     .setValue(pdfwidth)
+     .setLock(true)
+     .setLabelVisible(false)
      .setGroup(main)
      ;
-     for(Toggle t:pdfSizeButton.getItems()) {
-       //styleLabel(t, "P/L");
-     }
 
+  hBox = gui.addNumberbox("height")
+     .setPosition(indentX +107, ypos)
+     .setSize(34, h)
+     .setLabel("")
+     .setRange(20,2000)
+     .setDecimalPrecision(0) 
+     //.setMultiplier(0.1) // set the sensitifity of the numberbox
+     .setValue(pdfheight)
+     .setLock(true)
+     .setGroup(main)
+     ;
 
    pageOrientationToggle = gui.addToggle("pageOrientation")
      .setLabel("p/l")
@@ -91,8 +117,9 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(pageOrientationToggle, "p/l");
-
-   ypos += sep;
+     
+  ypos += sep;
+  
 
    showRefToggle = gui.addToggle("showRef")
      .setLabel("REF")
@@ -136,7 +163,7 @@ void setupGUI() {
    
   ypos += sep;
 
-   pageOffsetSlider = gui.addSlider("pageOffset")
+   pageOffsetSlider = gui.addSlider("absPageOffset")
      .setLabel("pageOffset")
      .setPosition(indentX, ypos)
      .setSize(w,h)
@@ -250,6 +277,8 @@ void setupGUI() {
      .setBackgroundColor(color(190))
      ;
   addItems(penner_tra);
+  penner_tra.captionLabel().style().marginTop = h/4+1;
+
   ypos += sep/2;
 
 
@@ -303,6 +332,7 @@ void setupGUI() {
      .setBackgroundColor(color(190))     
      ;
   addItems(penner_rot);
+  penner_rot.captionLabel().style().marginTop = h/4+1;
   ypos += sep/2;
 
 
@@ -351,6 +381,7 @@ void setupGUI() {
      .setBackgroundColor(color(190))
      ;
   addItems(penner_sca);
+  penner_sca.captionLabel().style().marginTop = h/4+1;
   ypos += sep;
 
 
@@ -455,6 +486,7 @@ void setupGUI() {
   }; 
   gui.addCallback(cb);
   
+  formatDropdown.bringToFront();
   penner_sca.bringToFront();
   penner_rot.bringToFront();
   penner_tra.bringToFront();
@@ -467,7 +499,7 @@ void setupGUI() {
   //cprop.remove(invertMapToggle);
   //cprop.remove(mapScaleToggle);
   //cprop.remove(mapRotToggle);
-  //cprop.remove(mapTraToggle);  
+  //cprop.remove(mapTraToggle); 
 
 
   dragOffset = gui.addTextlabel("dragoffset" )
@@ -476,8 +508,23 @@ void setupGUI() {
      .setGroup(main)
      ;
 
+  zoomLabel = gui.addTextlabel("zoomlabel" )
+     .setPosition(indentX+guiwidth-70, fheight-31)
+     .setText("ZOOM: 1.0")
+     .setGroup(main)
+     ;
 
 } //setupGUI
+
+
+
+void addFormatItems(DropdownList l) {
+  l.addItem("CUSTOM",  0);
+  for(int i=0; i<formats.length; i++) {
+    println(formats[i][0]);
+    l.addItem(formats[i][0], i+1);
+  }
+}
 
 void addItems(DropdownList l) {
 l.addItem("Linear.easeIn   ",  0);
@@ -573,8 +620,28 @@ void controlEvent(ControlEvent theEvent) {
       }
     }
   }
- 
-  if (theEvent.isFrom("rotType")) {
+  if (theEvent.isFrom("formats")) {
+    int num = (int)theEvent.getGroup().getValue();
+    println(num);
+    formatDropdown.setColorBackground(color(100));
+    formatDropdown.getItem(num).setColorBackground(c1);
+
+    if(formatDropdown.getItem(num).getText() == "CUSTOM") {
+      wBox.setLock(false);
+      hBox.setLock(false);
+    } else {
+      wBox.setLock(true);
+      hBox.setLock(true);
+      int ww = int(formats[formatDropdown.getItem(num).getValue()-1][1]);
+      int hh = int(formats[formatDropdown.getItem(num).getValue()-1][2]);
+      if(ww != fwidth || hh != fheight) {
+        wBox.setValue(ww);
+        hBox.setValue(hh);
+        canvasResize();  
+      }
+    }
+  } 
+  else if (theEvent.isFrom("rotType")) {
     rotType = (int)theEvent.getGroup().getValue();
     penner_rot.setColorBackground(color(100));
     penner_rot.getItem(rotType).setColorBackground(c1);
@@ -593,18 +660,6 @@ void controlEvent(ControlEvent theEvent) {
     toggleSvgStyle();
     disableStyle = !disableStyle;
   } 
-  else if(theEvent.isFrom(pdfSizeButton)) {
-    pdfSize = int(theEvent.getValue());
-    if(pdfSize == A4) {
-      formatName = "A4";
-    } else if (pdfSize == A3) {
-       formatName = "A3"; 
-    } else if (pdfSize == A2) {
-       formatName = "A2"; 
-    } else if (pdfSize == CS) {
-       formatName = "CS"; 
-    }
-  }
   else if(theEvent.isFrom(pageOrientationToggle)) {
     if(pageOrientation) {
       if((fwidth > fheight)) {
@@ -639,7 +694,13 @@ void controlEvent(ControlEvent theEvent) {
     mapTra = ((Toggle)theEvent.getController()).getState();
     updateImgMap();
   }   
-  
+  else if (theEvent.isFrom(wBox)) {
+    canvasResize();
+  } 
+  else if (theEvent.isFrom(hBox)) {
+    canvasResize();
+
+  }   
 }
 
 void enterShiftMode() {
@@ -661,9 +722,56 @@ void changebgcolor(float i) {
   if(colpi == null) {
     colpi = new ColorPicker(this, "colorpicker", 380, 300, bgcolor);
   } else {
-     colpi.show(); 
+    colpi.show(); 
   }
 }
+
+// +++++++ FRAME ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+void canvasResize() {
+  pdfwidth = (int) wBox.getValue();
+  pdfheight = (int) hBox.getValue();
+  resizeFrame(pdfwidth, pdfheight);
+  
+}
+
+void resizeFrame(int newW, int newH) {
+  fwidth = int(newW*zoom);
+  fheight = int(newH*zoom); 
+  
+ println("fwh:   " +fwidth +"x" +fheight); 
+ println("pdfwh: " +pdfwidth +"x" +pdfheight); 
+ println("-------------------------------"); 
+
+  insets = frame.getInsets();
+  
+  if (showMENU) {
+    newW = fwidth+guiwidth;
+    newH = fheight+insets.top;
+  } else {
+    newW = fwidth;
+    newH = fheight+insets.top;
+  }
+  frame.setSize(newW, newH);
+  gui.group("main").setPosition(fwidth+12,10);
+  dragOffset.setPosition(indentX, fheight-31);
+  zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
+}
+
+
+
+void scaleGUI(boolean bigger) {
+  if(bigger) {
+    zoom += .1;
+  } else {
+    if(zoom > 0.1) {
+      zoom -= .1;
+    }
+  }
+  zoomLabel.setText("ZOOM: " +zoom);
+  resizeFrame(pdfwidth, pdfheight);
+}
+
 
 
 // +++++++ MENU and SETTINGS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -692,7 +800,8 @@ void toggleSettings() {
     findSettingFiles();
     
     settingsFilelist = gui.addListBox("filelist")
-      .setPosition(width/2-90, 200)
+//      .setPosition(width/2-90, 200)
+      .setPosition(20, 40)
       .setSize(180, 260)
       .setItemHeight(15)
       .setBarHeight(15);
@@ -808,7 +917,7 @@ void togglePageOrientation() {
   dropNFO.updateTargetRect(fwidth, fheight);
   
   dragOffset.setPosition(indentX, fheight-31);
-
+  zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
 }
 
 //===========================================================================
