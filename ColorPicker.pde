@@ -269,7 +269,7 @@ public class ColorPicker extends PApplet {
 
 
 //==========================================================================
-//== SliderView to prevent drawing of controller-background ================
+//== Custom SliderView to prevent drawing of controller-background =========
 //==========================================================================
 
 class ColorSlider2DView implements ControllerView<Slider2D> {
@@ -389,4 +389,3 @@ class ColorSlider1DView implements ControllerView<Slider> {
     //                        }
   }
 }
-

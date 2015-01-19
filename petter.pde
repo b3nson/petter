@@ -9,7 +9,6 @@ static int ROT = 0;
 static int TRA = 1;
 static int SCA = 2;
 
-
 final static int KEYS = 0500;
 final static boolean[] keysDown = new boolean[KEYS];
 
@@ -19,7 +18,7 @@ DropTargetSVG dropSVGadd;
 DropTargetSVG dropSVGrep;
 DropTargetIMG dropIMG;
 DropTargetNFO dropNFO;
-ColorPicker colpi;
+ColorPicker bg_copi, stroke_copi, shape_copi;
 Memento undo;
 PGraphicsPDF pdf;
 
@@ -60,11 +59,14 @@ boolean mapScale = false;
 boolean mapRot = false;
 boolean mapTra = false;
 boolean invertMap = false;
-boolean strokeMode = false;
+boolean strokeMode = true;
+boolean stroke = true;
+boolean fill = true;
 boolean random = false;
 boolean dragAllowed = false;
 boolean showRef = false;
 boolean showNfo = false;
+boolean nfoOnTop = true;
 boolean guiExport = false;
 boolean guiExportNow = false;
 int seed = 0;
@@ -83,9 +85,10 @@ String filename = "";
 String formatName = "";
 
 boolean disableStyle = false;
-float strokeWeight = 1.0;
-int fillColor = 128;
+float strokeWeight = 2.0;
 color bgcolor = color(0,0,0);
+color strokecolor = color(0,0,0);
+color shapecolor = color(255,255,255);
 
 boolean pageOrientation = true;
 String[][] formats = { 
@@ -99,14 +102,16 @@ int fwidth = 595;
 int fheight = 842;
 int pdfwidth = 595;
 int pdfheight = 842;
-//int fwidth = 600; //ausnahme für customformat von constant
-//int fheight = 842;
 int guiwidth = 310;
 
 
+// ---------------------------------------------------------------------------
+//  SETUP
+// ---------------------------------------------------------------------------
+
 void setup() {  
   frameRate(25);
-  size(fwidth, fheight);   //A4 595x842   A3 842x1191  A2 1191x1684
+  size(fwidth, fheight);
   if (frame != null) {
     frame.setResizable(true);
   } 
@@ -153,12 +158,16 @@ void setup() {
   penner_tra.setValue(traType);
   showRefToggle.setState(showRef);
   showNfoToggle.setState(showNfo);
+  nfoLayerToggle.setState(nfoOnTop);
   last = null;
-  //mapScaleToggle.setValue(mapScale);
-  //mapRotToggle.setValue(mapRot);
 
   undo.setUndoStep();
 }
+
+
+// ---------------------------------------------------------------------------
+//  DRAW
+// ---------------------------------------------------------------------------
 
 void draw() {
 //println(frame.getSize().height - frame.getInsets().top);
@@ -178,8 +187,17 @@ void draw() {
   }
 
   if (disableStyle) {
-    strokeWeight(strokeWeight);
-    fill(fillColor);
+    if(stroke) {
+      stroke(strokecolor);
+      strokeWeight(strokeWeight);
+    } else {
+       noStroke(); 
+    }
+    if(fill) {
+      fill(shapecolor);
+    } else {
+      noFill(); 
+    }
   } 
 
   if (exportCurrentFrame) {
@@ -190,11 +208,9 @@ void draw() {
     }
     if(!guiExportNow) {
       filename = outputpath +timestamp +"_" +formatName +"_" +name +".pdf";//+"_petter.pdf";
-//      pdf = (PGraphicsPDF) createGraphics(formats[pdfSize][pageOrientation?0:1], formats[pdfSize][pageOrientation?1:0], PDF, filename);
       pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
     } else {
       filename = outputpath +timestamp +"_" +formatName +"_" +name +"+GUI.pdf";//+"_petter+GUI.pdf";
-//      pdf = (PGraphicsPDF) createGraphics(int(formats[pdfSize][pageOrientation?0:1]+(guiwidth/**0.75*/)), formats[pdfSize][pageOrientation?1:0], PDF, filename);
       pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);
     }
     
@@ -202,8 +218,17 @@ void draw() {
     pdf.shapeMode(CENTER);   
     pdf.pushStyle();
     if (disableStyle) {
-      pdf.strokeWeight(strokeWeight);
-      pdf.fill(fillColor);
+      if(stroke) {
+        pdf.stroke(strokecolor);
+        pdf.strokeWeight(strokeWeight);
+      } else {
+        pdf.noStroke(); 
+      }
+      if(fill) {
+        pdf.fill(shapecolor);
+      } else {
+        pdf.noFill(); 
+      }
     }
     pdf.pushMatrix();  
     pdf.scale(1f/zoom);
@@ -212,16 +237,25 @@ void draw() {
     //saveFrame("frame.png");
   }
 
-  pushStyle();
-    colorMode(RGB);
-    if(colpi != null) {
-       bgcolor=colpi.getColorRGB();
+  if(bg_copi != null) {
+     bgcolor=bg_copi.getColorRGB();
+  }
+  if(disableStyle) {
+    if(stroke_copi != null) {
+       strokecolor=stroke_copi.getColorRGB();
     }
-    bgcolorBang.setColorForeground(bgcolor);
+    if(shape_copi != null) {
+       shapecolor=shape_copi.getColorRGB();
+    }
+  }
+  bgcolorBang.setColorForeground(bgcolor);
+  strokecolorBang.setColorForeground(strokecolor);
+  shapecolorBang.setColorForeground(shapecolor);
+  
+  pushStyle();
     fill(bgcolor);
     noStroke();
     rect(0, 0, fwidth, fheight);
-        colorMode(HSB);
   popStyle();
   
   if(!exportCurrentFrame || (exportCurrentFrame && guiExportNow)) {
@@ -238,8 +272,20 @@ void draw() {
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
 
+  if (nfo != null && showNfo && !nfoOnTop) {
+    pushMatrix(); 
+    translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
+    scale(zoom);
+    shape(nfo);
+    popMatrix();
+  }
+
   randomSeed(seed);
 
+  // ---------------------------------------------------
+  // MAIN LOOP
+  // ---------------------------------------------------  
+  
   for (int i=0; i< (xaligndraw?xtilenum:ytilenum); i++) {
     for (int j=0; j< (xaligndraw?ytilenum:xtilenum); j++) {
       pushMatrix();
@@ -264,8 +310,8 @@ void draw() {
         try {
           color col = map.pixels[(int)constrain(absScreenY, 0, map.height)*(int)map.width+(int)constrain(absScreenX, 0, map.width)];
           if (col == color(0, 255, 0)) {
-            //popMatrix();
-            //popMatrix();
+            popMatrix();
+            popMatrix();
             abscount++;
             continue;
           }
@@ -310,8 +356,8 @@ void draw() {
       scale(absScale);
       if (mapScale && map != null) {
         try {
-          float sv = mapValue * (relScale);
-          scale( invertMap ? (1-sv) : sv );
+          relsca = mapValue * (relScale);
+          scale( invertMap ? (1-relsca) : relsca );
         } 
         catch (ArrayIndexOutOfBoundsException e) {
         }
@@ -321,10 +367,18 @@ void draw() {
       }
 
       //setRelativeStrokeWeight
-      if (disableStyle && strokeMode) {
-        float sw = abs(strokeWeight*(1/((relsca==0.0?1:relsca)*(absScale==0f?1:absScale)*(tilescale==0f?1:tilescale))));
+      if (disableStyle && stroke && !strokeMode) {
+        float sw = ((relsca)*(absScale)*(tilescale));
+        if(sw != 0f) {
+          sw = abs(strokeWeight*(1/sw));
+        } else {
+          sw = 0f; 
+        }
+
+        stroke(strokecolor);
         strokeWeight(sw);
         if (exportCurrentFrame) {
+          pdf.stroke(strokecolor);
           pdf.strokeWeight(sw);
         }
       }
@@ -344,7 +398,9 @@ void draw() {
     } //for j
   } //for i
   
-  if (nfo != null && showNfo) {
+  // ---------------------------------------------------
+
+  if (nfo != null && showNfo && nfoOnTop) {
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
     scale(zoom);
@@ -383,7 +439,8 @@ void draw() {
   }
 
   shapeMode(CENTER);
-
+  noStroke();
+  
   dropSVGadd.draw();
   dropSVGrep.draw();
   dropIMG.draw();
@@ -391,6 +448,10 @@ void draw() {
   //dragOffset.draw();
 }//DRAW END
 
+
+// ---------------------------------------------------------------------------
+//  INPUT EVENTS
+// ---------------------------------------------------------------------------
 
 void mouseMoved() {
   //pageOffset = int((mouseX));
@@ -500,103 +561,4 @@ static void processKey(int k, boolean set) {
 void mouseWheel(MouseEvent event) {
   float e = event.getAmount();
   gui.setMouseWheelRotation((int)e);
-}
-
-
-  void toggleSvgStyle() {
-    if (!disableStyle) {
-      for (int i = 0; i < svg.size (); i++) {
-        svg.get(i).disableStyle();
-      }
-    } else {
-      for (int i = 0; i < svg.size (); i++) {
-        svg.get(i).enableStyle();
-      }
-    }
-  }
-
-void toggleRandom() {
-  random = !random;
-  seed = mouseX;
-}
-
-float ease(int type, float a, float b, float c, float d) {
-  if (type == ROT) {
-    type = rotType;
-  } else if (type == TRA) {
-    type = traType;
-  } else {
-    type = scaType;
-  }
-
-  switch(type) {
-  case 0:
-    return Linear.easeIn    (a, b, c, d);
-  case 1:
-    return Linear.easeOut   (a, b, c, d);
-  case 2:
-    return Linear.easeInOut (a, b, c, d);
-  case 3:
-    return Quad.easeIn     (a, b, c, d);
-  case 4:
-    return Quad.easeOut    (a, b, c, d);
-  case 5:
-    return Quad.easeInOut  (a, b, c, d);
-  case 6:
-    return Cubic.easeIn    (a, b, c, d);
-  case 7:
-    return Cubic.easeOut   (a, b, c, d);
-  case 8:
-    return Cubic.easeInOut (a, b, c, d);
-  case 9:
-    return Quart.easeIn    (a, b, c, d);
-  case 10:
-    return Quart.easeOut   (a, b, c, d);
-  case 11:
-    return Quart.easeInOut (a, b, c, d);
-  case 12:
-    return Quint.easeIn    (a, b, c, d);
-  case 13:
-    return Quint.easeOut   (a, b, c, d);
-  case 14:
-    return Quint.easeInOut (a, b, c, d);
-  case 15:
-    return Sine.easeIn    (a, b, c, d);
-  case 16:
-    return Sine.easeOut   (a, b, c, d);
-  case 17:
-    return Sine.easeInOut (a, b, c, d);
-  case 18:
-    return Circ.easeIn    (a, b, c, d);
-  case 19:
-    return Circ.easeOut   (a, b, c, d);
-  case 20:
-    return Circ.easeInOut (a, b, c, d);
-  case 21:
-    return Expo.easeIn    (a, b, c, d);
-  case 22:
-    return Expo.easeOut   (a, b, c, d);
-  case 23:
-    return Expo.easeInOut (a, b, c, d);
-  case 24:
-    return Back.easeIn    (a, b, c, d);
-  case 25:
-    return Back.easeOut   (a, b, c, d);
-  case 26:
-    return Back.easeInOut (a, b, c, d);
-  case 27:
-    return Bounce.easeIn    (a, b, c, d);
-  case 28:
-    return Bounce.easeOut   (a, b, c, d);
-  case 29:
-    return Bounce.easeInOut (a, b, c, d);
-  case 30:
-    return Elastic.easeIn    (a, b, c, d);
-  case 31:
-    return Elastic.easeOut   (a, b, c, d);
-  case 32:
-    return Elastic.easeInOut (a, b, c, d);
-  default:
-    return 0.0;
-  }
 }
