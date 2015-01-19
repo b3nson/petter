@@ -1,7 +1,15 @@
 petter
 ======
-![petter screenshot](http://conversations.tools/m/20140818-174400_CS_petter+GUI.png "petter screenshot")
 
+DESCRIPTION:
+TODO
+repetition, variation
+vector based
+input: svg
+output: pdf
+
+
+![petter screenshot](http://conversations.tools/m/20140818-174400_CS_petter+GUI.png "petter screenshot")
 
 
 ##Keyboard Shortcuts
