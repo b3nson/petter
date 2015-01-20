@@ -8,6 +8,7 @@ import java.awt.event.InputEvent;
 static int ROT = 0;
 static int TRA = 1;
 static int SCA = 2;
+static int ANM = 3;
 
 final static int KEYS = 0500;
 final static boolean[] keysDown = new boolean[KEYS];
@@ -24,6 +25,7 @@ PGraphicsPDF pdf;
 
 String settingspath = "i/settings/";
 String outputpath = "o/";
+String subfolder = "";
 String[] names;
 String name;
 
@@ -69,6 +71,7 @@ boolean showNfo = false;
 boolean nfoOnTop = true;
 boolean guiExport = false;
 boolean guiExportNow = false;
+boolean sequencing = false;
 int seed = 0;
 float mapValue = 0f;
 
@@ -78,6 +81,7 @@ boolean shift = false;
 int rotType = 0;
 int scaType = 0;
 int traType = 0;
+int animType = 0;
 
 boolean exportCurrentFrame = false;
 String timestamp = "";
@@ -156,6 +160,7 @@ void setup() {
   penner_rot.setValue(rotType);
   penner_sca.setValue(scaType);
   penner_tra.setValue(traType);
+  penner_anim.setValue(animType);
   showRefToggle.setState(showRef);
   showNfoToggle.setState(showNfo);
   nfoLayerToggle.setState(nfoOnTop);
@@ -170,8 +175,11 @@ void setup() {
 // ---------------------------------------------------------------------------
 
 void draw() {
-//println(frame.getSize().height - frame.getInsets().top);
 
+  if(sequencing) {
+    animate();  
+  }
+  
   pageOffset = int(absPageOffset * zoom);
 
   if (keyPressed && key == CODED && keyCode == SHIFT && !shiftPressed) {
@@ -204,13 +212,15 @@ void draw() {
     formatName = pdfwidth +"x" +pdfheight;
     if(!guiExportNow) {
       timestamp = year() +"" +nf(month(), 2) +"" +nf(day(), 2) +"" +"-" +nf(hour(), 2) +"" +nf(minute(), 2) +"" +nf(second(), 2);
-      saveSettings(timestamp +"_" +name);
+      if(!sequencing) {
+        saveSettings(timestamp +"_" +name);
+      }
     }
     if(!guiExportNow) {
-      filename = outputpath +timestamp +"_" +formatName +"_" +name +".pdf";//+"_petter.pdf";
+      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +".pdf";//+"_petter.pdf";
       pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
     } else {
-      filename = outputpath +timestamp +"_" +formatName +"_" +name +"+GUI.pdf";//+"_petter+GUI.pdf";
+      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI.pdf";//+"_petter+GUI.pdf";
       pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);
     }
     
@@ -279,7 +289,7 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-
+  
   randomSeed(seed);
 
   // ---------------------------------------------------
@@ -407,7 +417,7 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-  if(exportCurrentFrame && guiExportNow) {    
+  if(exportCurrentFrame && guiExportNow) { 
     if (ref != null && showRef) {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
@@ -492,7 +502,6 @@ void mouseReleased() {
   dragAllowed = false;
 }
 
-
 void keyPressed() {  
   processKey(keyCode, true);
 
@@ -524,13 +533,7 @@ void keyPressed() {
     xaligndraw = !xaligndraw;
   } else if (keysDown['S']) {
     exportCurrentFrame = true;
-    randomSeed(mouseX*mouseY*frameCount);
-    if(names != null) {
-      name = names[int(random((float)names.length))];
-    } else {
-      name = "petter"; 
-    }
-    randomSeed(seed);
+    generateName();
   } else if (keysDown['M']) {
     toggleMenu();
   } else if (keysDown['0']) {
@@ -543,10 +546,24 @@ void keyPressed() {
   } else if (keysDown['N']) {
     showNfo = !showNfo;
     showNfoToggle.setState(showNfo);
-  } else if (keyCode == 93) { //PLUS
+  } else if (keyCode == 93 || keyCode == 107) { //PLUS
     scaleGUI(true);
-  } else if (keyCode == 47) { //MINUS
+  } else if (keyCode == 47 || keyCode == 109) { //MINUS
     scaleGUI(false);
+  } else if (keysDown['I']) {
+    openAnimate();
+    registerAnimStartValues();
+  } else if (keysDown['O']) {
+    openAnimate();
+    registerAnimEndValues();
+  } else if (keysDown['P']) {
+    startSequencer(false);
+  } else if (keysDown['A']) {
+    toggleAnimate();
+  } else if (keysDown['J']) {
+    showInValues();
+  } else if (keysDown['K']) {
+    showOutValues();
   }
 }
 
@@ -554,11 +571,11 @@ void keyReleased() {
   processKey(keyCode, false);
 }
 
-static void processKey(int k, boolean set) {
-  if (k < KEYS)  keysDown[k] = set;
-}
-
 void mouseWheel(MouseEvent event) {
   float e = event.getAmount();
   gui.setMouseWheelRotation((int)e);
+}
+
+static void processKey(int k, boolean set) {
+  if (k < KEYS)  keysDown[k] = set;
 }

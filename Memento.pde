@@ -46,7 +46,6 @@ public class Memento {
        deque.pollLast(); //remove and
        setUndoStep();   //try again
     }
-    
     //println(deque); 
   }
 }
