@@ -18,7 +18,10 @@ public class ColorPicker extends PApplet {
 
   color startCol;  
   color curCol;
-  Boolean preview = true;
+  color[] srccol;
+  
+  boolean opened = true;
+  boolean preview = true;
   
   ColorSlider2DView satpick;
   ColorSlider1DView huepick;
@@ -30,17 +33,15 @@ public class ColorPicker extends PApplet {
   Button okButton, cancelButton;
   Toggle previewToggle;
 
-  //public ColorPicker(PApplet theParent, String theName, int theWidth, int theHeight) {
-  //  this(theParent, theName, theWidth, theHeight, #AE57B4);
-  //}
-
-  public ColorPicker(PApplet theParent, String theName, int theWidth, int theHeight, int col) {
+  //using a color-array here, to set color-value of mainapp directly (like pass-by-reference in C/C++)
+  public ColorPicker(PApplet theParent, String theName, int theWidth, int theHeight, color[] col) {
     parent = theParent;
     w = theWidth;
     h = theHeight;
-    startCol = col;
+    startCol = col[0];
+    curCol = col[0];
+    srccol = col;
     name = theName;
-
     win = new Frame(theName);
     win.add(this);
     this.init();
@@ -57,8 +58,8 @@ public class ColorPicker extends PApplet {
     win.addWindowListener(new WindowAdapter() {
       @Override
         public void windowClosing(WindowEvent windowEvent) { 
-        curCol=startCol;
-        hide();
+        //curCol=startCol;
+        win.hide();
       }
     }
     );    
@@ -139,24 +140,25 @@ public class ColorPicker extends PApplet {
           .setId(3)
             ;
 
-    hue = hue(startCol);
-    sat = saturation(startCol);
-    bri = brightness(startCol)-255; 
-
-    s1D.setValue(hue);
-    s2D.setArrayValue(new float[] {sat, bri});
-
+    //initSliders(startCol);
+    show();
     smooth();
   } //end setup
 
 
   void draw() {
+    //pushStyle();
+    noStroke();
+    
     colorMode(HSB);
     background(50);
 
     fill(curCol);
-    rect(300, 10, 60, 80);
+    rect(300, 10, 60, 40);
 
+    fill(startCol);
+    rect(300, 50, 60, 40);
+    
     int xpos = (int)s1D.getPosition().x;
     int ypos = (int)s1D.getPosition().y;
 
@@ -166,7 +168,6 @@ public class ColorPicker extends PApplet {
         set(  i+xpos, j+ypos, color( j, 255, 255 ) );
       }
     }
-
 
     xpos = (int)s2D.getPosition().x;
     ypos = (int)s2D.getPosition().y;
@@ -178,44 +179,48 @@ public class ColorPicker extends PApplet {
       }
     }
     colorMode(RGB);
+    //popStyle();
   }
 
   public void hide() {
     noLoop();
+    opened = false;
     win.hide();
   }
 
   public void show() {
     loop();
-    win.show();
+    opened = true;
+    initSliders(startCol);
     updatePreviewColor();
+    win.show();
   }
 
-  
   void updatePreviewColor() {
     colorMode(HSB);
     curCol =  color(hue, sat, bri);
+    if(preview) {
+      srccol[0] = curCol;
+    } else {
+      srccol[0] = startCol;
+    }
     rgbValueLabel.setText("R " +(int)red(curCol) +"\nG " +(int)green(curCol) +"\nB " +(int)blue(curCol));
     hsbValueLabel.setText("H " +(int)hue(curCol) +"\nS " +(int)saturation(curCol) +"\nB " +(int)brightness(curCol));
     hexValueLabel.setText(hex(curCol, 6));
     colorMode(RGB);
   }
+  
+  
+  void initSliders(color c) {
+    hue = hue(c);
+    sat = saturation(c);
+    bri = brightness(c)-255; 
+    s1D.setValue(hue);
+    s2D.setArrayValue(new float[] {sat, bri});
+  }  
 
-  public color getColorRGB() {
-    //colorMode(RGB);
-    if(preview) {
-      return color(red(curCol), green(curCol), blue(curCol));
-    } else {
-      return color(red(startCol), green(startCol), blue(startCol));
-    }
-  }
-  public color getColorHSB() {
-    //colorMode(HSB);
-    if(preview) {    
-      return color(hue(curCol), saturation(curCol), brightness(curCol));
-    } else {
-      return color(hue(startCol), saturation(startCol), brightness(startCol));
-    }
+  boolean isOpen() {
+    return opened;
   }
 
   public void controlEvent(ControlEvent theEvent) {
@@ -231,17 +236,43 @@ public class ColorPicker extends PApplet {
       break;
       case(2): //OK
         startCol=curCol;
+        srccol[0] = curCol;
         win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
       break;
       case(3): //X
         curCol=startCol;
+        srccol[0] = startCol;
         win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
       break;
       case(4): //PREVIEW
        preview = boolean((int)theEvent.getController().getValue());
+       updatePreviewColor();
       break;
     }
   }
+
+
+// from previous version, where the colorpicker didn't operate directly on 
+// the actual colorvariable of the mainapp
+//
+//  public color getColorRGB() {
+//    //colorMode(RGB);
+//    if(preview) {
+//      return color(red(curCol), green(curCol), blue(curCol));
+//    } else {
+//      return color(red(startCol), green(startCol), blue(startCol));
+//    }
+//  }
+//
+//  public color getColorHSB() {
+//    //colorMode(HSB);
+//    if(preview) {    
+//      return color(hue(curCol), saturation(curCol), brightness(curCol));
+//    } else {
+//      return color(hue(startCol), saturation(startCol), brightness(startCol));
+//    }
+//  }
+
 
   void keyPressed() {
     if (key == RETURN || key == ENTER) {

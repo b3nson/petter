@@ -27,6 +27,7 @@ String settingspath = "i/settings/";
 String outputpath = "o/";
 String subfolder = "";
 String[] names;
+String[] helptext;
 String name;
 
 ArrayList<PShape> svg;
@@ -90,9 +91,9 @@ String formatName = "";
 
 boolean disableStyle = false;
 float strokeWeight = 2.0;
-color bgcolor = color(0,0,0);
-color strokecolor = color(0,0,0);
-color shapecolor = color(255,255,255);
+color[] bgcolor = {color(10,125,100)};
+color[] strokecolor = {color(0,0,0)};
+color[] shapecolor = {color(255,255,255)};
 
 boolean pageOrientation = true;
 String[][] formats = { 
@@ -125,8 +126,7 @@ void setup() {
   
   PFont pfont = createFont("i/fonts/PFArmaFive.ttf", 8, false);
   ControlFont font = new ControlFont(pfont);
-  
-  
+
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
   drop = new SDrop(this);  
@@ -141,20 +141,15 @@ void setup() {
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
-  try {
-    svg.add(loadShape("i/default.svg"));
-    ref = loadShape("i/ref.svg");
-    nfo = loadShape("i/info.svg");
-    //map = loadImage("album.jpg");
-    names = loadStrings("i/names.txt");
-  } 
-  catch(NullPointerException e) {
-  }
+  try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));} //<>//
+  try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;} //<>//
+  try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;} //<>//
+  //try { map = loadImage("album.jpg");}         catch(NullPointerException e) {}
+  try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {} //<>//
+  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} //<>// //<>// //<>// //<>// //<>// //<>// //<>//
 
-  setupGUI();
+  setupGUI(); //<>//
 
-  if (ref != null) showRef = true;
-  if (nfo != null) showNfo = true;
   pageOffsetSlider.setValue(absPageOffset);
   formatDropdown.setIndex(2);
   penner_rot.setValue(rotType);
@@ -167,6 +162,14 @@ void setup() {
   last = null;
 
   undo.setUndoStep();
+
+  println("  , _");
+  println(" /|/ \\ __|__|_  _  ,_");
+  println("  |__/|/ |  |  |/ /  |");
+  println("  |   |_/|_/|_/|_/   |/ v0.2");
+  println(" ");
+  println("  Press M for menu");
+  println("        H for help");
 }
 
 
@@ -175,7 +178,7 @@ void setup() {
 // ---------------------------------------------------------------------------
 
 void draw() {
-
+  
   if(sequencing) {
     animate();  
   }
@@ -196,13 +199,13 @@ void draw() {
 
   if (disableStyle) {
     if(stroke) {
-      stroke(strokecolor);
+      stroke(strokecolor[0]);
       strokeWeight(strokeWeight);
     } else {
        noStroke(); 
     }
     if(fill) {
-      fill(shapecolor);
+      fill(shapecolor[0]);
     } else {
       noFill(); 
     }
@@ -229,13 +232,13 @@ void draw() {
     pdf.pushStyle();
     if (disableStyle) {
       if(stroke) {
-        pdf.stroke(strokecolor);
+        pdf.stroke(strokecolor[0]);
         pdf.strokeWeight(strokeWeight);
       } else {
         pdf.noStroke(); 
       }
       if(fill) {
-        pdf.fill(shapecolor);
+        pdf.fill(shapecolor[0]);
       } else {
         pdf.noFill(); 
       }
@@ -247,23 +250,20 @@ void draw() {
     //saveFrame("frame.png");
   }
 
-  if(bg_copi != null) {
-     bgcolor=bg_copi.getColorRGB();
+  if(bg_copi != null && bg_copi.isOpen()) {
+    bgcolorBang.setColorForeground(bgcolor[0]);
   }
   if(disableStyle) {
-    if(stroke_copi != null) {
-       strokecolor=stroke_copi.getColorRGB();
+    if(stroke_copi != null && stroke_copi.isOpen()) {
+      strokecolorBang.setColorForeground(strokecolor[0]);
     }
-    if(shape_copi != null) {
-       shapecolor=shape_copi.getColorRGB();
+    if(shape_copi != null && shape_copi.isOpen()) {
+      shapecolorBang.setColorForeground(shapecolor[0]);
     }
   }
-  bgcolorBang.setColorForeground(bgcolor);
-  strokecolorBang.setColorForeground(strokecolor);
-  shapecolorBang.setColorForeground(shapecolor);
   
   pushStyle();
-    fill(bgcolor);
+    fill(bgcolor[0]);
     noStroke();
     rect(0, 0, fwidth, fheight);
   popStyle();
@@ -385,10 +385,10 @@ void draw() {
           sw = 0f; 
         }
 
-        stroke(strokecolor);
+        stroke(strokecolor[0]);
         strokeWeight(sw);
         if (exportCurrentFrame) {
-          pdf.stroke(strokecolor);
+          pdf.stroke(strokecolor[0]);
           pdf.strokeWeight(sw);
         }
       }
@@ -564,7 +564,10 @@ void keyPressed() {
     showInValues();
   } else if (keysDown['K']) {
     showOutValues();
+  } else if (keysDown['H']) {
+    toggleHelp();
   }
+  
 }
 
 void keyReleased() {

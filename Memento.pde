@@ -1,6 +1,5 @@
 import java.util.LinkedList;
 
-
 public class Memento {
   
   private int capacity;

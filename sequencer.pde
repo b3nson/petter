@@ -38,9 +38,13 @@ void registerAnimEndValues() {
 }
 
 void deleteRegisteredValues() {
-  keyframeValues = null;
-  startValuesRegistered = false;
-  endValuesRegistered = false;
+  if(!sequencing) {
+    keyframeValues = null;
+    startValuesRegistered = false;
+    endValuesRegistered = false;
+    animSetInButton.setColorBackground(color(100));
+    animSetOutButton.setColorBackground(color(100));
+  }
 }
 
 void startSequencer(boolean export) {

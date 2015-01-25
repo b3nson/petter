@@ -7,6 +7,7 @@ Insets insets;
 
 boolean showMENU = false;
 boolean showANIMATE = false;
+boolean showHELP = false;
 
 int c = 0;
 int d = 0;
@@ -35,14 +36,14 @@ Boolean shiftProcessed = false;
 
 Slider last;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider;
-Group main, style, animate;
+Group main, style, animate, help, helptextbox;
 DropdownList penner_rot, penner_sca, penner_tra, penner_anim, formatDropdown;
 ListBox settingsFilelist;
 Button currentOver;
-Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton;
+Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle;
-Textlabel dragOffset, zoomLabel, stylefillLabel;
+Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 
 
@@ -66,7 +67,6 @@ void setupGUI() {
 //  GUI SETUP - MAIN MENU
 // ---------------------------------------------------------------------------
 
-  println("setupGUI");
   main = gui.addGroup("main")
            .setPosition(fwidth+12,10)
            .hideBar()
@@ -170,7 +170,9 @@ void setupGUI() {
      ;
      //styleLabel(bgcolorBang, "BG");
      bgcolorBang.getCaptionLabel().setPadding(8,-14);
-     
+     bgcolorBang.setColorForeground(bgcolor[0]);
+
+
    indentX += h*2;
  
    showGuiExportToggle = gui.addToggle("guiExport")
@@ -224,7 +226,7 @@ void setupGUI() {
      ;   
      styleLabel(yTileNumSlider, "ytilenum   (UP/DOWN)");
   ypos += sep;
-  
+
 
 
 
@@ -512,7 +514,8 @@ void setupGUI() {
      .setSize(h, h)
      .setGroup(style)
      ;
-      strokecolorBang.getCaptionLabel().setPadding(8,-14);
+     strokecolorBang.getCaptionLabel().setPadding(8,-14);
+     strokecolorBang.setColorForeground(strokecolor[0]);
 
   
   strokeWeightSlider = gui.addSlider("strokeWeight")
@@ -548,7 +551,8 @@ void setupGUI() {
      .setGroup(style)
      ;
      styleLabel(shapecolorBang, "filloptions");
-   
+     shapecolorBang.setColorForeground(shapecolor[0]);
+
    
 // ---------------------------------------------------------------------------
 //  GUI SETUP - ANIMATE MENU
@@ -564,26 +568,35 @@ void setupGUI() {
 
   ypos = 0+indentY;
   
-  animSetInButton = gui.addButton("I")
-     .setValue(0)
+  animSetInButton = gui.addButton("startValuesRegistered")
+     .setLabel("I")
      .setPosition(indentX, ypos)
      .setSize(h, h)
      .setGroup("animate")
      ;
   animSetInButton.getCaptionLabel().setPadding(10,-14);
 
-  animSetOutButton = gui.addButton("O")
-     .setValue(0)
+  animSetOutButton = gui.addButton("endValuesRegistered")
+     .setLabel("O")
      .setPosition(indentX+1.5*h, ypos)
      .setSize(h, h)
      .setGroup("animate")
      ;
   animSetOutButton.getCaptionLabel().setPadding(8,-14);
 
+  clearInOutValuesButton = gui.addButton("clearKeyframes")
+     .setLabel("X")
+     .setValue(0)
+     .setPosition(indentX+3*h, ypos)
+     .setSize(h/2, h)
+     .setGroup("animate")
+     ;
+  clearInOutValuesButton.getCaptionLabel().setPadding(3,-14);
+  
     
   penner_anim = gui.addDropdownList("animType")
-     .setPosition(indentX+3*h, ypos+h+1)
-     .setSize(124, 70)
+     .setPosition(indentX+4*h, ypos+h+1)
+     .setSize(104, 70)
      .setItemHeight(12)
      .setBarHeight(h)
      .activateEvent(true)
@@ -640,6 +653,45 @@ void setupGUI() {
   animExportButton.getCaptionLabel().setPadding(7,-12);
   
 
+   
+// ---------------------------------------------------------------------------
+//  GUI SETUP - HELP MENU
+// ---------------------------------------------------------------------------   
+  
+  int helpwidth = 330;
+  int helpheight = 534;
+  
+  help = gui.addGroup("help")
+    .setSize(fwidth, fheight+1)
+    .setPosition(0, 0)
+    .setBackgroundHeight(fheight+1)
+    .setBackgroundColor(color(0, 170))
+    .hideBar()
+    .close();
+
+  helptextbox = gui.addGroup("helptextbox")
+    .setSize(helpwidth, helpheight)
+    .setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2)
+    .setBackgroundHeight(helpheight)
+    .setBackgroundColor(color(255))
+    .hideBar()
+    .setGroup(help);
+  
+  helptextLabel = gui.addTextlabel("shortcuts", "", 20, 20)
+    .setSize(helpwidth, helpheight)
+    .setMultiline(true)
+    .setLineHeight(9)
+    .setColorValue(color(0))
+    .setGroup(helptextbox);
+  
+  if(helptext != null) {
+    for (int i = 0; i < helptext.length; i++) {
+      String s = helptext[i];
+      if(s.equals("")) s = ".";
+      helptextLabel.append(s, 80);
+    }
+  }
+
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP - FINAL CLEANUP
@@ -663,7 +715,19 @@ void setupGUI() {
   cprop.remove(bgcolorBang);
   cprop.remove(strokecolorBang);
   cprop.remove(shapecolorBang);
-
+  cprop.remove(animate);
+  cprop.remove(animSetInButton);
+  cprop.remove(animSetOutButton);
+  cprop.remove(penner_anim);
+  cprop.remove(animGotoInButton);
+  cprop.remove(animGotoOutButton);
+  cprop.remove(animFrameNumBox);
+  cprop.remove(animRunButton);
+  cprop.remove(animExportButton);
+  cprop.remove(help);
+  cprop.remove(helptextLabel);
+  cprop.remove(helptextbox);
+  
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
   //cprop.remove(mapScaleToggle);
@@ -777,9 +841,11 @@ void styleLabel(Controller c, String text) {
 // ---------------------------------------------------------------------------
 
 void callbackEvent(CallbackEvent theEvent) {
-  //println("CallbackEvent: " +theEvent.getController());
   if (theEvent.getAction() == ControlP5.ACTION_RELEASED || theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
-     undo.setUndoStep(); 
+    if(theEvent.getController().getParent() != animate && 
+       theEvent.getController().getParent() != penner_anim) {
+          undo.setUndoStep();      
+       }
   } 
 }
 
@@ -902,7 +968,10 @@ void controlEvent(ControlEvent theEvent) {
   }    
   else if (theEvent.isFrom(animGotoOutButton)) {
     showOutValues();
-  }    
+  } 
+  else if (theEvent.isFrom(clearInOutValuesButton)) {
+    deleteRegisteredValues();
+  }      
   
   
   
@@ -940,6 +1009,16 @@ void catchMouseover() {
 // ---------------------------------------------------------------------------
 //  GUI ACTIONS
 // ---------------------------------------------------------------------------
+
+
+void toggleHelp() {
+  showHELP = !(gui.group("help").isOpen());
+  if (showHELP) {
+    help.open();
+  } else {
+    help.close();
+  }
+}
 
 void toggleAnimate() {
   showANIMATE = !(gui.group("animate").isOpen());
@@ -1120,6 +1199,8 @@ void resizeFrame(int newW, int newH) {
   frame.setSize(newW, newH);
   gui.group("main").setPosition(fwidth+12,10);
   gui.group("animate").setPosition(indentX, fheight-36- (gui.group("animate").isOpen()?80:0) );
+  gui.group("help").setSize(fwidth, fheight+1);
+  gui.group("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
   
   dropSVGadd.updateTargetRect(fwidth, fheight);
   dropSVGrep.updateTargetRect(fwidth, fheight);
@@ -1197,6 +1278,7 @@ void loadSettings(String filename, boolean close) {
 void saveSettings(String timestamp) {
   //gui.setFormat(ControllerProperties.Format);    
    gui.saveProperties(settingspath +timestamp +".ser");
+   //println(gui.getProperties().get());
 }
 
 void loadDefaultSettings() {
