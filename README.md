@@ -1,18 +1,20 @@
 Petter
 ======
+a vector-graphic-based pattern generator.
 
-Gallery: http://www.lafkon.net/petter/
+###Description:
+Petter is a experimental [processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
+Use SVG-Files as Input to generate, influence and export graphic patterns as PDF.    
+Images can be used as a "ImageMap" for pattern-generation.    
+Drag and Drop SVG and Image-Files into the GUI to set input-files, use gui-controls to alter the pattern,    
+press 's' to export as PDF. Press 'h' for further help.    
 
-DESCRIPTION:
-TODO
-repetition, variation
-vector based
-input: svg
-output: pdf
+See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 
 ![petter screenshot](http://www.lafkon.net/petter/css/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
 
-###Keyboard Shortcuts
+
+###Keyboard Shortcuts:
 ```
 SHORTCUTS
 ========================================================================
@@ -66,6 +68,7 @@ P	- view/testrun animation
 ========================================================================
 ```
 
+
 ### Use of contributed Libraries
 - `penner.easing` - https://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://www.sojamo.de/libraries/controlP5/
@@ -77,6 +80,7 @@ DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.
 Use e.g. `Nautilus` instead.    
 "The root error is pcmanfm sends a null-terminated-string for file list"    
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
+
 
 ###License: 
 ```
