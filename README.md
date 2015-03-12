@@ -3,7 +3,7 @@ Petter
 a vector-graphic-based pattern generator.
 
 ###Description:
-Petter is a experimental [processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
+Petter is a experimental [Processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
 Use SVG-Files as Input to generate, influence and export graphic patterns as PDF.    
 Images can be used as a "ImageMap" for pattern-generation.    
 Drag and Drop SVG and Image-Files into the GUI to set input-files, use gui-controls to alter the pattern,    
@@ -68,8 +68,13 @@ P	- view/testrun animation
 ========================================================================
 ```
 
+### Installation:
+- Grab a copy of [Processing](http://www.processing.org/) for your OS, install it.
+- Download/clone Petter to your Processing Sketch-Directory.
+- Download and install external libraries (see below).
 
-### Use of contributed Libraries
+
+### Use of contributed Libraries:
 - `penner.easing` - https://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://www.sojamo.de/libraries/controlP5/
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
