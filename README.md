@@ -12,7 +12,7 @@ output: pdf
 
 ![petter screenshot](http://www.lafkon.net/petter/css/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
 
-##Keyboard Shortcuts
+###Keyboard Shortcuts
 ```
 SHORTCUTS
 ========================================================================
@@ -66,15 +66,30 @@ P	- view/testrun animation
 ========================================================================
 ```
 
-## Use of contributed Libraries
+### Use of contributed Libraries
 - `penner.easing` - https://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://www.sojamo.de/libraries/controlP5/
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
 
 
-####Known Issues:    
+###Known Issues:    
 DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
 Use e.g. `Nautilus` instead.    
 "The root error is pcmanfm sends a null-terminated-string for file list"    
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
 
+###License: 
+```
+Petter - vector-graphic-based pattern generator.
+http://www.lafkon.net/petter/
+Copyright (C) 2015 LAFKON/Benjamin Stephan
+ 
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+ 
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+```
