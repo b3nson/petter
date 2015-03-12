@@ -8,9 +8,7 @@ vector based
 input: svg
 output: pdf
 
-
-![petter screenshot](http://conversations.tools/m/20140818-174400_CS_petter+GUI.png "petter screenshot")
-
+![petter screenshot](http://www.lafkon.net/petter/css/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
 
 ##Keyboard Shortcuts
 TODO
