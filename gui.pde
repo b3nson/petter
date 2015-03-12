@@ -20,7 +20,7 @@ CallbackListener cb;
 GuiImage imgMap;
 Insets insets;
 
-boolean showMENU = false;
+boolean showMENU = true;
 boolean showANIMATE = false;
 boolean showHELP = false;
 
@@ -76,7 +76,6 @@ void setupGUI() {
   gui.setColorValueLabel(color(255, 255, 255));
 
   gui.enableShortcuts();  
-  
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP - MAIN MENU
@@ -775,6 +774,10 @@ void setupGUI() {
      .setGroup(main)
      ;
 
+  if(showMENU) {
+    showMENU = false;
+    toggleMenu();
+  }
 } //setupGUI
 
 

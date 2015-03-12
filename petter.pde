@@ -131,7 +131,7 @@ int guiwidth = 310;
 
 void setup() {  
   frameRate(25);
-  size(fwidth, fheight);
+  size(fwidth+(showMENU?guiwidth:0), fheight);
   if (frame != null) {
     frame.setResizable(true);
   } 
@@ -177,7 +177,7 @@ void setup() {
   last = null;
 
   undo.setUndoStep();
-
+  
   println("  , _");
   println(" /|/ \\ __|__|_  _  ,_");
   println("  |__/|/ |  |  |/ /  |");
@@ -523,7 +523,6 @@ void keyPressed() {
   if (keysDown[SHIFT]) {
     shift = true;
   }  
-
   if (keysDown[LEFT]) {
     if (keysDown[LEFT] && keysDown[SHIFT]) xtilenum -= 10;
     else xtilenum -= 1;
