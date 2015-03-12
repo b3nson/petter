@@ -1,6 +1,8 @@
 petter
 ======
 
+Gallery: http://www.lafkon.net/petter/
+
 DESCRIPTION:
 TODO
 repetition, variation
