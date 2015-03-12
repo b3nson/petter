@@ -1,4 +1,4 @@
-petter
+Petter
 ======
 
 Gallery: http://www.lafkon.net/petter/
