@@ -12,7 +12,7 @@ press 's' to export as PDF. Press 'h' for further help.
 See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 
 ![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
-![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence") Export PDF-Sequences (w or w/o GUI)
+![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence") Export PDF-Sequences
 
 ###Keyboard Shortcuts:
 ```
