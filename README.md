@@ -11,8 +11,8 @@ press 's' to export as PDF. Press 'h' for further help.
 
 See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 
-![petter screenshot](http://www.lafkon.net/petter/css/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
-
+![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
+![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence") Export PDF-Sequences (w or w/o GUI)
 
 ###Keyboard Shortcuts:
 ```
@@ -32,14 +32,14 @@ SHIFT on Sliders	-	bigger steps
 SCROLL on Sliders	-	finer steps
 
 0 (ZERO)	-	Load previous Settings
-S	-	Save PDF
+S			-	Save PDF
 
 ------------------------------------------------------------------------
 CREATE
 ------------------------------------------------------------------------
 
 DRAG'N'DROP SVG-FILES (on canvas)	
-		-	one or multiple SVGS to add/replace tiles
+		- one or multiple SVGS to add/replace tiles
 		- (bottom-area) to add/replace nfo-graphic
 DRAG'N'DROP IMG-FILE (on menu)
 		- set image as transformation-map
