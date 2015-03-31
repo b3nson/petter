@@ -582,7 +582,7 @@ void setupGUI() {
 
   ypos = 0+indentY;
   
-  animSetInButton = gui.addButton("startValuesRegistered")
+  animSetInButton = gui.addButton("registerStartValues")
      .setLabel("I")
      .setPosition(indentX, ypos)
      .setSize(h, h)
@@ -590,7 +590,7 @@ void setupGUI() {
      ;
   animSetInButton.getCaptionLabel().setPadding(10,-14);
 
-  animSetOutButton = gui.addButton("endValuesRegistered")
+  animSetOutButton = gui.addButton("registerEndValues")
      .setLabel("O")
      .setPosition(indentX+1.5*h, ypos)
      .setSize(h, h)
@@ -732,6 +732,7 @@ void setupGUI() {
   cprop.remove(animate);
   cprop.remove(animSetInButton);
   cprop.remove(animSetOutButton);
+  cprop.remove(clearInOutValuesButton);
   cprop.remove(penner_anim);
   cprop.remove(animGotoInButton);
   cprop.remove(animGotoOutButton);
@@ -988,6 +989,7 @@ void controlEvent(ControlEvent theEvent) {
     showOutValues();
   } 
   else if (theEvent.isFrom(clearInOutValuesButton)) {
+    println("theEvent.isFrom(clearInOutValuesButton)");
     deleteRegisteredValues();
   }      
   
@@ -1333,6 +1335,9 @@ void generateName() {
     randomSeed(seed);
 }
 
+void generateTimestamp() {
+  timestamp = year() +"" +nf(month(), 2) +"" +nf(day(), 2) +"" +"-" +nf(hour(), 2) +"" +nf(minute(), 2) +"" +nf(second(), 2);  
+}
 
 // This function returns all the files in a directory as an array of Strings  
 String[] listFileNames(String dir) {

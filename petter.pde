@@ -156,14 +156,14 @@ void setup() {
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
-  try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));} //<>//
-  try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;} //<>//
-  try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;} //<>//
+  try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+  try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
+  try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   //try { map = loadImage("album.jpg");}         catch(NullPointerException e) {}
-  try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {} //<>//
-  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+  try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
+  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} //<>// //<>// //<>// //<>// //<>//
 
-  setupGUI(); //<>//
+  setupGUI();
 
   pageOffsetSlider.setValue(absPageOffset);
   formatDropdown.setIndex(2);
@@ -227,9 +227,8 @@ void draw() {
   } 
 
   if (exportCurrentFrame) {
-    formatName = pdfwidth +"x" +pdfheight;
     if(!guiExportNow) {
-      timestamp = year() +"" +nf(month(), 2) +"" +nf(day(), 2) +"" +"-" +nf(hour(), 2) +"" +nf(minute(), 2) +"" +nf(second(), 2);
+      formatName = pdfwidth +"x" +pdfheight;
       if(!sequencing) {
         saveSettings(timestamp +"_" +name);
       }
@@ -548,6 +547,7 @@ void keyPressed() {
   } else if (keysDown['S']) {
     exportCurrentFrame = true;
     generateName();
+    generateTimestamp();
   } else if (keysDown['M']) {
     toggleMenu();
   } else if (keysDown['0']) {
