@@ -86,7 +86,7 @@ void startSequencer(boolean export) {
         exportCurrentFrame = true;
         generateName();
         generateTimestamp();
-        subfolder = timestamp +"_" +name +"_" +frames +"f/";
+        subfolder = timestamp +"_" +frames +"f/" +"_" +name;
         showInValues();
         saveSettings(timestamp +"_" +"ANIMIN" +"_" +name);
       }
