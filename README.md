@@ -54,8 +54,8 @@ R	- randomize tile-order (when multiple different tiles are used)
 X	- change cycle-order (L>R>T>B to T>B>L>R)
 N	- show/hide NFO-Graphic
 
-C	- show next frame of animated-gif-imagemap
-V	- show prev frame of animated-gif-imagemap
+C	- show prev frame of animated-gif-imagemap
+V	- show next frame of animated-gif-imagemap
 ------------------------------------------------------------------------
 ANIM
 ------------------------------------------------------------------------
