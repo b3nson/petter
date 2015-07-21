@@ -54,6 +54,8 @@ R	- randomize tile-order (when multiple different tiles are used)
 X	- change cycle-order (L>R>T>B to T>B>L>R)
 N	- show/hide NFO-Graphic
 
+C	- show next frame of animated-gif-imagemap
+V	- show prev frame of animated-gif-imagemap
 ------------------------------------------------------------------------
 ANIM
 ------------------------------------------------------------------------
@@ -78,7 +80,7 @@ P	- view/testrun animation
 - `penner.easing` - https://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://www.sojamo.de/libraries/controlP5/
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
-
+- `gifAnimation` - http://extrapixel.github.io/gif-animation/
 
 ###Known Issues:    
 DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
