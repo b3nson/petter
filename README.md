@@ -12,7 +12,8 @@ press 's' to export as PDF. Press 'h' for further help.
 See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 
 ![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
-![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") Animated PDF-sequences with (right) and without (left) animated-gif as ImageMap.
+![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
+Animated PDF-sequences with (right) and without (left) animated-gif as ImageMap.
 
 ###Keyboard Shortcuts:
 ```
