@@ -5,7 +5,7 @@ a vector-graphic-based pattern generator.
 ###Description:
 Petter is a experimental [Processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
 Use [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)-Files as input to generate, influence and export graphic patterns as PDF.    
-Jpeg/Png/Gif (also animated) can be used as a "ImageMap" to alter the pattern.    
+JPEG/PNG/GIF (also animated ones) can be used as a "ImageMap" to alter the pattern.    
 Drag and Drop SVG and Image-Files into the GUI to set input-files, use gui-controls to alter the pattern,    
 press 's' to export as PDF. Press 'h' for further help.    
 
