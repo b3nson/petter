@@ -55,112 +55,113 @@ class GuiImage extends Canvas {
   public void draw(PApplet p) {
     pushStyle();
     
-    if(map != null) {
-      if(wtmp != map.width) {
-        hh = (int)(((float)map.height / (float)map.width) * (float)(ww));
-        imgMapHeight = hh;
-        updateImgMap();
-        a = 0;
-        b = y;
-
-        if(map.height > map.width) {
-          e = ww;
-          f = (int) ((float)ww * ((float)fheight) / (float)fwidth);
-          if(f > hh) {
+    if(map.size() != 0 && mapIndex < map.size()) {
+      if(map.get(mapIndex) != null) {
+        if(wtmp != map.get(mapIndex).width) {
+          hh = (int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(ww));
+          imgMapHeight = hh;
+          updateImgMap();
+          a = 0;
+          b = y;
+  
+          if(map.get(mapIndex).height > map.get(mapIndex).width) {
+            e = ww;
+            f = (int) ((float)ww * ((float)fheight) / (float)fwidth);
+            if(f > hh) {
+              f = hh;
+              e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
+            }
+          } else {
             f = hh;
             e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
           }
-        } else {
-          f = hh;
-          e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
-        }
-    }
-
-    p.image(map, x, y, ww,  hh);
-    wtmp = map.width;
-   
-    mx = mouseX-(int)main.getPosition().x-1;
-    my = mouseY-(int)main.getPosition().y-3;
-
-    stroke(c1);
-    strokeWeight(1f);
-    cornerCol = colCorner;
-        
-    if( (mx >= a && mx <= a+e) && (my >= b && my <= b+f)  ) {
-      fill(colOver);
-      cornerCol = colCornerActive;
-      inside = true;
-      insideCorner1 = false;
-      insideCorner3 = false;
-
-      if(mx >= a+e-cornerSize && my >= b+f-cornerSize) {
-        insideCorner3 = true;
-        cornerCol = colCornerOver;
-      } else if(mx <= a+cornerSize && my <= b+cornerSize) {
-        insideCorner1 = true;
-        cornerCol = colCornerOver;
       }
-    } else {
-        inside = false;
+      
+      p.image(map.get(mapIndex), x, y, ww,  hh);
+      wtmp = map.get(mapIndex).width;
+     
+      mx = mouseX-(int)main.getPosition().x-1;
+      my = mouseY-(int)main.getPosition().y-3;
+  
+      stroke(c1);
+      strokeWeight(1f);
+      cornerCol = colCorner;
+          
+      if( (mx >= a && mx <= a+e) && (my >= b && my <= b+f)  ) {
+        fill(colOver);
+        cornerCol = colCornerActive;
+        inside = true;
         insideCorner1 = false;
         insideCorner3 = false;
-    }
-
-    if(inside && mousePressed && !drag) {
-      drag = true;
-      offsetx = mx-a;
-      offsety = my-b;
-      if(insideCorner1 == true) {
-        dragC1 = true; 
-      }
-      if(insideCorner3 == true) {
-        dragC3 = true;
-        offsetx = e-offsetx;
-        offsety = f-offsety;
-      }
-    }
-    
-    if(drag) {
-      if(mousePressed) {
-        if(dragC1 == true) {   
-          e = e-(mx-a)+offsetx;
-          f = f-(my-b)+offsety;
-          a = mx-offsetx;
-          b = my-offsety;
-        } else if(dragC3 == true) {
-          //a = mx;
-          //b = my;          
-          e = mx-a+(offsetx);
-          if(shiftPressed) {
-            stroke(colCornerOver);
-            f = (int) ((float)e * ((float)fheight) / (float)fwidth);
-          } else {
-            f = my-b+(offsety);
-          }
-        } else {
-          a = mx-offsetx;
-          b = my-offsety; 
+  
+        if(mx >= a+e-cornerSize && my >= b+f-cornerSize) {
+          insideCorner3 = true;
+          cornerCol = colCornerOver;
+        } else if(mx <= a+cornerSize && my <= b+cornerSize) {
+          insideCorner1 = true;
+          cornerCol = colCornerOver;
         }
       } else {
-       inside = false;
-       drag = false; 
-       dragC1 = false;
-       dragC3 = false;       
-       insideCorner1 = false;
-       insideCorner3 = false;
+          inside = false;
+          insideCorner1 = false;
+          insideCorner3 = false;
+      }
+  
+      if(inside && mousePressed && !drag) {
+        drag = true;
+        offsetx = mx-a;
+        offsety = my-b;
+        if(insideCorner1 == true) {
+          dragC1 = true; 
+        }
+        if(insideCorner3 == true) {
+          dragC3 = true;
+          offsetx = e-offsetx;
+          offsety = f-offsety;
+        }
+      }
+      
+      if(drag) {
+        if(mousePressed) {
+          if(dragC1 == true) {   
+            e = e-(mx-a)+offsetx;
+            f = f-(my-b)+offsety;
+            a = mx-offsetx;
+            b = my-offsety;
+          } else if(dragC3 == true) {
+            //a = mx;
+            //b = my;          
+            e = mx-a+(offsetx);
+            if(shiftPressed) {
+              stroke(colCornerOver);
+              f = (int) ((float)e * ((float)fheight) / (float)fwidth);
+            } else {
+              f = my-b+(offsety);
+            }
+          } else {
+            a = mx-offsetx;
+            b = my-offsety; 
+          }
+        } else {
+         inside = false;
+         drag = false; 
+         dragC1 = false;
+         dragC3 = false;       
+         insideCorner1 = false;
+         insideCorner3 = false;
+        }
+      }
+      a = constrain(a, x-e,ww);
+      b = constrain(b, y-f, y+hh);
+      
+      rect(a, b, e, f);
+      fill(cornerCol);
+      
+      noStroke();
+      triangle(a+1, b+1, a+cornerSize, b+1, a+1, b+cornerSize);
+      triangle(a+e, b+f, a+e-cornerSize, b+f, a+e, b+f-cornerSize);
       }
     }
-    a = constrain(a, x-e,ww);
-    b = constrain(b, y-f, y+hh);
-    
-    rect(a, b, e, f);
-    fill(cornerCol);
-    
-    noStroke();
-    triangle(a+1, b+1, a+cornerSize, b+1, a+1, b+cornerSize);
-    triangle(a+e, b+f, a+e-cornerSize, b+f, a+e, b+f-cornerSize);
-    }
-
   popStyle();
   }
 }
@@ -317,11 +318,6 @@ class DropTargetIMG extends DropListener {
   String lastUrlDropped = "y";
   void dropEvent(DropEvent theDropEvent) {
     
-    
-    //println("XXX" +droppedFile.getPath());
-    //if(lastImgDropped == droppedFile.getPath()) {
-    //  println("samesame");
-    //}
   boolean url = theDropEvent.isURL();
   boolean file = theDropEvent.isFile();
   boolean img = theDropEvent.isImage();  
@@ -365,7 +361,16 @@ class DropTargetIMG extends DropListener {
         }
       }      
       if( (lastUrlDropped.equals(lastImgDropped)) == false) {
-        map = theDropEvent.loadImage();
+        String path = theDropEvent.filePath();
+        String p = path.substring(path.lastIndexOf('.') + 1);
+        map.clear();
+        mapIndex = 0;
+        if(p.equals("gif")) {
+          ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
+          map = tmpimg;
+        } else {
+          map.add(theDropEvent.loadImage());
+        }
         imgMap.setup(app);
         updateImgMap();
       } else {

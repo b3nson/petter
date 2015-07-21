@@ -74,7 +74,7 @@ public class ColorPicker extends PApplet {
       @Override
         public void windowClosing(WindowEvent windowEvent) { 
         //curCol=startCol;
-        win.hide();
+        hide();
       }
     }
     );    
@@ -198,13 +198,13 @@ public class ColorPicker extends PApplet {
   }
 
   public void hide() {
-    noLoop();
+    this.noLoop();
     opened = false;
     win.hide();
   }
 
   public void show() {
-    loop();
+    this.loop();
     opened = true;
     initSliders(startCol);
     updatePreviewColor();

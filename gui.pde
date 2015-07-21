@@ -14,6 +14,7 @@
  */
  
 import java.util.List;
+import java.util.Arrays;
 import java.awt.Insets;
 
 CallbackListener cb;
@@ -54,7 +55,7 @@ Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTra
 Group main, style, animate, help, helptextbox;
 DropdownList penner_rot, penner_sca, penner_tra, penner_anim, formatDropdown;
 ListBox settingsFilelist;
-Button currentOver;
+Button currentOver, mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle;
@@ -484,7 +485,54 @@ void setupGUI() {
      ;
    closeImgMapButton.getCaptionLabel().setPadding(8,-14);
 
+
  ypos += gapY+imgMapHeight;
+
+
+  mapFramePrevButton = gui.addButton("f<")
+     .setLabel("<")
+     .setValue(0)
+     .setPosition(indentX+w+4,ypos)
+     .setSize(h, h)
+     .setGroup("main")
+     .hide()
+     ;
+  mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
+   
+  mapFrameNextButton = gui.addButton("f>")
+     .setLabel(">")
+     .setValue(0)
+     .setPosition(indentX+w+h+8,ypos)
+     .setSize(h, h)
+     .setGroup("main")
+     .hide()
+     ;
+  mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
+
+  ypos += gapY;
+
+  mapFrameFirstButton = gui.addButton("ffirst")
+     .setLabel("<I")
+     .setValue(0)
+     .setPosition(indentX+w+4,ypos)
+     .setSize(h, h)
+     .setGroup("main")
+     .hide()
+     ;
+  mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
+   
+  mapFrameLastButton = gui.addButton("flast")
+     .setLabel("I>")
+     .setValue(0)
+     .setPosition(indentX+w+h+8,ypos)
+     .setSize(h, h)
+     .setGroup("main")
+     .hide()
+     ;
+  mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
+
+
+  //ypos += gapY+imgMapHeight;
 
 
 // ---------------------------------------------------------------------------
@@ -742,6 +790,10 @@ void setupGUI() {
   cprop.remove(help);
   cprop.remove(helptextLabel);
   cprop.remove(helptextbox);
+  cprop.remove(mapFramePrevButton);
+  cprop.remove(mapFrameNextButton);
+  cprop.remove(mapFrameFirstButton);
+  cprop.remove(mapFrameLastButton);
   
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
@@ -943,7 +995,8 @@ void controlEvent(ControlEvent theEvent) {
     mapScale = false;
     mapRot = false;
     mapTra = false;
-    map = null;
+    map.clear();
+    //map = null;
     updateImgMap();
   } 
   else if (theEvent.isFrom(mapScaleToggle)) {
@@ -989,11 +1042,20 @@ void controlEvent(ControlEvent theEvent) {
     showOutValues();
   } 
   else if (theEvent.isFrom(clearInOutValuesButton)) {
-    println("theEvent.isFrom(clearInOutValuesButton)");
     deleteRegisteredValues();
   }      
-  
-  
+  else if (theEvent.isFrom(mapFramePrevButton)) {
+    prevImgMapFrame(); 
+  }   
+  else if (theEvent.isFrom(mapFrameNextButton)) {
+    nextImgMapFrame();
+  }
+  else if (theEvent.isFrom(mapFrameFirstButton)) {
+    firstImgMapFrame();
+  }
+  else if (theEvent.isFrom(mapFrameLastButton)) {
+    lastImgMapFrame();
+  }  
   
 } //controlEvent
 
@@ -1169,8 +1231,8 @@ void togglePageOrientation() {
 }
 
 void updateImgMap() {
-  if(map != null) {
-    style.setPosition(indentX, imgMap.y + ((int)(((float)map.height / (float)map.width) * (float)(w))) +h);
+  if(map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) {
+    style.setPosition(indentX, imgMap.y + ((int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(w))) +h);
     closeImgMapButton.show();
     mapRotToggle.show();
     mapScaleToggle.show();
@@ -1179,12 +1241,30 @@ void updateImgMap() {
     penner_sca.setVisible(!mapScale);
     penner_rot.setVisible(!mapRot);
     penner_tra.setVisible(!mapTra);
+    if(map.size() > 1) {
+      frames = map.size();
+      mapFramePrevButton.show();
+      mapFrameNextButton.show();
+      mapFrameFirstButton.show();
+      mapFrameLastButton.show();
+    } else {
+      frames = 25;
+      mapFramePrevButton.hide();
+      mapFrameNextButton.hide();
+      mapFrameFirstButton.hide();
+      mapFrameLastButton.hide();
+    }
+    animFrameNumBox.setValue(frames);
   } else {
       closeImgMapButton.hide();
       mapRotToggle.hide();
       mapScaleToggle.hide();
       mapTraToggle.hide();
       invertMapToggle.hide();
+      mapFramePrevButton.hide();
+      mapFrameNextButton.hide();
+      mapFrameFirstButton.hide();
+      mapFrameLastButton.hide();
       style.setPosition(indentX, imgMap.y);
       penner_sca.show();
       penner_rot.show();
@@ -1192,7 +1272,36 @@ void updateImgMap() {
   }
 }
 
+  void nextImgMapFrame() {
+    if(map.size() > mapIndex+1) {
+      mapIndex++;
+    }
+  }
 
+  void prevImgMapFrame() {
+    if(mapIndex != 0) {
+      mapIndex--;
+    }  
+  }
+  
+  void firstImgMapFrame() {
+      mapIndex = 0;
+  }
+  
+  void lastImgMapFrame() {
+      mapIndex = map.size()-1;
+  }
+  
+    void specImgMapFrame(int f) {
+      if(map.size() != 0) {
+        if(f < map.size()) {
+          mapIndex = f;
+        }  else {
+          mapIndex = f%map.size();
+        }
+      }
+  }
+  
 // ---------------------------------------------------------------------------
 //  FRAME RESIZING AND ZOOM
 // ---------------------------------------------------------------------------

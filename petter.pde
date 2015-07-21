@@ -17,6 +17,7 @@ import processing.pdf.*;
 import penner.easing.*;
 import controlP5.*;
 import sojamo.drop.*;
+import gifAnimation.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
 
@@ -46,11 +47,13 @@ String[] helptext;
 String name;
 
 ArrayList<PShape> svg;
+ArrayList<PImage> map;
 PShape ref;
 PShape nfo;
 PShape s;
-PImage map;
 
+//PImage map;
+int mapIndex = 0;
 int absPageOffset = 25;
 int pageOffset = 25;
 int manualOffsetX = 0;
@@ -131,7 +134,7 @@ int guiwidth = 310;
 
 void setup() {  
   frameRate(25);
-  size(fwidth+(showMENU?guiwidth:0), fheight);
+  size(fwidth+(showMENU?guiwidth:0), fheight, JAVA2D);
   if (frame != null) {
     frame.setResizable(true);
   } 
@@ -156,6 +159,7 @@ void setup() {
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
+  map = new ArrayList<PImage>();
   try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
   try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
   try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
@@ -311,7 +315,7 @@ void draw() {
   // ---------------------------------------------------  
   
   for (int i=0; i< (xaligndraw?xtilenum:ytilenum); i++) {
-    for (int j=0; j< (xaligndraw?ytilenum:xtilenum); j++) {
+    for (int j=0; j< (xaligndraw?ytilenum:xtilenum); j++ ) {
       pushMatrix();
       translate(pageOffset, pageOffset);
       translate(manualOffsetX, manualOffsetY);
@@ -319,12 +323,11 @@ void draw() {
 
       translate( (tilewidth/2)+(tilewidth*(xaligndraw?i:j)), (tileheight/2)+(tileheight*(xaligndraw?j:i)) ); //swap i/j for xalign/yaligndraw
 
-      if ((mapScale || mapRot || mapTra) && map != null) {
-
-        int cropX = (int)map((imgMap.a - imgMap.x), 0, imgMap.ww, 0, map.width);
-        int cropY = (int)map((imgMap.b - imgMap.y), 0, imgMap.hh, 0, map.height);
-        int cropW = (int)map(imgMap.e, 0, imgMap.ww, 0, map.width ) + cropX;
-        int cropH = (int)map(imgMap.f, 0, imgMap.hh, 0, map.height) + cropY;
+      if ((mapScale || mapRot || mapTra) && (map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) ) {
+        int cropX = (int)map((imgMap.a - imgMap.x), 0, imgMap.ww, 0, map.get(mapIndex).width);
+        int cropY = (int)map((imgMap.b - imgMap.y), 0, imgMap.hh, 0, map.get(mapIndex).height);
+        int cropW = (int)map(imgMap.e, 0, imgMap.ww, 0, map.get(mapIndex).width ) + cropX;
+        int cropH = (int)map(imgMap.f, 0, imgMap.hh, 0, map.get(mapIndex).height) + cropY;
 
         absScreenX = screenX(0, 0);
         absScreenY = screenY(0, 0);
@@ -332,7 +335,7 @@ void draw() {
         absScreenY = map(absScreenY, pageOffset, ((float(fwidth-(2*pageOffset)) / fwidth) * fheight)+pageOffset, cropY, cropH );
 
         try {
-          color col = map.pixels[(int)constrain(absScreenY, 0, map.height)*(int)map.width+(int)constrain(absScreenX, 0, map.width)];
+          color col = map.get(mapIndex).pixels[(int)constrain(absScreenY, 0, map.get(mapIndex).height)*(int)map.get(mapIndex).width+(int)constrain(absScreenX, 0, map.get(mapIndex).width)];
           if (col == color(0, 255, 0)) {
             popMatrix();
             popMatrix();
@@ -580,6 +583,10 @@ void keyPressed() {
     showOutValues();
   } else if (keysDown['H']) {
     toggleHelp();
+  } else if (keysDown['C']) {
+    prevImgMapFrame();
+  } else if (keysDown['V']) {
+    nextImgMapFrame();
   }
   
 }

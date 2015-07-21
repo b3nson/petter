@@ -81,12 +81,13 @@ void startSequencer(boolean export) {
   if(!sequencing) {
     if(startValuesRegistered && endValuesRegistered) {
       sequencing = true;
+      mapIndex = 0;
       if(export) {
         exportCurrentRun = true; 
         exportCurrentFrame = true;
         generateName();
         generateTimestamp();
-        subfolder = timestamp +"_" +frames +"f/" +"_" +name;
+        subfolder = timestamp +"_" +frames +"f" +"_" +name+"/";
         showInValues();
         saveSettings(timestamp +"_" +"ANIMIN" +"_" +name);
       }
@@ -145,6 +146,9 @@ void animate() {
       exportCurrentFrame = true;
       seqname = "-" +nf(fcount, 4);
     }
+    
+    specImgMapFrame(fcount);
+    
     for (int i = 0; i < animctrls.size(); i++) {
       float from = keyframeValues[i][0];
       float to =   keyframeValues[i][1];
@@ -155,7 +159,6 @@ void animate() {
           animctrls.get(i).setColorForeground(color(255, 0, 0));
         } else if(fcount == frames-1) {
           animctrls.get(i).setColorForeground(color(50));
-        //println(animctrls.get(i).getLabel() +"ANIM from: " +from +" to: " +to +"=== " +curval);
         }
       }
     }

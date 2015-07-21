@@ -55,6 +55,7 @@ public class Memento {
     String key = str(millis());
     if(deque.size() < capacity) {
       deque.offerFirst(key);
+            
       gui.getProperties().setSnapshot(key);
     } else {
        deque.pollLast(); //remove and
