@@ -109,7 +109,8 @@ String formatName = "";
 
 boolean disableStyle = false;
 float strokeWeight = 2.0;
-color[] bgcolor = {color(10,125,100)};
+//color[] bgcolor = {color(10,125,100)};
+color[] bgcolor = {color(random(255),random(255),random(255))};
 color[] strokecolor = {color(0,0,0)};
 color[] shapecolor = {color(255,255,255)};
 
@@ -165,12 +166,12 @@ void setup() {
   try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   //try { map = loadImage("album.jpg");}         catch(NullPointerException e) {}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
-  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} //<>// //<>// //<>// //<>// //<>//
+  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
 
   setupGUI();
 
   pageOffsetSlider.setValue(absPageOffset);
-  formatDropdown.setIndex(2);
+  //formatDropdown.setIndex(2);
   penner_rot.setValue(rotType);
   penner_sca.setValue(scaType);
   penner_tra.setValue(traType);
@@ -189,6 +190,11 @@ void setup() {
   println(" ");
   println("  Press M for menu");
   println("        H for help");
+  
+  checkArgs();
+  
+  gui.printControllerMap();
+  ControlP5.DEBUG = true;
 }
 
 
@@ -233,7 +239,7 @@ void draw() {
   if (exportCurrentFrame) {
     if(!guiExportNow) {
       formatName = pdfwidth +"x" +pdfheight;
-      if(!sequencing) {
+      if(!sequencing && !batchmode) {
         saveSettings(timestamp +"_" +name);
       }
     }
@@ -447,6 +453,9 @@ void draw() {
     pdf.popStyle();
     endRecord();  
     println(filename +" exported!");
+    if(batchmode) {
+      exit();  
+    }
     if(guiExport && !guiExportNow) {
       guiExportNow = true;
     } else if(guiExport && guiExportNow){

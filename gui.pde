@@ -24,6 +24,7 @@ Insets insets;
 boolean showMENU = true;
 boolean showANIMATE = false;
 boolean showHELP = false;
+boolean batchmode = false;
 
 int c = 0;
 int d = 0;
@@ -71,8 +72,8 @@ void setupGUI() {
   gui.setColorActive(c1);
   gui.setColorBackground(color(100));
   gui.setColorForeground(color(50));
-  gui.setColorLabel(color(0, 255, 0));
-  gui.setColorValue(color(255, 0, 0));
+  //gui.setColorLabel(color(0, 255, 0));
+  //gui.setColorValue(color(255, 0, 0));
   gui.setColorCaptionLabel(color(255, 255, 255));
   gui.setColorValueLabel(color(255, 255, 255));
 
@@ -100,12 +101,12 @@ void setupGUI() {
      .setSize(54, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     //.activateEvent(true)
+     ////.activateEvent(true)
      .setBackgroundColor(color(190))
      //.addItems(formatsx)
      ;
   addFormatItems(formatDropdown);
-  formatDropdown.captionLabel().style().marginTop = h/4+1;
+  //formatDropdown.getCaptionLabel().getStyle().marginTop = h/4+1;
 
      
   wBox = gui.addNumberbox("width")
@@ -315,11 +316,11 @@ void setupGUI() {
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     ////.activateEvent(true)
      .setBackgroundColor(color(190))
      ;
   addItems(penner_tra);
-  penner_tra.captionLabel().style().marginTop = h/4+1;
+  //penner_tra.getCaptionLabel().getStyle().marginTop = h/4+1;
 
   ypos += sep/2;
 
@@ -370,11 +371,11 @@ void setupGUI() {
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))     
      ;
   addItems(penner_rot);
-  penner_rot.captionLabel().style().marginTop = h/4+1;
+  penner_rot.getCaptionLabel().getStyle().marginTop = h/4+1;
   ypos += sep/2;
 
 
@@ -418,11 +419,11 @@ void setupGUI() {
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))
      ;
   addItems(penner_sca);
-  penner_sca.captionLabel().style().marginTop = h/4+1;
+  penner_sca.getCaptionLabel().getStyle().marginTop = h/4+1;
   ypos += sep;
 
 
@@ -542,7 +543,7 @@ void setupGUI() {
  style = gui.addGroup("style")
            .setPosition(indentX,ypos)
            .setBackgroundHeight(100)
-           .activateEvent(true)
+           //.activateEvent(true)
            .setGroup(main)
            //.close()
            ;
@@ -623,7 +624,7 @@ void setupGUI() {
  animate = gui.addGroup("animate")
            .setPosition(indentX, fheight-36)
            .setBackgroundHeight(100)
-           .activateEvent(true)
+           //.activateEvent(true)
            .setGroup(main)
            .close()
            ;
@@ -661,12 +662,12 @@ void setupGUI() {
      .setSize(104, 70)
      .setItemHeight(12)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))
      .setGroup("animate")
      ;
   addItems(penner_anim);
-  penner_anim.captionLabel().style().marginTop = h/4+1;
+  penner_anim.getCaptionLabel().getStyle().marginTop = h/4+1;
   
   ypos += sep;
 
@@ -695,8 +696,8 @@ void setupGUI() {
      .setLabelVisible(false)
      .setGroup("animate")
      ;
-  animFrameNumBox.getCaptionLabel().style().marginLeft = 28;
-  animFrameNumBox.getCaptionLabel().style().marginTop = -17;
+  animFrameNumBox.getCaptionLabel().getStyle().marginLeft = 28;
+  animFrameNumBox.getCaptionLabel().getStyle().marginTop = -17;
 
   animRunButton = gui.addButton("RUN")
      .setValue(0)
@@ -933,9 +934,9 @@ void controlEvent(ControlEvent theEvent) {
   }
   if (theEvent.isFrom("formats")) {
     int num = (int)theEvent.getGroup().getValue();
-
+/*
     formatDropdown.setColorBackground(color(100));
-    formatDropdown.getItem(num).setColorBackground(c1);
+    //formatDropdown.getItem(num).setColorBackground(c1);
 
     if(formatDropdown.getItem(num).getText() == "CUSTOM") {
       wBox.setLock(false);
@@ -951,29 +952,30 @@ void controlEvent(ControlEvent theEvent) {
         canvasResize();  
       }
     }
+    */
   } 
   else if (theEvent.isFrom("rotType")) {
     rotType = (int)theEvent.getGroup().getValue();
     penner_rot.setColorBackground(color(100));
-    penner_rot.getItem(rotType).setColorBackground(c1);
+    //penner_rot.getItem(rotType).setColorBackground(c1);
   }   
   else if (theEvent.isFrom("scaType")) {
     scaType = (int)theEvent.getGroup().getValue();
     penner_sca.setColorBackground(color(100));
-    penner_sca.getItem(scaType).setColorBackground(c1);
+    //penner_sca.getItem(scaType).setColorBackground(c1);
   }
   else if (theEvent.isFrom("traType")) {
     traType = (int)theEvent.getGroup().getValue();
     penner_tra.setColorBackground(color(100));
-    penner_tra.getItem(traType).setColorBackground(c1);
+    //penner_tra.getItem(traType).setColorBackground(c1);
   }    
   else if (theEvent.isFrom("animType")) {
     animType = (int)theEvent.getGroup().getValue();
     penner_anim.setColorBackground(color(100));
-    penner_anim.getItem(traType).setColorBackground(c1);
+    //penner_anim.getItem(traType).setColorBackground(c1);
   } 
   else if(theEvent.isFrom("style")) {
-    toggleSvgStyle();
+    toggleSvggetStyle();
     disableStyle = !disableStyle;
   } 
   else if(theEvent.isFrom(pageOrientationToggle)) {
@@ -988,7 +990,7 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
   else if (theEvent.isFrom(settingsFilelist)) {
-    int val = (int)theEvent.group().value();
+    int val = (int)theEvent.group().getValue();
     loadSettings((String)settingFiles.get(val), true);
   } 
   else if (theEvent.isFrom(closeImgMapButton)) {
@@ -1018,7 +1020,7 @@ void controlEvent(ControlEvent theEvent) {
     canvasResize();
   }
   else if(theEvent.isFrom("animate")) {
-    if(gui.group("animate").isOpen())
+    if(gui.getGroup("animate").isOpen())
       openAnimate();
     else
       closeAnimate();
@@ -1073,7 +1075,7 @@ void catchMouseover() {
         if(currentOver == null || currentOver != overs.get(i)) {
          currentOver = (Button)overs.get(i);
          
-          int val = (int)currentOver.value();
+          int val = (int)currentOver.getValue();
           loadSettings((String)settingFiles.get(val), false);
         break;
         }
@@ -1094,7 +1096,7 @@ void catchMouseover() {
 
 
 void toggleHelp() {
-  showHELP = !(gui.group("help").isOpen());
+  showHELP = !(gui.getGroup("help").isOpen());
   if (showHELP) {
     help.open();
   } else {
@@ -1103,7 +1105,7 @@ void toggleHelp() {
 }
 
 void toggleAnimate() {
-  showANIMATE = !(gui.group("animate").isOpen());
+  showANIMATE = !(gui.getGroup("animate").isOpen());
   if (showANIMATE) {
     openAnimate();
   } else {
@@ -1122,19 +1124,19 @@ void closeAnimate() {
 }
 
 void toggleMenu() {
-  showMENU = !(gui.group("main").isOpen());
+  showMENU = !(gui.getGroup("main").isOpen());
   insets = frame.getInsets();
   if (showMENU) {
     frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
-    gui.group("main").open();
+    gui.getGroup("main").open();
   } else {
     frame.setSize(fwidth, fheight+insets.top);
-    gui.group("main").close();
+    gui.getGroup("main").close();
   }
 }
 
-void toggleSvgStyle() {
+void toggleSvggetStyle() {
   if (!disableStyle) {
     for (int i = 0; i < svg.size (); i++) {
       svg.get(i).disableStyle();
@@ -1157,6 +1159,8 @@ void changebgcolor(float i) {
   } else {
     bg_copi.show(); 
   }
+  //gui.getProperties().print();
+  gui.printControllerMap();
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
@@ -1326,10 +1330,10 @@ void resizeFrame(int newW, int newH) {
     newH = fheight+insets.top;
   }
   frame.setSize(newW, newH);
-  gui.group("main").setPosition(fwidth+12,10);
-  gui.group("animate").setPosition(indentX, fheight-36- (gui.group("animate").isOpen()?80:0) );
-  gui.group("help").setSize(fwidth, fheight+1);
-  gui.group("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
+  gui.getGroup("main").setPosition(fwidth+12,10);
+  gui.getGroup("animate").setPosition(indentX, fheight-36- (gui.getGroup("animate").isOpen()?80:0) );
+  gui.getGroup("help").setSize(fwidth, fheight+1);
+  gui.getGroup("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
   
   dropSVGadd.updateTargetRect(fwidth, fheight);
   dropSVGrep.updateTargetRect(fwidth, fheight);
@@ -1375,14 +1379,14 @@ void toggleSettings() {
       .setItemHeight(15)
       .setBarHeight(15);
   
-    //settingsFilelist.captionLabel().toUpperCase(true);
-    settingsFilelist.captionLabel().set("LAST SAVED SETTINGS");
-    settingsFilelist.captionLabel().setColor(0xffffffff);
-    settingsFilelist.captionLabel().style().marginTop = 3;
-    settingsFilelist.valueLabel().style().marginTop = 3;
+    //settingsFilelist.getCaptionLabel().toUpperCase(true);
+    settingsFilelist.getCaptionLabel().set("LAST SAVED SETTINGS");
+    settingsFilelist.getCaptionLabel().setColor(0xffffffff);
+    settingsFilelist.getCaptionLabel().getStyle().marginTop = 3;
+    settingsFilelist.getValueLabel().getStyle().marginTop = 3;
   
     for (int i = 0; i < settingFiles.size(); i++) {
-      ListBoxItem lbi = settingsFilelist.addItem((String)(settingFiles.get(i)), i);
+      //ListBoxItem lbi = settingsFilelist.addItem((String)(settingFiles.get(i)), i);
     }
     gui.getProperties().remove(settingsFilelist);
     settingsBoxOpened = true;
@@ -1396,6 +1400,7 @@ void toggleSettings() {
 }
 
 void loadSettings(String filename, boolean close) {
+  //gui.getProperties().getSnapshot(settingspath +filename).print();
   gui.loadProperties(settingspath +filename);
   if(close) {
     settingsFilelist.close();
@@ -1407,7 +1412,7 @@ void loadSettings(String filename, boolean close) {
 void saveSettings(String timestamp) {
   //gui.setFormat(ControllerProperties.Format);    
    gui.saveProperties(settingspath +timestamp +".ser");
-   //println(gui.getProperties().get());
+   gui.getProperties().print();
 }
 
 void loadDefaultSettings() {
@@ -1434,9 +1439,43 @@ void findSettingFiles() {
 //  GENERAL UTIL
 // ---------------------------------------------------------------------------
 
+void checkArgs() {
+  boolean firstSer = true;
+  boolean firstSvg = true;
+  
+  if(args != null && args.length > 0) {
+    for(int i=0; i<args.length; i++) {
+      String ext = args[i].substring(args[i].lastIndexOf('.') + 1);
+      if(ext.equals("svg")) {
+        if(firstSvg) {
+          firstSvg = false;
+          svg.clear();
+        }
+        try { 
+          svg.add(loadShape(args[i]));
+        } catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+      } else if(ext.equals("ser")) {
+        if(firstSer) {
+          firstSer = false;
+          gui.loadProperties(args[i]);
+        }
+      }
+    }
+    if(!firstSer || !firstSvg) {
+      batchmode = true;
+      undo.setUndoStep();
+      generateName();
+      generateTimestamp();
+      exportCurrentFrame = true;
+    }
+  }
+}
+
 void generateName() {
     randomSeed(mouseX*mouseY*frameCount);
-    if(names != null) {
+    if(batchmode) {
+      name = "petterbatch";
+    } else if(names != null) {
       name = names[int(random((float)names.length))];
     } else {
       name = "petter"; 
