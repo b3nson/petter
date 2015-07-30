@@ -1167,7 +1167,9 @@ void controlEvent(ControlEvent theEvent) {
     shapecolorBang.setColorForeground(shapecolor[0]);
   }
   else if (theEvent.isFrom(styleSaveLabel)) {
-    if( customStyle != boolean(int(styleSaveLabel.getValue())) ) {
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(styleSaveLabel.getValue());
+    if( customStyle != boolean(val) ) {
       if(customStyle) {
         disableCustomStyle();
         style.close();
@@ -1178,7 +1180,9 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
   else if (theEvent.isFrom(loopDirectionSaveLabel)) {
-    loopDirection = boolean(int(loopDirectionSaveLabel.getValue()));
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(loopDirectionSaveLabel.getValue());
+    loopDirection = boolean(val);
   }
   else if (theEvent.isFrom(offsetxSaveLabel)) {
     manualOffsetX = offsetxSaveLabel.getValue();
