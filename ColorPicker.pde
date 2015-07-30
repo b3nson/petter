@@ -147,9 +147,9 @@ public class ColorPicker extends PApplet {
       .setPosition(300, 236)
         .setSize(40, 30)
           .setId(2)
-     //       .plugTo(parent, "open")
               ;
-    cancelButton = cp5.addButton("XX")
+    cancelButton = cp5.addButton("CANCEL")
+      .setLabel("X")
       .setPosition(342, 236)
         .setSize(18, 30)
           .setId(3)
@@ -219,9 +219,6 @@ prop.remove(s2D);
     initSliders(startCol);
     updatePreviewColor();
     win.show();
-    
-    //cp5.getProperties().print();
-    cp5.printControllerMap();
   }
 
   void updatePreviewColor() {
@@ -279,36 +276,28 @@ prop.remove(s2D);
     }
   }
 
+  private void closeAndApply() {
+    startCol=curCol;
+    srccol[0] = curCol;
+    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+  }
 
-// from previous version, where the colorpicker didn't operate directly on 
-// the actual colorvariable of the mainapp
-//
-//  public color getColorRGB() {
-//    //colorMode(RGB);
-//    if(preview) {
-//      return color(red(curCol), green(curCol), blue(curCol));
-//    } else {
-//      return color(red(startCol), green(startCol), blue(startCol));
-//    }
-//  }
-//
-//  public color getColorHSB() {
-//    //colorMode(HSB);
-//    if(preview) {    
-//      return color(hue(curCol), saturation(curCol), brightness(curCol));
-//    } else {
-//      return color(hue(startCol), saturation(startCol), brightness(startCol));
-//    }
-//  }
+  private void closeAndCancel() {
+    curCol=startCol;
+    srccol[0] = startCol;
+    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+  }
 
 
   void keyPressed() {
     if (key == RETURN || key == ENTER) {
       //okButton.trigger();
+      closeAndApply();
     } else if (key == ESC || keyCode==ESC) {
       key=0;
       keyCode=0;
       //cancelButton.trigger();
+      closeAndCancel();
     }
   }
 

@@ -257,7 +257,7 @@ class DropTargetSVG extends DropListener {
       if (path.toLowerCase().endsWith(".svg")) {
         println("SVG: " +path);
         PShape sh = loadShape(path);
-        if(disableStyle) sh.disableStyle();
+        if(customStyle) sh.disableStyle();
         tmpsvg.add(sh);
         
         if (addmode) {
@@ -316,11 +316,12 @@ class DropTargetIMG extends DropListener {
   
   String lastImgDropped = "x";
   String lastUrlDropped = "y";
+  
   void dropEvent(DropEvent theDropEvent) {
     
-  boolean url = theDropEvent.isURL();
-  boolean file = theDropEvent.isFile();
-  boolean img = theDropEvent.isImage();  
+    boolean url = theDropEvent.isURL();
+    boolean file = theDropEvent.isFile();
+    boolean img = theDropEvent.isImage();  
   
   //println("------------------------------------------");
   //println("isURL: " +theDropEvent.isURL()); 
@@ -451,3 +452,5 @@ class DropTargetNFO extends DropListener {
   }
   
 }//class DropTarget
+
+
