@@ -1527,7 +1527,12 @@ void toggleSettings() {
     if(settingsFilelist != null) {
       settingsFilelist.remove();
     }
-    findSettingFiles();
+    try {
+      findSettingFiles();
+    } catch(NullPointerException e) {
+      //no settings-folder
+      return; 
+    }
     
     settingsFilelist = new ScrollableListPlus(gui, "filelist");
     settingsFilelist// = gui.addDropdownList("filelist")
