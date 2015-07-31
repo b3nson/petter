@@ -147,13 +147,23 @@ public class ColorPicker extends PApplet {
       .setPosition(300, 236)
         .setSize(40, 30)
           .setId(2)
-            .plugTo(parent, "open")
               ;
-    cancelButton = cp5.addButton("X")
+    cancelButton = cp5.addButton("CANCEL")
+      .setLabel("X")
       .setPosition(342, 236)
         .setSize(18, 30)
           .setId(3)
             ;
+
+ControllerProperties prop = cp5.getProperties();
+prop.remove(cancelButton);
+prop.remove(okButton);
+prop.remove(previewToggle);
+prop.remove(hexValueLabel);
+prop.remove(hsbValueLabel);
+prop.remove(rgbValueLabel);
+prop.remove(s1D);
+prop.remove(s2D);
 
     //initSliders(startCol);
     show();
@@ -174,8 +184,8 @@ public class ColorPicker extends PApplet {
     fill(startCol);
     rect(300, 50, 60, 40);
     
-    int xpos = (int)s1D.getPosition().x;
-    int ypos = (int)s1D.getPosition().y;
+    int xpos = (int)s1D.getPosition()[0];
+    int ypos = (int)s1D.getPosition()[1];
 
     loadPixels();
     for ( int j = 0; j < 255; j++ ) {
@@ -184,8 +194,8 @@ public class ColorPicker extends PApplet {
       }
     }
 
-    xpos = (int)s2D.getPosition().x;
-    ypos = (int)s2D.getPosition().y;
+    xpos = (int)s2D.getPosition()[0];
+    ypos = (int)s2D.getPosition()[1];
 
     loadPixels();
     for ( int j = 0; j < 255; j++ ) { 
@@ -266,36 +276,28 @@ public class ColorPicker extends PApplet {
     }
   }
 
+  private void closeAndApply() {
+    startCol=curCol;
+    srccol[0] = curCol;
+    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+  }
 
-// from previous version, where the colorpicker didn't operate directly on 
-// the actual colorvariable of the mainapp
-//
-//  public color getColorRGB() {
-//    //colorMode(RGB);
-//    if(preview) {
-//      return color(red(curCol), green(curCol), blue(curCol));
-//    } else {
-//      return color(red(startCol), green(startCol), blue(startCol));
-//    }
-//  }
-//
-//  public color getColorHSB() {
-//    //colorMode(HSB);
-//    if(preview) {    
-//      return color(hue(curCol), saturation(curCol), brightness(curCol));
-//    } else {
-//      return color(hue(startCol), saturation(startCol), brightness(startCol));
-//    }
-//  }
+  private void closeAndCancel() {
+    curCol=startCol;
+    srccol[0] = startCol;
+    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+  }
 
 
   void keyPressed() {
     if (key == RETURN || key == ENTER) {
-      okButton.trigger();
+      //okButton.trigger();
+      closeAndApply();
     } else if (key == ESC || keyCode==ESC) {
       key=0;
       keyCode=0;
-      cancelButton.trigger();
+      //cancelButton.trigger();
+      closeAndCancel();
     }
   }
 
@@ -325,7 +327,7 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
     theApplet = a;
   }
   
-  public void display(PApplet theAppletx, Slider2D theController) {
+  public void display(PGraphics g, Slider2D theController) {
 
     theApplet.noStroke();
     theApplet.noFill();
@@ -352,8 +354,8 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
     theApplet.fill(theController.getColor().getActive());
     theApplet.rect((int) theController.getCursorX(), (int) theController.getCursorY(), (int) theController.getCursorWidth(), (int) theController.getCursorHeight());
 
-    theController.getCaptionLabel().draw(theApplet, 0, 0, theController);
-    theController.getValueLabel().draw(theApplet, 0, 0, theController);
+    theController.getCaptionLabel().draw(g, 0, 0, theController);
+    theController.getValueLabel().draw(g, 0, 0, theController);
   }
 }
 
@@ -391,7 +393,7 @@ class ColorSlider1DView implements ControllerView<Slider> {
   //                }
 
 
-  public void display(PApplet theAppletx, Slider theController) {
+  public void display(PGraphics g, Slider theController) {
     // theApplet.fill(theController.getColor().getBackground());
     theApplet.noStroke();
     //if ((theController.getColor().getBackground() >> 24 & 0xff) > 0) {
@@ -413,10 +415,10 @@ class ColorSlider1DView implements ControllerView<Slider> {
     }
 
     if (theController.isLabelVisible()) {
-      theController.getCaptionLabel().draw(theApplet, 0, 0, theController);
+      theController.getCaptionLabel().draw(g, 0, 0, theController);
       theApplet.pushMatrix();
       //theApplet.translate(0, (int) PApplet.map(_myValue, _myMax, _myMin, 0, getHeight() - _myValueLabel.getHeight()));
-      theController.getValueLabel().draw(theApplet, 0, 0, theController);
+      theController.getValueLabel().draw(g, 0, 0, theController);
       theApplet.popMatrix();
     }
 

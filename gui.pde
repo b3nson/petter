@@ -17,13 +17,16 @@ import java.util.List;
 import java.util.Arrays;
 import java.awt.Insets;
 
-CallbackListener cb;
+CallbackListener cbAllUndo, cbDropdownHover;
 GuiImage imgMap;
 Insets insets;
 
 boolean showMENU = true;
 boolean showANIMATE = false;
 boolean showHELP = false;
+boolean batchmode = false;
+boolean batchnow = false;
+int batchwait = 1;
 
 int c = 0;
 int d = 0;
@@ -39,29 +42,31 @@ int w = 180;
 int imgMapHeight = 0;
 int tickMarks = 11;
 
-//color c1 = color(218, 78, 57);    // red
 color c1 = color(16, 181, 198);    // blue
 color c2 = color(60, 105, 97, 180);// green
 color c3 = color(200, 200, 200);  //lightgray for separatorlines
 
 ArrayList settingFiles;
 
-Boolean settingsBoxOpened = false;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
 Slider last;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider;
 Group main, style, animate, help, helptextbox;
-DropdownList penner_rot, penner_sca, penner_tra, penner_anim, formatDropdown;
-ListBox settingsFilelist;
-Button currentOver, mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
+ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
+ScrollableList penner_anim, formatDropdown;
+Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel;
 Numberbox wBox, hBox, animFrameNumBox;
+//save values to hidden controllers to get saved in properties 
+Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel;
+Slider offsetxSaveLabel, offsetySaveLabel;
 
+Controller currentOver; // still needed???
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP
@@ -71,8 +76,8 @@ void setupGUI() {
   gui.setColorActive(c1);
   gui.setColorBackground(color(100));
   gui.setColorForeground(color(50));
-  gui.setColorLabel(color(0, 255, 0));
-  gui.setColorValue(color(255, 0, 0));
+  //gui.setColorLabel(color(0, 255, 0));
+  //gui.setColorValue(color(255, 0, 0));
   gui.setColorCaptionLabel(color(255, 255, 255));
   gui.setColorValueLabel(color(255, 255, 255));
 
@@ -94,18 +99,20 @@ void setupGUI() {
    
   ypos += 10;
   
-  formatDropdown = gui.addDropdownList("formats")
+  //formatDropdown = new ScrollableList(gui, "formats");
+  formatDropdown = gui.addScrollableList("formats")
      .setGroup(main)
-     .setPosition(indentX, ypos+21)
+     .setPosition(indentX, ypos)
      .setSize(54, 300)
      .setItemHeight(h)
      .setBarHeight(h)
      //.activateEvent(true)
      .setBackgroundColor(color(190))
-     //.addItems(formatsx)
+     .setType(ControlP5.DROPDOWN)
+     .close();
      ;
   addFormatItems(formatDropdown);
-  formatDropdown.captionLabel().style().marginTop = h/4+1;
+  //formatDropdown.getCaptionLabel().getStyle().marginTop = h/4+1;
 
      
   wBox = gui.addNumberbox("width")
@@ -307,21 +314,24 @@ void setupGUI() {
      .setGroup(main)
      ;  
      styleLabel(relTransYSlider, "relative trans Y");
-  ypos += gapY+gapY;
+  ypos += gapY;
   
-  penner_tra = gui.addDropdownList("traType")
+  penner_tra = new ScrollableListPlus(gui, "traType");
+  penner_tra// = gui.addScrollableList("traType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     ////.activateEvent(true)
      .setBackgroundColor(color(190))
+     .setType(ControlP5.DROPDOWN)
+     .close();
      ;
   addItems(penner_tra);
-  penner_tra.captionLabel().style().marginTop = h/4+1;
+  //penner_tra.getCaptionLabel().getStyle().marginTop = h/4+1;
 
-  ypos += sep/2;
+  ypos += sep;
 
 
 
@@ -362,22 +372,23 @@ void setupGUI() {
      ;  
      styleLabel(relRotSlider, "relative rot");
 
-  ypos += gapY+gapY;
+  ypos += gapY;
 
-  penner_rot = gui.addDropdownList("rotType")
+  penner_rot = new ScrollableListPlus(gui, "rotType");
+  penner_rot// = gui.addScrollableList("rotType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))     
+     .setType(ControlP5.DROPDOWN)
+     .close();
      ;
   addItems(penner_rot);
-  penner_rot.captionLabel().style().marginTop = h/4+1;
-  ypos += sep/2;
-
-
+  //penner_rot.getCaptionLabel().getStyle().marginTop = h/4+1;
+  ypos += sep;  
 
 
   absScaSlider = gui.addSlider("absScale")
@@ -410,26 +421,85 @@ void setupGUI() {
      .setGroup(main)
      ; 
      styleLabel(relScaSlider, "relative scale");
-  ypos += gapY+gapY;
+  ypos += gapY;
 
-  penner_sca = gui.addDropdownList("scaType")
+  penner_sca = new ScrollableListPlus(gui, "scaType");
+  penner_sca// = gui.addScrollableList("scaType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))
+     .setType(ControlP5.DROPDOWN)
+     .close();
      ;
   addItems(penner_sca);
-  penner_sca.captionLabel().style().marginTop = h/4+1;
+  //penner_sca.getCaptionLabel().getStyle().marginTop = h/4+1;
   ypos += sep;
+
+
+
+// ---------------------------------------------------------------------------
+//  GUI SETUP - SAVELABELS - Workaround to save additional values in cp5-properties 
+// ---------------------------------------------------------------------------
+
+
+  bgcolorSaveLabel = gui.addNumberbox("bgcolorSaveLabel" )
+     .setPosition(0, 0)
+     .setValue(bgcolor[0])
+     .setGroup(main)
+     .hide()
+     ;
+  strokecolorSaveLabel  = gui.addNumberbox("strokecolorSaveLabel" )
+     .setPosition(0, 0)
+     .setValue(strokecolor[0])
+     .setGroup(main)
+     .hide()
+     ;
+  shapecolorSaveLabel  = gui.addNumberbox("shapecolorSaveLabel" )
+     .setPosition(0, 0)
+     .setValue(shapecolor[0])
+     .setGroup(main)
+     .hide()
+     ;
+  styleSaveLabel = gui.addNumberbox("styleSaveLabel" )
+     .setPosition(0, 0)
+     .setValue((int(customStyle)))
+     .setGroup(main)
+     .hide()
+     ;
+
+  loopDirectionSaveLabel = gui.addNumberbox("loopDirectionSaveLabel" )
+     .setPosition(0, 0)
+     .setValue((int(loopDirection)))
+     .setGroup(main)
+     .hide()
+     ;
+     
+  offsetxSaveLabel = gui.addSlider("offsetxSaveLabel" )
+     .setPosition(0, 0)
+     .setRange(-5000f, 5000f)
+     .setValue(manualOffsetX)
+     .setGroup(main)
+     .hide()
+     ;
+
+  offsetySaveLabel = gui.addSlider("offsetySaveLabel" )
+   .setPosition(0, 0)
+   .setRange(-5000f, 5000f)
+   .setValue(manualOffsetY)
+   .setGroup(main)
+   .hide()
+   ;
 
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP - IMGMAP MENU
 // ---------------------------------------------------------------------------
-
+  
+  ypos += gapY;
   imgMap = new GuiImage(indentX, ypos);
   imgMap.pre();
   main.addCanvas(imgMap);
@@ -544,16 +614,16 @@ void setupGUI() {
            .setBackgroundHeight(100)
            .activateEvent(true)
            .setGroup(main)
-           //.close()
+           .close()
            ;
-  if(disableStyle) style.open();
+  if(customStyle) style.open();
   else style.close();
   
   ypos += gapY;
 
-  strokeToggle = gui.addToggle("stroke")
+  strokeToggle = gui.addToggle("customStroke")
      .setLabel("X")
-     .setValue(stroke)
+     .setValue(customStroke)
      .setPosition(indentX,indentY)
      .setSize(h,h)
      .setMode(ControlP5.SWITCH_BACK)
@@ -580,7 +650,7 @@ void setupGUI() {
      strokecolorBang.setColorForeground(strokecolor[0]);
 
   
-  strokeWeightSlider = gui.addSlider("strokeWeight")
+  strokeWeightSlider = gui.addSlider("customStrokeWeight")
      .setLabel("strokeWeight")
      .setPosition(indentX+4.5*h,indentY)
      .setSize(w-4*h,h)
@@ -596,9 +666,9 @@ void setupGUI() {
      ;   
      styleLabel(strokeWeightSlider, "strokeoptions");     
      
-  fillToggle = gui.addToggle("fill")
+  fillToggle = gui.addToggle("customFill")
      .setLabel("X")
-     .setValue(fill)
+     .setValue(customFill)
      .setPosition(indentX,indentY+sep)
      .setSize(h,h)
      .setMode(ControlP5.SWITCH_BACK)
@@ -655,18 +725,21 @@ void setupGUI() {
      ;
   clearInOutValuesButton.getCaptionLabel().setPadding(3,-14);
   
-    
-  penner_anim = gui.addDropdownList("animType")
-     .setPosition(indentX+4*h, ypos+h+1)
+  
+  //penner_anim = new ScrollableList(gui, "animType");
+  penner_anim = gui.addScrollableList("animType")
+     .setPosition(indentX+4*h, ypos)
      .setSize(104, 70)
      .setItemHeight(12)
      .setBarHeight(h)
-     .activateEvent(true)
+     //.activateEvent(true)
      .setBackgroundColor(color(190))
      .setGroup("animate")
+     .setType(ControlP5.DROPDOWN)
+     .close();
      ;
   addItems(penner_anim);
-  penner_anim.captionLabel().style().marginTop = h/4+1;
+  //penner_anim.getCaptionLabel().getStyle().marginTop = h/4+1;
   
   ypos += sep;
 
@@ -695,8 +768,8 @@ void setupGUI() {
      .setLabelVisible(false)
      .setGroup("animate")
      ;
-  animFrameNumBox.getCaptionLabel().style().marginLeft = 28;
-  animFrameNumBox.getCaptionLabel().style().marginTop = -17;
+  animFrameNumBox.getCaptionLabel().getStyle().marginLeft = 28;
+  animFrameNumBox.getCaptionLabel().getStyle().marginTop = -17;
 
   animRunButton = gui.addButton("RUN")
      .setValue(0)
@@ -754,17 +827,29 @@ void setupGUI() {
     }
   }
 
-
+     
 // ---------------------------------------------------------------------------
 //  GUI SETUP - FINAL CLEANUP
 // --------------------------------------------------------------------------- 
 
-  cb = new CallbackListener() {
+  cbAllUndo = new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-       callbackEvent(theEvent);
+       callbackUndoAction(theEvent);
     }
   }; 
-  gui.addCallback(cb);
+  gui.addCallback(cbAllUndo);
+
+  cbDropdownHover = new CallbackListener() {
+    public void controlEvent(CallbackEvent theEvent) {
+       callbackDropdownHover(theEvent);
+    }
+  }; 
+  penner_tra.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  penner_rot.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  penner_sca.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  //settingsFilelist not created yet. Created on userinput (Key 0)
+  //settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+
   
   formatDropdown.bringToFront();
   penner_sca.bringToFront();
@@ -813,8 +898,11 @@ void setupGUI() {
   registerForAnimation(absScaSlider); 
   registerForAnimation(relScaSlider);
   registerForAnimation(strokeWeightSlider);
-
-
+  registerForAnimation(offsetxSaveLabel);
+  registerForAnimation(offsetySaveLabel);  
+  
+  cprop.setFormat(ControlP5Constants.JSON);
+  
   dragOffset = gui.addTextlabel("dragoffset" )
      .setPosition(indentX, fheight-31)
      .setText("OFFSET: 0 x 0")
@@ -835,14 +923,14 @@ void setupGUI() {
 
 
 
-void addFormatItems(DropdownList l) {
+void addFormatItems(ScrollableList l) {
   l.addItem("CUSTOM",  0);
   for(int i=0; i<formats.length; i++) {
     l.addItem(formats[i][0], i+1);
   }
 }
 
-void addItems(DropdownList l) {
+void addItems(ScrollableList l) {
 l.addItem("Linear.easeIn   ",  0);
 l.addItem("Linear.easeOut  ",  1);
 l.addItem("Linear.easeInOut",  2);
@@ -911,17 +999,69 @@ void styleLabel(Controller c, String text) {
 //  GUI GENERAL EVENTHANDLING
 // ---------------------------------------------------------------------------
 
-void callbackEvent(CallbackEvent theEvent) {
+int orgType = -1;
+int tmpType = -1;
+
+void callbackDropdownHover(CallbackEvent theEvent) {
+  ScrollableListPlus c = (ScrollableListPlus)theEvent.getController();
+   
+  if(theEvent.getAction() == ControlP5.ACTION_MOVE) {
+    tmpType = c.getItemHover();
+    if(tmpType == -1) {   
+        tmpType = orgType;
+    }
+    if(c.equals(penner_tra)) {
+      traType = tmpType;
+    } else if(c.equals(penner_rot)) {
+      rotType = tmpType;
+    } else if(c.equals(penner_sca)) {
+      scaType = tmpType;
+    } else if(c.equals(settingsFilelist)) {
+      if(tmpType >= settingsFilelist.getItems().size()) tmpType = orgType;
+      if(tmpType == -1) {
+        gui.getProperties().getSnapshot("tmp");
+      } else {
+        loadSettings((String)settingFiles.get(tmpType), false);
+      }
+    }
+  } 
+  else if(theEvent.getAction() == ControlP5.ACTION_ENTER) {
+    tmpType = -1;
+    orgType = (int)c.getValue();
+    if(c.equals(settingsFilelist)) {
+       gui.getProperties().setSnapshot("tmp");
+       orgType = -1;
+    }
+  } 
+  else if(theEvent.getAction() == ControlP5.ACTION_LEAVE) {       
+    if(c.equals(penner_tra)) {
+      traType = orgType;
+    } else if(c.equals(penner_rot)) {
+      rotType = orgType;
+    } else if(c.equals(penner_sca)) {
+      scaType = orgType;
+    } else if(c.equals(settingsFilelist)) {
+      gui.getProperties().getSnapshot("tmp");
+    }
+    tmpType = -1;
+    orgType = -1;
+  }
+}
+
+
+void callbackUndoAction(CallbackEvent theEvent) {
+//println("CALLBACK: " +theEvent.getController() +"ACTION: " +theEvent.getAction());
   if (theEvent.getAction() == ControlP5.ACTION_RELEASED || theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
     if(theEvent.getController().getParent() != animate && 
        theEvent.getController().getParent() != penner_anim) {
           undo.setUndoStep();      
        }
-  } 
+  }
 }
 
+
 void controlEvent(ControlEvent theEvent) {
- 
+
   if(theEvent.isController() && theEvent.getController() instanceof Slider) {
    Slider tmp =  (Slider)theEvent.getController();
    if(tmp != xTileNumSlider && tmp != yTileNumSlider) {
@@ -932,19 +1072,20 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
   if (theEvent.isFrom("formats")) {
-    int num = (int)theEvent.getGroup().getValue();
+    int num = (int)theEvent.getController().getValue();
 
     formatDropdown.setColorBackground(color(100));
-    formatDropdown.getItem(num).setColorBackground(c1);
-
-    if(formatDropdown.getItem(num).getText() == "CUSTOM") {
+    //formatDropdown.getItem(num).setColorBackground(c1);
+    if(formatDropdown.getItem(num).get("text").equals("CUSTOM")) {
       wBox.setLock(false);
       hBox.setLock(false);
     } else {
       wBox.setLock(true);
       hBox.setLock(true);
-      int ww = int(formats[formatDropdown.getItem(num).getValue()-1][pageOrientation?1:2]);
-      int hh = int(formats[formatDropdown.getItem(num).getValue()-1][pageOrientation?2:1]);
+      
+      int ww = int(formats[num-1][pageOrientation?1:2]);
+      int hh = int(formats[num-1][pageOrientation?2:1]);
+   
       if(ww != fwidth || hh != fheight) {
         wBox.setValue(ww);
         hBox.setValue(hh);
@@ -953,28 +1094,32 @@ void controlEvent(ControlEvent theEvent) {
     }
   } 
   else if (theEvent.isFrom("rotType")) {
-    rotType = (int)theEvent.getGroup().getValue();
+    rotType = (int)theEvent.getController().getValue();
     penner_rot.setColorBackground(color(100));
-    penner_rot.getItem(rotType).setColorBackground(c1);
+    //penner_rot.getItem(rotType).setColorBackground(c1);
   }   
   else if (theEvent.isFrom("scaType")) {
-    scaType = (int)theEvent.getGroup().getValue();
+    scaType = (int)theEvent.getController().getValue();
     penner_sca.setColorBackground(color(100));
-    penner_sca.getItem(scaType).setColorBackground(c1);
+    //penner_sca.getItem(scaType).setColorBackground(c1);
   }
   else if (theEvent.isFrom("traType")) {
-    traType = (int)theEvent.getGroup().getValue();
+    traType = (int)theEvent.getController().getValue();
     penner_tra.setColorBackground(color(100));
-    penner_tra.getItem(traType).setColorBackground(c1);
+    //penner_tra.getItem(traType).setColorBackground(c1);
   }    
   else if (theEvent.isFrom("animType")) {
-    animType = (int)theEvent.getGroup().getValue();
+    animType = (int)theEvent.getController().getValue();
     penner_anim.setColorBackground(color(100));
-    penner_anim.getItem(traType).setColorBackground(c1);
+    //penner_anim.getItem(traType).setColorBackground(c1);
   } 
   else if(theEvent.isFrom("style")) {
-    toggleSvgStyle();
-    disableStyle = !disableStyle;
+    if(customStyle) {
+      disableCustomStyle();
+    } else {
+      enableCustomStyle();
+    }
+    styleSaveLabel.setValue((int(customStyle)));
   } 
   else if(theEvent.isFrom(pageOrientationToggle)) {
     if(pageOrientation) {
@@ -988,7 +1133,7 @@ void controlEvent(ControlEvent theEvent) {
     }
   }
   else if (theEvent.isFrom(settingsFilelist)) {
-    int val = (int)theEvent.group().value();
+    int val = (int)theEvent.getController().getValue();
     loadSettings((String)settingFiles.get(val), true);
   } 
   else if (theEvent.isFrom(closeImgMapButton)) {
@@ -1018,7 +1163,7 @@ void controlEvent(ControlEvent theEvent) {
     canvasResize();
   }
   else if(theEvent.isFrom("animate")) {
-    if(gui.group("animate").isOpen())
+    if(gui.getGroup("animate").isOpen())
       openAnimate();
     else
       closeAnimate();
@@ -1055,37 +1200,49 @@ void controlEvent(ControlEvent theEvent) {
   }
   else if (theEvent.isFrom(mapFrameLastButton)) {
     lastImgMapFrame();
-  }  
-  
+  } 
+  else if (theEvent.isFrom(bgcolorSaveLabel)) {
+    bgcolor[0] = int(bgcolorSaveLabel.getValue());
+    bgcolorBang.setColorForeground(bgcolor[0]);
+  }
+  else if (theEvent.isFrom(strokecolorSaveLabel)) {
+    strokecolor[0] = int(strokecolorSaveLabel.getValue());
+    strokecolorBang.setColorForeground(strokecolor[0]);
+  }
+  else if (theEvent.isFrom(shapecolorSaveLabel)) {
+    shapecolor[0] = int(shapecolorSaveLabel.getValue());
+    shapecolorBang.setColorForeground(shapecolor[0]);
+  }
+  else if (theEvent.isFrom(styleSaveLabel)) {
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(styleSaveLabel.getValue());
+    if( customStyle != boolean(val) ) {
+      if(customStyle) {
+        disableCustomStyle();
+        style.close();
+      } else {
+        enableCustomStyle();
+        style.open(); 
+      }
+    }
+  }
+  else if (theEvent.isFrom(loopDirectionSaveLabel)) {
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(loopDirectionSaveLabel.getValue());
+    loopDirection = boolean(val);
+  }
+  else if (theEvent.isFrom(offsetxSaveLabel)) {
+    manualOffsetX = offsetxSaveLabel.getValue();
+    dragOffset.setText("OFFSET: " +(int)manualOffsetX +" x " +(int)manualOffsetY);
+  }
+  else if (theEvent.isFrom(offsetySaveLabel)) {
+    manualOffsetY = offsetySaveLabel.getValue();
+    dragOffset.setText("OFFSET: " +(int)manualOffsetX +" x " +(int)manualOffsetY);
+  }
+
 } //controlEvent
 
 
-void catchMouseover() {
-  List overs = gui.getWindow().getMouseOverList();
-  ControllerInterface over = gui.getWindow().getFirstFromMouseOverList();
- 
-  if(over == settingsFilelist) {
-    if(currentOver == null) {
-      gui.getProperties().setSnapshot("tmp");
-    }
-    for(int i = 0; i<overs.size(); i++)
-      if(overs.get(i) instanceof controlP5.Button) {
-        if(currentOver == null || currentOver != overs.get(i)) {
-         currentOver = (Button)overs.get(i);
-         
-          int val = (int)currentOver.value();
-          loadSettings((String)settingFiles.get(val), false);
-        break;
-        }
-      }
-    
-  } else {
-    if(currentOver != null) {
-      gui.getProperties().getSnapshot("tmp");
-      currentOver = null;
-    }
-  }
-}
 
 
 // ---------------------------------------------------------------------------
@@ -1094,7 +1251,7 @@ void catchMouseover() {
 
 
 void toggleHelp() {
-  showHELP = !(gui.group("help").isOpen());
+  showHELP = !(gui.getGroup("help").isOpen());
   if (showHELP) {
     help.open();
   } else {
@@ -1103,7 +1260,7 @@ void toggleHelp() {
 }
 
 void toggleAnimate() {
-  showANIMATE = !(gui.group("animate").isOpen());
+  showANIMATE = !(gui.getGroup("animate").isOpen());
   if (showANIMATE) {
     openAnimate();
   } else {
@@ -1122,27 +1279,29 @@ void closeAnimate() {
 }
 
 void toggleMenu() {
-  showMENU = !(gui.group("main").isOpen());
+  showMENU = !(gui.getGroup("main").isOpen());
   insets = frame.getInsets();
   if (showMENU) {
     frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
-    gui.group("main").open();
+    gui.getGroup("main").open();
   } else {
     frame.setSize(fwidth, fheight+insets.top);
-    gui.group("main").close();
+    gui.getGroup("main").close();
   }
 }
 
-void toggleSvgStyle() {
-  if (!disableStyle) {
-    for (int i = 0; i < svg.size (); i++) {
-      svg.get(i).disableStyle();
-    }
-  } else {
-    for (int i = 0; i < svg.size (); i++) {
-      svg.get(i).enableStyle();
-    }
+void disableCustomStyle() {
+  customStyle = false;
+  for (int i = 0; i < svg.size (); i++) {
+    svg.get(i).enableStyle();
+  }
+}
+
+void enableCustomStyle() {
+  customStyle = true;
+  for (int i = 0; i < svg.size (); i++) {
+    svg.get(i).disableStyle();
   }
 }
 
@@ -1265,7 +1424,7 @@ void updateImgMap() {
       mapFrameNextButton.hide();
       mapFrameFirstButton.hide();
       mapFrameLastButton.hide();
-      style.setPosition(indentX, imgMap.y);
+      style.setPosition(indentX, imgMap.y+gapY);
       penner_sca.show();
       penner_rot.show();
       penner_tra.show();
@@ -1292,14 +1451,14 @@ void updateImgMap() {
       mapIndex = map.size()-1;
   }
   
-    void specImgMapFrame(int f) {
-      if(map.size() != 0) {
-        if(f < map.size()) {
-          mapIndex = f;
-        }  else {
-          mapIndex = f%map.size();
-        }
+  void specImgMapFrame(int f) {
+    if(map.size() != 0) {
+      if(f < map.size()) {
+        mapIndex = f;
+      }  else {
+        mapIndex = f%map.size();
       }
+    }
   }
   
 // ---------------------------------------------------------------------------
@@ -1326,10 +1485,10 @@ void resizeFrame(int newW, int newH) {
     newH = fheight+insets.top;
   }
   frame.setSize(newW, newH);
-  gui.group("main").setPosition(fwidth+12,10);
-  gui.group("animate").setPosition(indentX, fheight-36- (gui.group("animate").isOpen()?80:0) );
-  gui.group("help").setSize(fwidth, fheight+1);
-  gui.group("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
+  gui.getGroup("main").setPosition(fwidth+12,10);
+  gui.getGroup("animate").setPosition(indentX, fheight-36- (gui.getGroup("animate").isOpen()?80:0) );
+  gui.getGroup("help").setSize(fwidth, fheight+1);
+  gui.getGroup("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
   
   dropSVGadd.updateTargetRect(fwidth, fheight);
   dropSVGrep.updateTargetRect(fwidth, fheight);
@@ -1338,6 +1497,8 @@ void resizeFrame(int newW, int newH) {
 
   dragOffset.setPosition(indentX, fheight-31);
   zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
+  
+  gui.update();
 }
 
 void scaleGUI(boolean bigger) {
@@ -1368,50 +1529,56 @@ void toggleSettings() {
     }
     findSettingFiles();
     
-    settingsFilelist = gui.addListBox("filelist")
-//      .setPosition(width/2-90, 200)
-      .setPosition(20, 40)
+    settingsFilelist = new ScrollableListPlus(gui, "filelist");
+    settingsFilelist// = gui.addDropdownList("filelist")
+      .setPosition(30, 30)
+      //.setSize(180, fheight-60)
       .setSize(180, 260)
       .setItemHeight(15)
-      .setBarHeight(15);
+      .setBarHeight(20)
+      .setType(ControlP5.DROPDOWN);
   
-    //settingsFilelist.captionLabel().toUpperCase(true);
-    settingsFilelist.captionLabel().set("LAST SAVED SETTINGS");
-    settingsFilelist.captionLabel().setColor(0xffffffff);
-    settingsFilelist.captionLabel().style().marginTop = 3;
-    settingsFilelist.valueLabel().style().marginTop = 3;
+    settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  
+    //settingsFilelist.getCaptionLabel().toUpperCase(true);
+    settingsFilelist.getCaptionLabel().set("LAST SAVED SETTINGS");
+    settingsFilelist.getCaptionLabel().setColor(0xffffffff);
+    settingsFilelist.getCaptionLabel().getStyle().marginTop = 3;
+    settingsFilelist.getValueLabel().getStyle().marginTop = 3;
   
     for (int i = 0; i < settingFiles.size(); i++) {
-      ListBoxItem lbi = settingsFilelist.addItem((String)(settingFiles.get(i)), i);
+      settingsFilelist.addItem((String)(settingFiles.get(i)), i);
     }
+
     gui.getProperties().remove(settingsFilelist);
-    settingsBoxOpened = true;
  } 
  else {
+    gui.getProperties().getSnapshot("tmp");
     settingsFilelist.close();
     settingsFilelist.hide();
     currentOver = null;
-    settingsBoxOpened = false;
  } 
 }
 
 void loadSettings(String filename, boolean close) {
-  gui.loadProperties(settingspath +filename);
+  //gui.getProperties().getSnapshot(settingspath +filename).print();
+  try {
+    gui.loadProperties(settingspath +filename);
+  } catch(NullPointerException e) {}
   if(close) {
     settingsFilelist.close();
     settingsFilelist.hide();
-    settingsBoxOpened = false;
   }
+  
 }
 
-void saveSettings(String timestamp) {
-  //gui.setFormat(ControllerProperties.Format);    
-   gui.saveProperties(settingspath +timestamp +".ser");
-   //println(gui.getProperties().get());
+void saveSettings(String timestamp) {    
+   gui.saveProperties(settingspath +timestamp +".json");
+   //gui.getProperties().print();
 }
 
 void loadDefaultSettings() {
-  gui.loadProperties("default.ser");
+  gui.loadProperties("default.json");
 }
 
 
@@ -1421,7 +1588,7 @@ void findSettingFiles() {
   settingFiles = new ArrayList(); 
   for (int k = 0; k < allFiles.length; k++) {
     String file = allFiles[k];
-    if (file.indexOf(".ser") != -1) {
+    if (file.indexOf(".json") != -1) {
       settingFiles.add(file);
     }
   }
@@ -1434,9 +1601,41 @@ void findSettingFiles() {
 //  GENERAL UTIL
 // ---------------------------------------------------------------------------
 
+void checkArgs() {
+  boolean firstSer = true;
+  boolean firstSvg = true;
+  
+  if(args != null && args.length > 0) {
+    for(int i=0; i<args.length; i++) {
+      String ext = args[i].substring(args[i].lastIndexOf('.') + 1);
+      if(ext.equals("svg")) {
+        if(firstSvg) {
+          firstSvg = false;
+          svg.clear();
+        }
+        try { 
+          svg.add(loadShape(args[i]));
+        } catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+      } else if(ext.equals("json")) {
+        if(firstSer) {
+          firstSer = false;
+          gui.loadProperties(args[i]);
+        }
+      }
+    }
+    if(!firstSer || !firstSvg) {
+      batchmode = true;
+      batchnow = false;
+      undo.setUndoStep();
+    }
+  }
+}
+
 void generateName() {
     randomSeed(mouseX*mouseY*frameCount);
-    if(names != null) {
+    if(batchmode) {
+      name = "petterbatch";
+    } else if(names != null) {
       name = names[int(random((float)names.length))];
     } else {
       name = "petter"; 

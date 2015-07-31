@@ -52,7 +52,7 @@ class GuiImage extends Canvas {
     wtmp = 0;
   }  
 
-  public void draw(PApplet p) {
+  public void draw(PGraphics g) {
     pushStyle();
     
     if(map.size() != 0 && mapIndex < map.size()) {
@@ -77,11 +77,11 @@ class GuiImage extends Canvas {
           }
       }
       
-      p.image(map.get(mapIndex), x, y, ww,  hh);
+      g.image(map.get(mapIndex), x, y, ww,  hh);
       wtmp = map.get(mapIndex).width;
      
-      mx = mouseX-(int)main.getPosition().x-1;
-      my = mouseY-(int)main.getPosition().y-3;
+      mx = mouseX-(int)main.getPosition()[0]-1;
+      my = mouseY-(int)main.getPosition()[1]-3;
   
       stroke(c1);
       strokeWeight(1f);
@@ -257,7 +257,7 @@ class DropTargetSVG extends DropListener {
       if (path.toLowerCase().endsWith(".svg")) {
         println("SVG: " +path);
         PShape sh = loadShape(path);
-        if(disableStyle) sh.disableStyle();
+        if(customStyle) sh.disableStyle();
         tmpsvg.add(sh);
         
         if (addmode) {
@@ -316,11 +316,12 @@ class DropTargetIMG extends DropListener {
   
   String lastImgDropped = "x";
   String lastUrlDropped = "y";
+  
   void dropEvent(DropEvent theDropEvent) {
     
-  boolean url = theDropEvent.isURL();
-  boolean file = theDropEvent.isFile();
-  boolean img = theDropEvent.isImage();  
+    boolean url = theDropEvent.isURL();
+    boolean file = theDropEvent.isFile();
+    boolean img = theDropEvent.isImage();  
   
   //println("------------------------------------------");
   //println("isURL: " +theDropEvent.isURL()); 
@@ -451,3 +452,26 @@ class DropTargetNFO extends DropListener {
   }
   
 }//class DropTarget
+
+
+// ---------------------------------------------------------------------------
+//  ScrollableListPlus - temporarily till controlP5-lib makes itemHover in ScrollableList visible
+// ---------------------------------------------------------------------------
+
+class ScrollableListPlus extends ScrollableList {
+
+  ScrollableListPlus( ControlP5 theControlP5, String theName ) {
+    super(theControlP5, theName);
+    registerProperty( "value" );
+  }
+
+  public ScrollableListPlus setValue( float theValue ) {
+    super.setValue(theValue);
+    return this;
+  }
+
+  int getItemHover() {
+    return itemHover;
+  }
+}
+

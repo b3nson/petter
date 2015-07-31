@@ -20,6 +20,7 @@ import sojamo.drop.*;
 import gifAnimation.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+import java.util.*;
 
 static int ROT = 0;
 static int TRA = 1;
@@ -56,12 +57,12 @@ PShape s;
 int mapIndex = 0;
 int absPageOffset = 25;
 int pageOffset = 25;
-int manualOffsetX = 0;
-int manualOffsetY = 0;
 int manualNFOX = 0;
 int manualNFOY = 0;
 int xtilenum = 8;
 int ytilenum = 10;
+float manualOffsetX = 0;
+float manualOffsetY = 0;
 float tilewidth, tileheight, tilescale;
 float absTransX = 0;
 float absTransY = 0;
@@ -76,13 +77,14 @@ float relRot = 90;
 float absScale = 1.0;
 float relScale = 0.0;
 float relsca = 0.0;
+float customStrokeWeight = 2.0;
 boolean mapScale = false;
 boolean mapRot = false;
 boolean mapTra = false;
 boolean invertMap = false;
 boolean strokeMode = true;
-boolean stroke = true;
-boolean fill = true;
+boolean customStroke = true;
+boolean customFill = true;
 boolean random = false;
 boolean dragAllowed = false;
 boolean showRef = false;
@@ -95,7 +97,7 @@ int seed = 0;
 float mapValue = 0f;
 
 int abscount = 0;
-boolean xaligndraw = false;
+boolean loopDirection = false; //false = X before Y | true = Y before X
 boolean shift = false;
 int rotType = 0;
 int scaType = 0;
@@ -107,9 +109,9 @@ String timestamp = "";
 String filename = "";
 String formatName = "";
 
-boolean disableStyle = false;
-float strokeWeight = 2.0;
-color[] bgcolor = {color(10,125,100)};
+boolean customStyle = false;
+
+color[] bgcolor = {color(random(255),random(255),random(255))};
 color[] strokecolor = {color(0,0,0)};
 color[] shapecolor = {color(255,255,255)};
 
@@ -165,12 +167,12 @@ void setup() {
   try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   //try { map = loadImage("album.jpg");}         catch(NullPointerException e) {}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
-  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} //<>// //<>// //<>// //<>// //<>//
+  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
 
   setupGUI();
 
   pageOffsetSlider.setValue(absPageOffset);
-  formatDropdown.setIndex(2);
+  formatDropdown.setValue(2);
   penner_rot.setValue(rotType);
   penner_sca.setValue(scaType);
   penner_tra.setValue(traType);
@@ -178,6 +180,7 @@ void setup() {
   showRefToggle.setState(showRef);
   showNfoToggle.setState(showNfo);
   nfoLayerToggle.setState(nfoOnTop);
+  //strokeWeightSlider.setValue(strokeWeight);
   last = null;
 
   undo.setUndoStep();
@@ -189,6 +192,9 @@ void setup() {
   println(" ");
   println("  Press M for menu");
   println("        H for help");
+  
+  checkArgs();
+  ControlP5.DEBUG = false;
 }
 
 
@@ -197,7 +203,7 @@ void setup() {
 // ---------------------------------------------------------------------------
 
 void draw() {
-  
+
   if(sequencing) {
     animate();  
   }
@@ -212,18 +218,15 @@ void draw() {
     leaveShiftMode();
     last = null;
   }
-  if (settingsBoxOpened) {
-    catchMouseover();
-  }
 
-  if (disableStyle) {
-    if(stroke) {
+  if (customStyle) {
+    if(customStroke) {
       stroke(strokecolor[0]);
-      strokeWeight(strokeWeight);
+      strokeWeight(customStrokeWeight);
     } else {
        noStroke(); 
     }
-    if(fill) {
+    if(customFill) {
       fill(shapecolor[0]);
     } else {
       noFill(); 
@@ -233,7 +236,7 @@ void draw() {
   if (exportCurrentFrame) {
     if(!guiExportNow) {
       formatName = pdfwidth +"x" +pdfheight;
-      if(!sequencing) {
+      if(!sequencing && !batchmode) {
         saveSettings(timestamp +"_" +name);
       }
     }
@@ -248,14 +251,14 @@ void draw() {
     beginRecord(pdf); 
     pdf.shapeMode(CENTER);   
     pdf.pushStyle();
-    if (disableStyle) {
-      if(stroke) {
+    if (customStyle) {
+      if(customStroke) {
         pdf.stroke(strokecolor[0]);
-        pdf.strokeWeight(strokeWeight);
+        pdf.strokeWeight(customStrokeWeight);
       } else {
         pdf.noStroke(); 
       }
-      if(fill) {
+      if(customFill) {
         pdf.fill(shapecolor[0]);
       } else {
         pdf.noFill(); 
@@ -270,13 +273,16 @@ void draw() {
 
   if(bg_copi != null && bg_copi.isOpen()) {
     bgcolorBang.setColorForeground(bgcolor[0]);
+    bgcolorSaveLabel.setValue((bgcolor[0]));
   }
-  if(disableStyle) {
+  if(customStyle) {
     if(stroke_copi != null && stroke_copi.isOpen()) {
       strokecolorBang.setColorForeground(strokecolor[0]);
+      strokecolorSaveLabel.setValue((strokecolor[0]));
     }
     if(shape_copi != null && shape_copi.isOpen()) {
       shapecolorBang.setColorForeground(shapecolor[0]);
+      shapecolorSaveLabel.setValue((shapecolor[0]));
     }
   }
   
@@ -314,14 +320,14 @@ void draw() {
   // MAIN LOOP
   // ---------------------------------------------------  
   
-  for (int i=0; i< (xaligndraw?xtilenum:ytilenum); i++) {
-    for (int j=0; j< (xaligndraw?ytilenum:xtilenum); j++ ) {
+  for (int i=0; i< (loopDirection?xtilenum:ytilenum); i++) {
+    for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
       pushMatrix();
       translate(pageOffset, pageOffset);
       translate(manualOffsetX, manualOffsetY);
       pushMatrix();
 
-      translate( (tilewidth/2)+(tilewidth*(xaligndraw?i:j)), (tileheight/2)+(tileheight*(xaligndraw?j:i)) ); //swap i/j for xalign/yaligndraw
+      translate( (tilewidth/2)+(tilewidth*(loopDirection?i:j)), (tileheight/2)+(tileheight*(loopDirection?j:i)) ); //swap i/j for xalign/yaligndraw
 
       if ((mapScale || mapRot || mapTra) && (map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) ) {
         int cropX = (int)map((imgMap.a - imgMap.x), 0, imgMap.ww, 0, map.get(mapIndex).width);
@@ -394,10 +400,10 @@ void draw() {
       }
 
       //setRelativeStrokeWeight
-      if (disableStyle && stroke && !strokeMode) {
+      if (customStyle && customStroke && !strokeMode) {
         float sw = ((relsca)*(absScale)*(tilescale));
         if(sw != 0f) {
-          sw = abs(strokeWeight*(1/sw));
+          sw = abs(customStrokeWeight*(1/sw));
         } else {
           sw = 0f; 
         }
@@ -413,7 +419,7 @@ void draw() {
       if (random) {
         s = svg.get(int(random(svg.size())));
       } else {
-        s = svg.get( (((xaligndraw?ytilenum:xtilenum)*i)+j)%svg.size() );
+        s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
       }
       if (s != null) {
         shape(s);
@@ -447,6 +453,9 @@ void draw() {
     pdf.popStyle();
     endRecord();  
     println(filename +" exported!");
+    if(batchmode && batchnow) {
+      exit();  
+    }
     if(guiExport && !guiExportNow) {
       guiExportNow = true;
     } else if(guiExport && guiExportNow){
@@ -465,6 +474,17 @@ void draw() {
     gui.draw();
   }
 
+  if(batchmode) {
+    if(batchwait > 0) {
+       batchwait--; 
+    } else {
+      generateName();
+      generateTimestamp();
+      batchnow = true;
+      exportCurrentFrame = true;
+    }
+  }
+  
   shapeMode(CENTER);
   noStroke();
   
@@ -472,7 +492,8 @@ void draw() {
   dropSVGrep.draw();
   dropIMG.draw();
   dropNFO.draw();
-  //dragOffset.draw();
+  
+ 
 }//DRAW END
 
 
@@ -481,15 +502,13 @@ void draw() {
 // ---------------------------------------------------------------------------
 
 void mouseMoved() {
+  //for testing-purposes
   //pageOffset = int((mouseX));
   //absScale = (float(mouseX)/100f);
   //relScale = (float(mouseX)/100f);
-
   //absTransX = (mouseX-(width/2))*2;
   //absTransY = (mouseY-(height/2))*2;
-
   //relTrans = (mouseX);
-
   //absRot = mouseX;
   //relRot = mouseY;
   //xtilenum = mouseX/10;
@@ -508,7 +527,9 @@ void mouseDragged ( ) {
   if (dragAllowed && mouseButton == LEFT) {
     manualOffsetX -= pmouseX-mouseX;
     manualOffsetY -= pmouseY-mouseY;
-    dragOffset.setText("OFFSET: " +manualOffsetX +" x " +manualOffsetY);
+    dragOffset.setText("OFFSET: " +(int)manualOffsetX +" x " +(int)manualOffsetY);
+    offsetxSaveLabel.setValue(manualOffsetX);
+    offsetySaveLabel.setValue(manualOffsetY);
   } else if(dragAllowed && mouseButton == RIGHT) {
     manualNFOX -= pmouseX-mouseX;
     manualNFOY -= pmouseY-mouseY;
@@ -546,7 +567,8 @@ void keyPressed() {
   } else if (keysDown['Y']) {
     undo.redo();
   } else if (keysDown['X']) {
-    xaligndraw = !xaligndraw;
+    loopDirection = !loopDirection;
+    loopDirectionSaveLabel.setValue((int(loopDirection)));
   } else if (keysDown['S']) {
     exportCurrentFrame = true;
     generateName();

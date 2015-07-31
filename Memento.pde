@@ -44,7 +44,7 @@ public class Memento {
   }
 
   public void setUndoStep() {
-    //when not on head of undo-list, remove head-elements when new Action is triggered
+    //when not on head of undo-list, remove head-elements on new undo-step
     if(index != 0) {
        for(int i = 0; i<index ; i++) {
         deque.pollFirst();
@@ -52,11 +52,10 @@ public class Memento {
        index = 0;
     }
     
-    String key = str(millis());
+    String id = str(millis());
     if(deque.size() < capacity) {
-      deque.offerFirst(key);
-            
-      gui.getProperties().setSnapshot(key);
+      deque.offerFirst(id);
+      gui.getProperties().setSnapshot(id);
     } else {
        deque.pollLast(); //remove and
        setUndoStep();   //try again
