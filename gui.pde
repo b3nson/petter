@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.awt.Insets;
 
-CallbackListener cb;
+CallbackListener cbAllUndo, cbDropdownHover;
 GuiImage imgMap;
 Insets insets;
 
@@ -48,14 +48,14 @@ color c3 = color(200, 200, 200);  //lightgray for separatorlines
 
 ArrayList settingFiles;
 
-Boolean settingsBoxOpened = false;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
 Slider last;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider;
 Group main, style, animate, help, helptextbox;
-ScrollableList penner_rot, penner_sca, penner_tra, penner_anim, formatDropdown, settingsFilelist;
+ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
+ScrollableList penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
@@ -316,8 +316,8 @@ void setupGUI() {
      styleLabel(relTransYSlider, "relative trans Y");
   ypos += gapY;
   
-  //penner_tra = new ScrollableList(gui, "traType");
-  penner_tra = gui.addScrollableList("traType")
+  penner_tra = new ScrollableListPlus(gui, "traType");
+  penner_tra// = gui.addScrollableList("traType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -374,8 +374,8 @@ void setupGUI() {
 
   ypos += gapY;
 
-  //penner_rot = new ScrollableList(gui, "rotType");
-  penner_rot = gui.addScrollableList("rotType")
+  penner_rot = new ScrollableListPlus(gui, "rotType");
+  penner_rot// = gui.addScrollableList("rotType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -423,8 +423,8 @@ void setupGUI() {
      styleLabel(relScaSlider, "relative scale");
   ypos += gapY;
 
-  //penner_sca = new ScrollableList(gui, "scaType");
-  penner_sca = gui.addScrollableList("scaType")
+  penner_sca = new ScrollableListPlus(gui, "scaType");
+  penner_sca// = gui.addScrollableList("scaType")
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -832,12 +832,24 @@ void setupGUI() {
 //  GUI SETUP - FINAL CLEANUP
 // --------------------------------------------------------------------------- 
 
-  cb = new CallbackListener() {
+  cbAllUndo = new CallbackListener() {
     public void controlEvent(CallbackEvent theEvent) {
-       callbackEvent(theEvent);
+       callbackUndoAction(theEvent);
     }
   }; 
-  gui.addCallback(cb);
+  gui.addCallback(cbAllUndo);
+
+  cbDropdownHover = new CallbackListener() {
+    public void controlEvent(CallbackEvent theEvent) {
+       callbackDropdownHover(theEvent);
+    }
+  }; 
+  penner_tra.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  penner_rot.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  penner_sca.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+  //settingsFilelist not created yet. Created on userinput (Key 0)
+  //settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
+
   
   formatDropdown.bringToFront();
   penner_sca.bringToFront();
@@ -987,7 +999,57 @@ void styleLabel(Controller c, String text) {
 //  GUI GENERAL EVENTHANDLING
 // ---------------------------------------------------------------------------
 
-void callbackEvent(CallbackEvent theEvent) {
+int orgType = -1;
+int tmpType = -1;
+
+void callbackDropdownHover(CallbackEvent theEvent) {
+  ScrollableListPlus c = (ScrollableListPlus)theEvent.getController();
+   
+  if(theEvent.getAction() == ControlP5.ACTION_MOVE) {
+    tmpType = c.getItemHover();
+    if(tmpType == -1) {   
+        tmpType = orgType;
+    }
+    if(c.equals(penner_tra)) {
+      traType = tmpType;
+    } else if(c.equals(penner_rot)) {
+      rotType = tmpType;
+    } else if(c.equals(penner_sca)) {
+      scaType = tmpType;
+    } else if(c.equals(settingsFilelist)) {
+      if(tmpType >= settingsFilelist.getItems().size()) tmpType = orgType;
+      if(tmpType == -1) {
+        gui.getProperties().getSnapshot("tmp");
+      } else {
+        loadSettings((String)settingFiles.get(tmpType), false);
+      }
+    }
+  } 
+  else if(theEvent.getAction() == ControlP5.ACTION_ENTER) {
+    tmpType = -1;
+    orgType = (int)c.getValue();
+    if(c.equals(settingsFilelist)) {
+       gui.getProperties().setSnapshot("tmp");
+       orgType = -1;
+    }
+  } 
+  else if(theEvent.getAction() == ControlP5.ACTION_LEAVE) {       
+    if(c.equals(penner_tra)) {
+      traType = orgType;
+    } else if(c.equals(penner_rot)) {
+      rotType = orgType;
+    } else if(c.equals(penner_sca)) {
+      scaType = orgType;
+    } else if(c.equals(settingsFilelist)) {
+      gui.getProperties().getSnapshot("tmp");
+    }
+    tmpType = -1;
+    orgType = -1;
+  }
+}
+
+
+void callbackUndoAction(CallbackEvent theEvent) {
 //println("CALLBACK: " +theEvent.getController() +"ACTION: " +theEvent.getAction());
   if (theEvent.getAction() == ControlP5.ACTION_RELEASED || theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
     if(theEvent.getController().getParent() != animate && 
@@ -995,23 +1057,8 @@ void callbackEvent(CallbackEvent theEvent) {
           undo.setUndoStep();      
        }
   }
-  /*
-  else if(theEvent.getAction() == ControlP5.ACTION_ENTER) {
-    if(theEvent.getController().equals(settingsFilelist)) {
-      settingListHover = true; 
-    }
-  }
-  else if(theEvent.getAction() == ControlP5.ACTION_LEAVE) {
-    if(theEvent.getController().equals(settingsFilelist)) {
-      settingListHover = false; 
-      if(settingsFilelist.isOpen()) {
-        //gui.getProperties().getSnapshot("tmp");
-        settingsTmpSaved = false;
-      }
-    }
-  } 
-  */
 }
+
 
 void controlEvent(ControlEvent theEvent) {
 
@@ -1195,35 +1242,6 @@ void controlEvent(ControlEvent theEvent) {
 
 } //controlEvent
 
-
-void catchMouseover() {
-  /*
-  List overs = gui.getWindow().getMouseOverList();
-  ControllerInterface over = gui.getWindow().getFirstFromMouseOverList();
- 
-  if(over == settingsFilelist) {
-    if(currentOver == null) {
-      gui.getProperties().setSnapshot("tmp");
-    }
-    for(int i = 0; i<overs.size(); i++)
-      if(overs.get(i) instanceof controlP5.ScrollableList) {
-        if(currentOver == null || currentOver != overs.get(i)) {
-         currentOver = (ScrollableList)overs.get(i);
-         
-          int val = (int)currentOver.getValue();
-          loadSettings((String)settingFiles.get(val), false);
-        break;
-        }
-      }
-    
-  } else {
-    if(currentOver != null) {
-      gui.getProperties().getSnapshot("tmp");
-      currentOver = null;
-    }
-  }
-  */
-}
 
 
 
@@ -1511,7 +1529,7 @@ void toggleSettings() {
     }
     findSettingFiles();
     
-    settingsFilelist = new ScrollableList(gui, "filelist");
+    settingsFilelist = new ScrollableListPlus(gui, "filelist");
     settingsFilelist// = gui.addDropdownList("filelist")
       .setPosition(30, 30)
       //.setSize(180, fheight-60)
@@ -1519,6 +1537,8 @@ void toggleSettings() {
       .setItemHeight(15)
       .setBarHeight(20)
       .setType(ControlP5.DROPDOWN);
+  
+    settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
   
     //settingsFilelist.getCaptionLabel().toUpperCase(true);
     settingsFilelist.getCaptionLabel().set("LAST SAVED SETTINGS");
@@ -1531,24 +1551,25 @@ void toggleSettings() {
     }
 
     gui.getProperties().remove(settingsFilelist);
-    settingsBoxOpened = true;
  } 
  else {
+    gui.getProperties().getSnapshot("tmp");
     settingsFilelist.close();
     settingsFilelist.hide();
     currentOver = null;
-    settingsBoxOpened = false;
  } 
 }
 
 void loadSettings(String filename, boolean close) {
   //gui.getProperties().getSnapshot(settingspath +filename).print();
-  gui.loadProperties(settingspath +filename);
+  try {
+    gui.loadProperties(settingspath +filename);
+  } catch(NullPointerException e) {}
   if(close) {
     settingsFilelist.close();
     settingsFilelist.hide();
-    settingsBoxOpened = false;
   }
+  
 }
 
 void saveSettings(String timestamp) {    

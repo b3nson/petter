@@ -454,3 +454,24 @@ class DropTargetNFO extends DropListener {
 }//class DropTarget
 
 
+// ---------------------------------------------------------------------------
+//  ScrollableListPlus - temporarily till controlP5-lib makes itemHover in ScrollableList visible
+// ---------------------------------------------------------------------------
+
+class ScrollableListPlus extends ScrollableList {
+
+  ScrollableListPlus( ControlP5 theControlP5, String theName ) {
+    super(theControlP5, theName);
+    registerProperty( "value" );
+  }
+
+  public ScrollableListPlus setValue( float theValue ) {
+    super.setValue(theValue);
+    return this;
+  }
+
+  int getItemHover() {
+    return itemHover;
+  }
+}
+

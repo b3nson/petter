@@ -218,9 +218,6 @@ void draw() {
     leaveShiftMode();
     last = null;
   }
-  if (settingsBoxOpened) {
-    catchMouseover();
-  }
 
   if (customStyle) {
     if(customStroke) {
