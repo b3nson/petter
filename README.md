@@ -13,7 +13,7 @@ See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 
 ![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
 ![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
-Animated PDF-sequences with (right) and without (left) animated-gif as ImageMap.
+Animated PDF-sequences with (bottom) and without (top) animated-gif as ImageMap.
 
 ###Keyboard Shortcuts:
 ```
@@ -76,12 +76,18 @@ P	- view/testrun animation
 - Download/clone Petter to your Processing Sketch-Directory.
 - Download and install external libraries (see below).
 
+  Currently runs with Procesing 2.2.1 and 3.0a5 (not newer)
+
 
 ### Use of contributed Libraries:
-- `penner.easing` - https://github.com/jesusgollonet/processing-penner-easing
-- `controlP5` - http://www.sojamo.de/libraries/controlP5/
+- `penner.easing` - http://github.com/jesusgollonet/processing-penner-easing
+- `controlP5` - http://github.com/sojamo/controlp5
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
 - `gifAnimation` - http://extrapixel.github.io/gif-animation/
+
+###Command-Line-Options:
+soon...
+
 
 ###Known Issues:    
 DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
