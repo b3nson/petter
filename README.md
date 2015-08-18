@@ -76,7 +76,7 @@ P	- view/testrun animation
 - Download/clone Petter to your Processing Sketch-Directory.
 - Download and install external libraries (see below).
 
-  Currently runs with Procesing 2.2.1 and 3.0a5 (not newer)
+Currently runs with Procesing 2.2.1 and 3.0a5 (not newer).
 
 
 ### Use of contributed Libraries:
