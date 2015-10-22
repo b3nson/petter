@@ -12,7 +12,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
- 
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Frame;
@@ -20,7 +20,7 @@ import java.awt.BorderLayout;
 
 public class ColorPicker extends PApplet {
 
-  final Frame win;
+  //final Frame win;
   PApplet parent;
 
   private ControlP5 cp5;
@@ -34,10 +34,10 @@ public class ColorPicker extends PApplet {
   color startCol;  
   color curCol;
   color[] srccol;
-  
+
   boolean opened = true;
   boolean preview = true;
-  
+
   ColorSlider2DView satpick;
   ColorSlider1DView huepick;
 
@@ -57,29 +57,33 @@ public class ColorPicker extends PApplet {
     curCol = col[0];
     srccol = col;
     name = theName;
-    win = new Frame(theName);
-    win.add(this);
-    this.init();
-    win.setTitle(theName);
-    win.setSize(this.w, this.h);
-    win.setLocationRelativeTo(null);    
-    //win.setLocation(frame.getLocation().x, frame.getLocation().y);
-    //win.setUndecorated(true);
-    win.setResizable(true);
-    win.setVisible(true);
+    //win = new Frame(theName);
+    //win.add(this);
+    //this.init();
+    //win.setTitle(theName);
+    //win.setSize(this.w, this.h);
+    //win.setLocationRelativeTo(null);    
+    ////win.setLocation(frame.getLocation().x, frame.getLocation().y);
+    ////win.setUndecorated(true);
+    //win.setResizable(true);
+    //win.setVisible(true);
   }  
 
-  void setup() {    
-    win.addWindowListener(new WindowAdapter() {
-      @Override
-        public void windowClosing(WindowEvent windowEvent) { 
-        //curCol=startCol;
-        hide();
-      }
-    }
-    );    
+  public void settings() {
+    //surface.setSize(380, 285);
+    size(380, 285);
+  }
 
-    size(w, h);
+  void setup() {    
+    //win.addWindowListener(new WindowAdapter() {
+    //  @Override
+    //    public void windowClosing(WindowEvent windowEvent) { 
+    //    //curCol=startCol;
+    //    hide();
+    //  }
+    //}
+    //);    
+
     colorMode(HSB);
     frameRate(25);
 
@@ -89,32 +93,32 @@ public class ColorPicker extends PApplet {
 
     s2D = cp5.addSlider2D("s2D")
       .setPosition(10, 10)
-        .setSize(255, 255)
-          //.setArrayValue(new float[] {80, 50})
-          .setColorBackground(0) 
-            .setMaxX(255)
-              .setMaxY(0)
-                .setMinX(0)
-                  .setMinY(255)
-                    .setId(0)
-                      .setView(satpick)
-                        //.disableCrosshair()
-                        ;
+      .setSize(255, 255)
+      //.setArrayValue(new float[] {80, 50})
+      .setColorBackground(0) 
+      .setMaxX(255)
+      .setMaxY(0)
+      .setMinX(0)
+      .setMinY(255)
+      .setId(0)
+      .setView(satpick)
+      //.disableCrosshair()
+      ;
     //s2D.plugTo(parent, "satbri");
     s2D.getCaptionLabel().hide();
     s2D.getValueLabel().hide();
 
     s1D = cp5.addSlider("s1D")
       .setPosition(270, 10)
-        .setSize(20, 255)
-          .setRange(255, 0)
-            .setValue(128)
-              .setSliderMode(Slider.FLEXIBLE)
-                .setHandleSize(1) 
-                  .setId(1)
-                    .setScrollSensitivity(0.0392) 
-                      .setView(huepick)
-                        ;
+      .setSize(20, 255)
+      .setRange(255, 0)
+      .setValue(128)
+      .setSliderMode(Slider.FLEXIBLE)
+      .setHandleSize(1) 
+      .setId(1)
+      .setScrollSensitivity(0.0392) 
+      .setView(huepick)
+      ;
     //s1D.plugTo(parent, "hue");
     s1D.getCaptionLabel().hide();
     s1D.getValueLabel().hide();
@@ -122,48 +126,48 @@ public class ColorPicker extends PApplet {
 
     rgbValueLabel = cp5.addTextlabel("RGB" )
       .setPosition(300, 104)
-        .setText("RGB")
-          ;   
+      .setText("RGB")
+      ;   
 
     hsbValueLabel = cp5.addTextlabel("HSB" )
       .setPosition(300, 140)
-        .setText("HSB")
-          ;   
+      .setText("HSB")
+      ;   
 
     hexValueLabel = cp5.addTextlabel("HEX" )
       .setPosition(300, 176)
-        .setText("HEX")
-          ;       
+      .setText("HEX")
+      ;       
 
     previewToggle = cp5.addToggle("preview")
-     .setLabel("preview")
-     .setPosition(302, 196)
-     .setSize(10, 10)
-     .setValue(true)
+      .setLabel("preview")
+      .setPosition(302, 196)
+      .setSize(10, 10)
+      .setValue(true)
       .setId(4)
-     ;
-     
+      ;
+
     okButton = cp5.addButton("OK")
       .setPosition(300, 236)
-        .setSize(40, 30)
-          .setId(2)
-              ;
+      .setSize(40, 30)
+      .setId(2)
+      ;
     cancelButton = cp5.addButton("CANCEL")
       .setLabel("X")
       .setPosition(342, 236)
-        .setSize(18, 30)
-          .setId(3)
-            ;
+      .setSize(18, 30)
+      .setId(3)
+      ;
 
-ControllerProperties prop = cp5.getProperties();
-prop.remove(cancelButton);
-prop.remove(okButton);
-prop.remove(previewToggle);
-prop.remove(hexValueLabel);
-prop.remove(hsbValueLabel);
-prop.remove(rgbValueLabel);
-prop.remove(s1D);
-prop.remove(s2D);
+    ControllerProperties prop = cp5.getProperties();
+    prop.remove(cancelButton);
+    prop.remove(okButton);
+    prop.remove(previewToggle);
+    prop.remove(hexValueLabel);
+    prop.remove(hsbValueLabel);
+    prop.remove(rgbValueLabel);
+    prop.remove(s1D);
+    prop.remove(s2D);
 
     //initSliders(startCol);
     show();
@@ -174,7 +178,7 @@ prop.remove(s2D);
   void draw() {
     //pushStyle();
     noStroke();
-    
+
     colorMode(HSB);
     background(50);
 
@@ -183,7 +187,7 @@ prop.remove(s2D);
 
     fill(startCol);
     rect(300, 50, 60, 40);
-    
+
     int xpos = (int)s1D.getPosition()[0];
     int ypos = (int)s1D.getPosition()[1];
 
@@ -210,7 +214,7 @@ prop.remove(s2D);
   public void hide() {
     this.noLoop();
     opened = false;
-    win.hide();
+    surface.setVisible(false); //win.hide();
   }
 
   public void show() {
@@ -218,13 +222,13 @@ prop.remove(s2D);
     opened = true;
     initSliders(startCol);
     updatePreviewColor();
-    win.show();
+    surface.setVisible(true); //win.show();
   }
 
   void updatePreviewColor() {
     colorMode(HSB);
     curCol =  color(hue, sat, bri);
-    if(preview) {
+    if (preview) {
       srccol[0] = curCol;
     } else {
       srccol[0] = startCol;
@@ -234,8 +238,8 @@ prop.remove(s2D);
     hexValueLabel.setText(hex(curCol, 6));
     colorMode(RGB);
   }
-  
-  
+
+
   void initSliders(color c) {
     hue = hue(c);
     sat = saturation(c);
@@ -251,27 +255,27 @@ prop.remove(s2D);
   public void controlEvent(ControlEvent theEvent) {
     switch(theEvent.getId()) {
       case(0): //sat-bri
-        sat = (theEvent.getController().getArrayValue())[0];
-        bri = (theEvent.getController().getArrayValue())[1];
-        updatePreviewColor();
+      sat = (theEvent.getController().getArrayValue())[0];
+      bri = (theEvent.getController().getArrayValue())[1];
+      updatePreviewColor();
       break;
       case(1): //hue
-        hue = (theEvent.getController().getValue());
-        updatePreviewColor();
+      hue = (theEvent.getController().getValue());
+      updatePreviewColor();
       break;
       case(2): //OK
-        startCol=curCol;
-        srccol[0] = curCol;
-        win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+      startCol=curCol;
+      srccol[0] = curCol;
+      hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
       break;
       case(3): //X
-        curCol=startCol;
-        srccol[0] = startCol;
-        win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+      curCol=startCol;
+      srccol[0] = startCol;
+      hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
       break;
       case(4): //PREVIEW
-       preview = boolean((int)theEvent.getController().getValue());
-       updatePreviewColor();
+      preview = boolean((int)theEvent.getController().getValue());
+      updatePreviewColor();
       break;
     }
   }
@@ -279,13 +283,14 @@ prop.remove(s2D);
   private void closeAndApply() {
     startCol=curCol;
     srccol[0] = curCol;
-    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+    hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+    
   }
 
   private void closeAndCancel() {
     curCol=startCol;
     srccol[0] = startCol;
-    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+    hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
   }
 
 
@@ -326,7 +331,7 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
   public ColorSlider2DView(PApplet a) {
     theApplet = a;
   }
-  
+
   public void display(PGraphics g, Slider2D theController) {
 
     theApplet.noStroke();
@@ -339,7 +344,7 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
     //                        }
 
     //theApplet.fill(theController.getColor().getBackground());
-    theApplet.rect(0, 0, getWidth(), getHeight());
+    theApplet.rect(0, 0, width, height);
 
     if (theController.isCrosshairs) {
       if (theController.isInside()) {
@@ -397,7 +402,7 @@ class ColorSlider1DView implements ControllerView<Slider> {
     // theApplet.fill(theController.getColor().getBackground());
     theApplet.noStroke();
     //if ((theController.getColor().getBackground() >> 24 & 0xff) > 0) {
-      //theApplet.rect(0, 0, theController.getWidth(), theController.getHeight());
+    //theApplet.rect(0, 0, theController.getWidth(), theController.getHeight());
     //}
 
     theApplet.fill(theController.isInside() ? theController.getColor().getActive() : theController.getColor().getForeground());

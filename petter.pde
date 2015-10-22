@@ -136,11 +136,11 @@ int guiwidth = 310;
 
 void setup() {  
   frameRate(25);
-  size(fwidth+(showMENU?guiwidth:0), fheight, JAVA2D);
-  if (frame != null) {
-    frame.setResizable(true);
-  } 
-  
+  //size(fwidth+(showMENU?guiwidth:0), fheight, JAVA2D);
+  size(905, 842, JAVA2D);
+  surface.setResizable(true);
+  surface.setSize(905, 842);
+
   smooth();
   shapeMode(CENTER);
   
@@ -149,15 +149,15 @@ void setup() {
 
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
-  drop = new SDrop(this);  
-  dropSVGadd = new DropTargetSVG(this, true);
-  dropSVGrep = new DropTargetSVG(this, false);
-  dropIMG = new DropTargetIMG(this); 
-  dropNFO = new DropTargetNFO(this);  
-  drop.addDropListener(dropSVGadd);
-  drop.addDropListener(dropSVGrep);
-  drop.addDropListener(dropIMG);
-  drop.addDropListener(dropNFO);
+  //drop = new SDrop(this);  
+  //dropSVGadd = new DropTargetSVG(this, true);
+  //dropSVGrep = new DropTargetSVG(this, false);
+  //dropIMG = new DropTargetIMG(this); 
+  //dropNFO = new DropTargetNFO(this);  
+  //drop.addDropListener(dropSVGadd);
+  //drop.addDropListener(dropSVGrep);
+  //drop.addDropListener(dropIMG);
+  //drop.addDropListener(dropNFO);
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
@@ -488,10 +488,10 @@ void draw() {
   shapeMode(CENTER);
   noStroke();
   
-  dropSVGadd.draw();
-  dropSVGrep.draw();
-  dropIMG.draw();
-  dropNFO.draw();
+  //dropSVGadd.draw();
+  //dropSVGrep.draw();
+  //dropIMG.draw();
+  //dropNFO.draw();
   
  
 }//DRAW END

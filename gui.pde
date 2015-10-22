@@ -1312,21 +1312,28 @@ void toggleRandom() {
 
 void changebgcolor(float i) {
   if(bg_copi == null) {
-    bg_copi = new ColorPicker(this, "colorpicker", 380, 300, bgcolor);
+    bg_copi = new ColorPicker(this, "colorpicker1", 380, 300, bgcolor);
+    String[] args = {"colorpicker1"};
+    PApplet.runSketch(args, bg_copi);
   } else {
     bg_copi.show(); 
   }
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
-    stroke_copi = new ColorPicker(this, "colorpicker", 380, 300, strokecolor);
+    stroke_copi = new ColorPicker(this, "colorpicker2", 380, 300, strokecolor);
+    String[] args = {"colorpicker2"};
+    PApplet.runSketch(args, stroke_copi);
   } else {
     stroke_copi.show(); 
   }
 }
 void changeshapecolor(float i) {
   if(shape_copi == null) {
-    shape_copi = new ColorPicker(this, "colorpicker", 380, 300, shapecolor);
+    shape_copi = new ColorPicker(this, "colorpicker3", 380, 300, shapecolor);
+    String[] args = {"colorpicker3"};
+    PApplet.runSketch(args, shape_copi);
+    println("------------------ new copi");
   } else {
     shape_copi.show(); 
   }
@@ -1380,10 +1387,10 @@ void togglePageOrientation() {
   xTileNumSlider.setValue(xtilenum);
   yTileNumSlider.setValue(ytilenum); 
  
-  dropSVGadd.updateTargetRect(fwidth, fheight);
-  dropSVGrep.updateTargetRect(fwidth, fheight);
-  dropIMG.updateTargetRect(fwidth, fheight);
-  dropNFO.updateTargetRect(fwidth, fheight);
+  //dropSVGadd.updateTargetRect(fwidth, fheight);
+  //dropSVGrep.updateTargetRect(fwidth, fheight);
+  //dropIMG.updateTargetRect(fwidth, fheight);
+  //dropNFO.updateTargetRect(fwidth, fheight);
   
   dragOffset.setPosition(indentX, fheight-31);
   zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
@@ -1484,20 +1491,22 @@ void resizeFrame(int newW, int newH) {
     newW = fwidth;
     newH = fheight+insets.top;
   }
-  frame.setSize(newW, newH);
+  surface.setSize(newW, newH);
+  //frame.setSize(newW, newH);
   gui.getGroup("main").setPosition(fwidth+12,10);
   gui.getGroup("animate").setPosition(indentX, fheight-36- (gui.getGroup("animate").isOpen()?80:0) );
   gui.getGroup("help").setSize(fwidth, fheight+1);
   gui.getGroup("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
   
-  dropSVGadd.updateTargetRect(fwidth, fheight);
-  dropSVGrep.updateTargetRect(fwidth, fheight);
-  dropIMG.updateTargetRect(fwidth, fheight);
-  dropNFO.updateTargetRect(fwidth, fheight);
+  //dropSVGadd.updateTargetRect(fwidth, fheight);
+  //dropSVGrep.updateTargetRect(fwidth, fheight);
+  //dropIMG.updateTargetRect(fwidth, fheight);
+  //dropNFO.updateTargetRect(fwidth, fheight);
 
   dragOffset.setPosition(indentX, fheight-31);
   zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
   
+  gui.setGraphics(this, 0, 0);
   gui.update();
 }
 
