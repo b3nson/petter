@@ -1282,11 +1282,13 @@ void toggleMenu() {
   showMENU = !(gui.getGroup("main").isOpen());
   insets = frame.getInsets();
   if (showMENU) {
-    frame.setSize(fwidth+guiwidth, fheight+insets.top);
+    surface.setSize(fwidth+guiwidth, fheight+insets.top);
+    //frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.getGroup("main").open();
   } else {
-    frame.setSize(fwidth, fheight+insets.top);
+    surface.setSize(fwidth, fheight+insets.top);    
+    //frame.setSize(fwidth, fheight+insets.top);
     gui.getGroup("main").close();
   }
 }
@@ -1498,10 +1500,10 @@ void resizeFrame(int newW, int newH) {
   gui.getGroup("help").setSize(fwidth, fheight+1);
   gui.getGroup("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
   
-  //dropSVGadd.updateTargetRect(fwidth, fheight);
-  //dropSVGrep.updateTargetRect(fwidth, fheight);
-  //dropIMG.updateTargetRect(fwidth, fheight);
-  //dropNFO.updateTargetRect(fwidth, fheight);
+  dropSVGadd.updateTargetRect(fwidth, fheight);
+  dropSVGrep.updateTargetRect(fwidth, fheight);
+  dropIMG.updateTargetRect(fwidth, fheight);
+  dropNFO.updateTargetRect(fwidth, fheight);
 
   dragOffset.setPosition(indentX, fheight-31);
   zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);

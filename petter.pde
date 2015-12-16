@@ -20,6 +20,7 @@ import sojamo.drop.*;
 import gifAnimation.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
+import java.awt.Component;
 import java.util.*;
 
 static int ROT = 0;
@@ -149,15 +150,18 @@ void setup() {
 
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
+  
+  drop = new SDrop((Component)this.surface.getNative(), this);
   //drop = new SDrop(this);  
-  //dropSVGadd = new DropTargetSVG(this, true);
-  //dropSVGrep = new DropTargetSVG(this, false);
-  //dropIMG = new DropTargetIMG(this); 
-  //dropNFO = new DropTargetNFO(this);  
-  //drop.addDropListener(dropSVGadd);
-  //drop.addDropListener(dropSVGrep);
-  //drop.addDropListener(dropIMG);
-  //drop.addDropListener(dropNFO);
+  dropSVGadd = new DropTargetSVG(this, true);
+  dropSVGrep = new DropTargetSVG(this, false);
+  dropIMG = new DropTargetIMG(this); 
+  dropNFO = new DropTargetNFO(this);  
+  drop.addDropListener(dropSVGadd);
+  drop.addDropListener(dropSVGrep);
+  drop.addDropListener(dropIMG);
+  drop.addDropListener(dropNFO);
+  
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
@@ -488,11 +492,10 @@ void draw() {
   shapeMode(CENTER);
   noStroke();
   
-  //dropSVGadd.draw();
-  //dropSVGrep.draw();
-  //dropIMG.draw();
-  //dropNFO.draw();
-  
+  dropSVGadd.draw();
+  dropSVGrep.draw();
+  dropIMG.draw();
+  dropNFO.draw();
  
 }//DRAW END
 
