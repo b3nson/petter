@@ -1498,6 +1498,7 @@ void resizeFrame(int newW, int newH) {
   dragOffset.setPosition(indentX, fheight-31);
   zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
   
+  gui.setGraphics(this, 0, 0);
   gui.update();
 }
 
