@@ -76,7 +76,7 @@ class GuiImage extends Canvas {
             e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
           }
       }
-      
+
       g.image(map.get(mapIndex), x, y, ww,  hh);
       wtmp = map.get(mapIndex).width;
      
@@ -322,7 +322,7 @@ class DropTargetIMG extends DropListener {
     boolean url = theDropEvent.isURL();
     boolean file = theDropEvent.isFile();
     boolean img = theDropEvent.isImage();  
-  
+
   //println("------------------------------------------");
   //println("isURL: " +theDropEvent.isURL()); 
   //println("isFil: " +theDropEvent.isFile()); 
@@ -370,10 +370,12 @@ class DropTargetIMG extends DropListener {
           ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
           map = tmpimg;
         } else {
-          map.add(theDropEvent.loadImage());
+          //map.add(theDropEvent.loadImage()); //fails in Processing 3.x
+          map.add(loadImage(path)); //no threaded loading
         }
         imgMap.setup(app);
         updateImgMap();
+
       } else {
         lastImgDropped = "x";
         lastUrlDropped = "y"; 
@@ -474,4 +476,3 @@ class ScrollableListPlus extends ScrollableList {
     return itemHover;
   }
 }
-
