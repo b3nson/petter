@@ -41,7 +41,9 @@ int h = 20;
 int w = 180;
 int imgMapHeight = 0;
 int tickMarks = 11;
-
+int helpwidth = 330;
+int helpheight = 580;
+  
 color c1 = color(16, 181, 198);    // blue
 color c2 = color(60, 105, 97, 180);// green
 color c3 = color(200, 200, 200);  //lightgray for separatorlines
@@ -793,9 +795,6 @@ void setupGUI() {
 //  GUI SETUP - HELP MENU
 // ---------------------------------------------------------------------------   
   
-  int helpwidth = 330;
-  int helpheight = 560;
-  
   help = gui.addGroup("help")
     .setSize(fwidth, fheight+1)
     .setPosition(0, 0)
@@ -1250,9 +1249,10 @@ void controlEvent(ControlEvent theEvent) {
 // ---------------------------------------------------------------------------
 
 
-void toggleHelp() {
+void toggleHelp() {  
   showHELP = !(gui.getGroup("help").isOpen());
   if (showHELP) {
+    helptextbox.setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2);
     help.open();
   } else {
     help.close();
