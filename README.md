@@ -75,13 +75,13 @@ P	- view/testrun animation
 - Grab a copy of [Processing](http://www.processing.org/) for your OS, install it.
 - Download/clone Petter to your Processing Sketch-Directory.
 - Download and install external libraries (see below).
-
-Currently runs with Procesing 2.2.1 and 3.0a5 (not newer).
+- For **Processing 3**.x choose `master`-branch: [master](https://github.com/b3nson/petter/tree/master)
+- For **Processing 2**.x choose `processing-2.x`-branch: [processing-2.x](https://github.com/b3nson/petter/tree/processing-2.x)
 
 
 ### Use of contributed Libraries:
 - `penner.easing` - http://github.com/jesusgollonet/processing-penner-easing
-- `controlP5` - http://github.com/sojamo/controlp5
+- `controlP5` - http://github.com/sojamo/controlp5 (> v2.2.3)
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
 - `gifAnimation` - http://extrapixel.github.io/gif-animation/
 
