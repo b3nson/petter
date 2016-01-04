@@ -436,7 +436,7 @@ void draw() {
   } //for i
   
   // ---------------------------------------------------
-
+  
   if (nfo != null && showNfo && nfoOnTop) {
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
@@ -449,9 +449,10 @@ void draw() {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
     }
-    gui.draw();
+    //gui.draw();
+    gui.getWindow().draw(pdf);
   }
-  
+
   if (exportCurrentFrame) {
     pdf.popMatrix(); 
     pdf.popStyle();
@@ -469,7 +470,7 @@ void draw() {
       exportCurrentFrame = false;
     }
   }
-  
+
   if(!exportCurrentFrame) {
     if (ref != null && showRef) {
       shapeMode(CORNER);
