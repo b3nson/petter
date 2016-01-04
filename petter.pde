@@ -445,7 +445,8 @@ void draw() {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
     }
-    gui.draw();
+    //gui.draw();
+    gui.getWindow().draw(pdf);
   }
   
   if (exportCurrentFrame) {
