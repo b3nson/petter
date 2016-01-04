@@ -14,6 +14,7 @@
  */
  
 import processing.pdf.*;
+import processing.svg.*;
 import penner.easing.*;
 import controlP5.*;
 import sojamo.drop.*;
@@ -39,7 +40,7 @@ DropTargetIMG dropIMG;
 DropTargetNFO dropNFO;
 ColorPicker bg_copi, stroke_copi, shape_copi;
 Memento undo;
-PGraphicsPDF pdf;
+PGraphics pdf; 
 
 String settingspath = "i/settings/";
 String outputpath = "o/";
@@ -91,6 +92,7 @@ boolean dragAllowed = false;
 boolean showRef = false;
 boolean showNfo = false;
 boolean nfoOnTop = true;
+boolean exportFormat = true; //true=PDF|false=SVG
 boolean guiExport = false;
 boolean guiExportNow = false;
 boolean sequencing = false;
@@ -184,6 +186,7 @@ void setup() {
   showRefToggle.setState(showRef);
   showNfoToggle.setState(showNfo);
   nfoLayerToggle.setState(nfoOnTop);
+  exportFormatToggle.setState(exportFormat);
   //strokeWeightSlider.setValue(strokeWeight);
   last = null;
 
@@ -245,11 +248,24 @@ void draw() {
       }
     }
     if(!guiExportNow) {
-      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +".pdf";//+"_petter.pdf";
-      pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
+      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname;
+      if(exportFormat) {
+        filename += ".pdf";
+        pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
+      } else {
+        filename += ".svg";
+        pdf = (PGraphicsSVG) createGraphics(pdfwidth, pdfheight, SVG, filename);
+      }
     } else {
-      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI.pdf";//+"_petter+GUI.pdf";
-      pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);
+      filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI";
+      if(exportFormat) {
+        filename += ".pdf";
+        pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);        
+      } else {
+        filename += ".svg";
+        pdf = (PGraphicsSVG) createGraphics(pdfwidth+(guiwidth), pdfheight, SVG, filename);
+      }
+
     }
     
     beginRecord(pdf); 

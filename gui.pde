@@ -61,7 +61,7 @@ ScrollableList penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
-Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle;
+Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
@@ -151,7 +151,7 @@ void setupGUI() {
      ;
      styleLabel(pageOrientationToggle, "p/l");
      
-  ypos += sep;
+  ypos += sep+8;
   
 
    showRefToggle = gui.addToggle("showRef")
@@ -162,7 +162,8 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(showRefToggle, "REF");
-   indentX += h*2;
+     showRefToggle.getCaptionLabel().setPadding(-h,-10);
+   indentX += h+12;
 
    showNfoToggle = gui.addToggle("showNfo")
      .setLabel("NFO")
@@ -172,7 +173,8 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(showNfoToggle, "NFO");
-   indentX += h*2;
+     showNfoToggle.getCaptionLabel().setPadding(-h,-10);
+   indentX += h+12;
 
    nfoLayerToggle = gui.addToggle("nfoOnTop")
      .setLabel("nfotop")
@@ -183,8 +185,8 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(nfoLayerToggle, "nfotop");
-     
-   indentX += h*2;
+     nfoLayerToggle.getCaptionLabel().setPadding(-h,-10);
+   indentX += h+12;
      
    bgcolorBang = gui.addBang("changebgcolor")
      .setLabel("C")
@@ -195,9 +197,7 @@ void setupGUI() {
      //styleLabel(bgcolorBang, "BG");
      bgcolorBang.getCaptionLabel().setPadding(8,-14);
      bgcolorBang.setColorForeground(bgcolor[0]);
-
-
-   indentX += h*2;
+   indentX += h+12;
  
    showGuiExportToggle = gui.addToggle("guiExport")
      .setLabel("GUIEXP")
@@ -207,7 +207,19 @@ void setupGUI() {
      .setGroup(main)
      ;
      styleLabel(showGuiExportToggle, "GUIEXP");
+     showGuiExportToggle.getCaptionLabel().setPadding(-h,-10);
+   indentX += h+12;
 
+   exportFormatToggle = gui.addToggle("exportFormat")
+     .setLabel("pdf/svg")
+     .setPosition(indentX, ypos)
+     .setMode(ControlP5.SWITCH)
+     .setSize(h, h)
+     .setValue(nfoOnTop)
+     .setGroup(main)
+     ;
+     styleLabel(exportFormatToggle, "pdf/svg");
+     exportFormatToggle.getCaptionLabel().setPadding(-h,-10);
 
    indentX = 0;
  
@@ -1335,7 +1347,6 @@ void changeshapecolor(float i) {
     shape_copi = new ColorPicker(this, "colorpicker3", 380, 300, shapecolor);
     String[] args = {"colorpicker3"};
     PApplet.runSketch(args, shape_copi);
-    println("------------------ new copi");
   } else {
     shape_copi.show(); 
   }
