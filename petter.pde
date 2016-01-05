@@ -72,6 +72,7 @@ float absScreenX;
 float absScreenY;
 
 float zoom = 1.0;
+float tmpzoom = 0;
 float relTransX = 0;
 float relTransY = 0;
 float absRot = 0;
@@ -172,7 +173,6 @@ void setup() {
   try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
   try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
   try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
-  //try { map = loadImage("album.jpg");}         catch(NullPointerException e) {}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
   try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
 
@@ -215,8 +215,6 @@ void draw() {
   if(sequencing) {
     animate();  
   }
-  
-  pageOffset = int(absPageOffset * zoom);
 
   if (keyPressed && key == CODED && keyCode == SHIFT && !shiftPressed) {
     shiftPressed = true;
@@ -261,10 +259,10 @@ void draw() {
       filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI";
       if(exportFormat) {
         filename += ".pdf";
-        pdf = (PGraphicsPDF) createGraphics(pdfwidth+(guiwidth), pdfheight, PDF, filename);        
+        pdf = (PGraphicsPDF) createGraphics(pdfwidth+guiwidth, pdfheight, PDF, filename);        
       } else {
         filename += ".svg";
-        pdf = (PGraphicsSVG) createGraphics(pdfwidth+(guiwidth), pdfheight, SVG, filename);
+        pdf = (PGraphicsSVG) createGraphics(pdfwidth+guiwidth, pdfheight, SVG, filename);
       }
 
     }
@@ -285,9 +283,14 @@ void draw() {
         pdf.noFill(); 
       }
     }
+   
+    if(guiExportNow) { //reset scale to 1 for guiexport
+      tmpzoom = zoom;
+      scaleGUI(1f);
+    }    
+    
     pdf.pushMatrix();  
     pdf.scale(1f/zoom);
-    //pdf.scale((float)Math.pow(1.41, pdfSize-1));
     
     //saveFrame("frame.png");
   }
@@ -322,7 +325,8 @@ void draw() {
   }
 
   abscount = 0;
-
+  pageOffset = int(absPageOffset * zoom);
+  
   tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
@@ -461,13 +465,15 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
+  
   if(exportCurrentFrame && guiExportNow) { 
     if (ref != null && showRef) {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
     }
-    //gui.draw();
     gui.getWindow().draw(pdf);
+    scaleGUI(tmpzoom); //recreate prev zoom
+    tmpzoom = 0f;
   }
 
   if (exportCurrentFrame) {
@@ -640,6 +646,7 @@ void keyReleased() {
 
 void mouseWheel(MouseEvent event) {
   float e = event.getAmount();
+  menuScroll((int)e);
   gui.setMouseWheelRotation((int)e);
 }
 
