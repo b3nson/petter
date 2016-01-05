@@ -41,7 +41,13 @@ int h = 20;
 int w = 180;
 int imgMapHeight = 0;
 int tickMarks = 11;
-
+int helpwidth = 330;
+int helpheight = 580;
+int infoheight = 22;
+int scrollOffset = 0;
+float mapwidth = 0;
+float mapheight = 0;
+  
 color c1 = color(16, 181, 198);    // blue
 color c2 = color(60, 105, 97, 180);// green
 color c3 = color(200, 200, 200);  //lightgray for separatorlines
@@ -51,16 +57,15 @@ ArrayList settingFiles;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
-Slider last;
-Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider;
-Group main, style, animate, help, helptextbox;
+Group main, style, animate, help, helptextbox, info;
+Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableList penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
-Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle;
-Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel;
+Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
+Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, lastguielem;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
 Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel;
@@ -88,7 +93,7 @@ void setupGUI() {
 // ---------------------------------------------------------------------------
 
   main = gui.addGroup("main")
-           .setPosition(fwidth+12,10)
+           .setPosition(fwidth+12, 0)
            .hideBar()
            //.setBackgroundHeight(height-38)
            //.setWidth(guiwidth-24)
@@ -97,7 +102,7 @@ void setupGUI() {
            .close()
            ;
    
-  ypos += 10;
+  ypos += 20;
   
   //formatDropdown = new ScrollableList(gui, "formats");
   formatDropdown = gui.addScrollableList("formats")
@@ -691,7 +696,7 @@ void setupGUI() {
 // ---------------------------------------------------------------------------   
 
  animate = gui.addGroup("animate")
-           .setPosition(indentX, fheight-36)
+           .setPosition(indentX, ypos)
            .setBackgroundHeight(100)
            .activateEvent(true)
            .setGroup(main)
@@ -787,7 +792,41 @@ void setupGUI() {
      ;
   animExportButton.getCaptionLabel().setPadding(7,-12);
   
+// ---------------------------------------------------------------------------
+//  GUI SETUP - LAST ELEM
+// ---------------------------------------------------------------------------  
 
+  lastguielem = gui.addTextlabel("last" )
+     .setPosition(indentX, animate.getPosition()[1]+h)
+     .setText("----------")
+     .setGroup(main)
+     .hide()
+     ;
+   
+// ---------------------------------------------------------------------------
+//  GUI SETUP - INFO LABELS
+// --------------------------------------------------------------------------- 
+   
+  info = gui.addGroup("info")
+    .setSize(guiwidth, infoheight)
+    .setPosition(fwidth, fheight-infoheight)
+    .setBackgroundHeight(infoheight+2)
+    .setBackgroundColor(color(45))
+    .hideBar()
+    .open()
+    ;
+    
+  dragOffset = gui.addTextlabel("dragoffset" )
+     .setPosition(10, 7)
+     .setText("OFFSET: 0 x 0")
+     .setGroup(info)
+     ;
+
+  zoomLabel = gui.addTextlabel("zoomlabel" )
+     .setPosition(guiwidth-60, 7)
+     .setText("ZOOM: 1.0")
+     .setGroup(info)
+     ;
    
 // ---------------------------------------------------------------------------
 //  GUI SETUP - HELP MENU
@@ -856,6 +895,7 @@ void setupGUI() {
   penner_rot.bringToFront();
   penner_tra.bringToFront();
   penner_anim.bringToFront();
+  info.bringToFront();
   
   ControllerProperties cprop = gui.getProperties();
   cprop.remove(closeImgMapButton);
@@ -879,6 +919,9 @@ void setupGUI() {
   cprop.remove(mapFrameNextButton);
   cprop.remove(mapFrameFirstButton);
   cprop.remove(mapFrameLastButton);
+  cprop.remove(lastguielem);
+  cprop.remove(dragOffset);
+  cprop.remove(zoomLabel);
   
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
@@ -902,19 +945,9 @@ void setupGUI() {
   registerForAnimation(offsetySaveLabel);  
   
   cprop.setFormat(ControlP5Constants.JSON);
+
+  reorderGuiElements();
   
-  dragOffset = gui.addTextlabel("dragoffset" )
-     .setPosition(indentX, fheight-31)
-     .setText("OFFSET: 0 x 0")
-     .setGroup(main)
-     ;
-
-  zoomLabel = gui.addTextlabel("zoomlabel" )
-     .setPosition(indentX+guiwidth-70, fheight-31)
-     .setText("ZOOM: 1.0")
-     .setGroup(main)
-     ;
-
   if(showMENU) {
     showMENU = false;
     toggleMenu();
@@ -1249,6 +1282,20 @@ void controlEvent(ControlEvent theEvent) {
 //  GUI ACTIONS
 // ---------------------------------------------------------------------------
 
+void toggleMenu() {
+  showMENU = !(gui.getGroup("main").isOpen());
+  insets = frame.getInsets();
+  if (showMENU) {
+    surface.setSize(fwidth+guiwidth, fheight+insets.top);
+    //frame.setSize(fwidth+guiwidth, fheight+insets.top);
+    style.setPosition(indentX, imgMap.y+imgMapHeight+h);
+    gui.getGroup("main").open();
+  } else {
+    surface.setSize(fwidth, fheight+insets.top);    
+    //frame.setSize(fwidth, fheight+insets.top);
+    gui.getGroup("main").close();
+  }
+}
 
 void toggleHelp() {
   showHELP = !(gui.getGroup("help").isOpen());
@@ -1269,26 +1316,13 @@ void toggleAnimate() {
 }
 
 void openAnimate() {
-  animate.setPosition(indentX, fheight-36-80);
   animate.open();
+  reorderGuiElements();
 }
 
 void closeAnimate() {
-  animate.setPosition(indentX, fheight-36);
   animate.close();
-}
-
-void toggleMenu() {
-  showMENU = !(gui.getGroup("main").isOpen());
-  insets = frame.getInsets();
-  if (showMENU) {
-    frame.setSize(fwidth+guiwidth, fheight+insets.top);
-    style.setPosition(indentX, imgMap.y+imgMapHeight+h);
-    gui.getGroup("main").open();
-  } else {
-    frame.setSize(fwidth, fheight+insets.top);
-    gui.getGroup("main").close();
-  }
+  reorderGuiElements();
 }
 
 void disableCustomStyle() {
@@ -1296,6 +1330,7 @@ void disableCustomStyle() {
   for (int i = 0; i < svg.size (); i++) {
     svg.get(i).enableStyle();
   }
+  reorderGuiElements();
 }
 
 void enableCustomStyle() {
@@ -1303,6 +1338,28 @@ void enableCustomStyle() {
   for (int i = 0; i < svg.size (); i++) {
     svg.get(i).disableStyle();
   }
+  reorderGuiElements();
+}
+
+void reorderGuiElements() {
+  int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+10;
+  int styleheight = style.isOpen() ? 70 : 4;
+  int animateheight = animate.isOpen() ? 70 : 4;
+  style.setPosition(indentX, imgMap.y+imgmapheight+h);
+  animate.setPosition(indentX, style.getPosition()[1]+gapY+styleheight);
+  lastguielem.setPosition(indentX, animate.getPosition()[1]+h/2+animateheight);
+  
+  int scrollpos = (int)main.getPosition()[1];
+  if(scrollpos < 0) {
+    if( (lastguielem.getPosition()[1] < (fheight-infoheight))) { 
+      main.setPosition(main.getPosition()[0], 0);
+    } else {
+      if(scrollpos < -1*((int)lastguielem.getPosition()[1] - (fheight-infoheight))) {
+        int newy = (int)lastguielem.getPosition()[1] - (fheight-infoheight);
+        main.setPosition(main.getPosition()[0], -newy);
+      }
+    }
+  }  
 }
 
 void toggleRandom() {
@@ -1379,19 +1436,14 @@ void togglePageOrientation() {
   
   xTileNumSlider.setValue(xtilenum);
   yTileNumSlider.setValue(ytilenum); 
- 
-  dropSVGadd.updateTargetRect(fwidth, fheight);
-  dropSVGrep.updateTargetRect(fwidth, fheight);
-  dropIMG.updateTargetRect(fwidth, fheight);
-  dropNFO.updateTargetRect(fwidth, fheight);
-  
-  dragOffset.setPosition(indentX, fheight-31);
-  zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
 }
 
 void updateImgMap() {
   if(map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) {
-    style.setPosition(indentX, imgMap.y + ((int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(w))) +h);
+    mapwidth = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(h));
+    mapheight = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(w));
+    //style.setPosition(indentX, imgMap.y+mapheight+h);
+//    style.setPosition(indentX, imgMap.y + ((int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(w))) +h);
     closeImgMapButton.show();
     mapRotToggle.show();
     mapScaleToggle.show();
@@ -1415,6 +1467,9 @@ void updateImgMap() {
     }
     animFrameNumBox.setValue(frames);
   } else {
+      mapwidth = 0;
+      mapheight = 0;
+      //style.setPosition(indentX, imgMap.y+gapY);
       closeImgMapButton.hide();
       mapRotToggle.hide();
       mapScaleToggle.hide();
@@ -1424,11 +1479,11 @@ void updateImgMap() {
       mapFrameNextButton.hide();
       mapFrameFirstButton.hide();
       mapFrameLastButton.hide();
-      style.setPosition(indentX, imgMap.y+gapY);
       penner_sca.show();
       penner_rot.show();
       penner_tra.show();
   }
+  reorderGuiElements();
 }
 
   void nextImgMapFrame() {
@@ -1462,7 +1517,7 @@ void updateImgMap() {
   }
   
 // ---------------------------------------------------------------------------
-//  FRAME RESIZING AND ZOOM
+//  FRAME RESIZING, ZOOM AND SCROLL
 // ---------------------------------------------------------------------------
 
 void canvasResize() {
@@ -1484,22 +1539,29 @@ void resizeFrame(int newW, int newH) {
     newW = fwidth;
     newH = fheight+insets.top;
   }
-  frame.setSize(newW, newH);
-  gui.getGroup("main").setPosition(fwidth+12,10);
-  gui.getGroup("animate").setPosition(indentX, fheight-36- (gui.getGroup("animate").isOpen()?80:0) );
+
+  surface.setSize(newW, newH);
+  //frame.setSize(newW, newH);
+  gui.getGroup("main").setPosition(fwidth+12, main.getPosition()[1]);
   gui.getGroup("help").setSize(fwidth, fheight+1);
-  gui.getGroup("helptextbox").setPosition((fwidth-helptextLabel.getWidth())/2, (fheight-helptextLabel.getHeight())/2);
+  gui.getGroup("helptextbox").setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2);
+  gui.getGroup("info").setPosition(fwidth, fheight-infoheight);
   
   dropSVGadd.updateTargetRect(fwidth, fheight);
   dropSVGrep.updateTargetRect(fwidth, fheight);
   dropIMG.updateTargetRect(fwidth, fheight);
   dropNFO.updateTargetRect(fwidth, fheight);
-
-  dragOffset.setPosition(indentX, fheight-31);
-  zoomLabel.setPosition(indentX+guiwidth-70, fheight-31);
+  
+  reorderGuiElements();
   
   gui.setGraphics(this, 0, 0);
   gui.update();
+}
+
+void scaleGUI(float newzoom) {
+  zoom = newzoom;
+  zoomLabel.setText("ZOOM: " +nf(zoom, 1, 1));
+  resizeFrame(pdfwidth, pdfheight);
 }
 
 void scaleGUI(boolean bigger) {
@@ -1514,6 +1576,29 @@ void scaleGUI(boolean bigger) {
   resizeFrame(pdfwidth, pdfheight);
 }
 
+//somewhat confusing and dirty
+void menuScroll(int amount) {
+  amount *= 2;
+  if(!gui.isMouseOver() && mouseX > fwidth) {
+    int scrollpos = (int)main.getPosition()[1];
+    if( (lastguielem.getPosition()[1]-scrollpos > (fheight-infoheight))) {
+      if(amount < 0) {
+          if(scrollpos < 0) {
+            scrollpos = (scrollpos-amount) > 0 ? 0 : scrollpos-amount;
+            main.setPosition(main.getPosition()[0], scrollpos); 
+          }
+      } else {
+        if((lastguielem.getPosition()[1]+scrollpos) > (fheight-infoheight)) { //scroll upwards when longer
+          main.setPosition(main.getPosition()[0], scrollpos-amount); 
+        }
+      }
+    } else {
+      if(scrollpos < 0) {
+          main.setPosition(main.getPosition()[0], 0);
+      }
+    }
+  }
+}
 
 
 // ---------------------------------------------------------------------------
