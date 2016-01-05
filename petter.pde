@@ -98,6 +98,7 @@ boolean guiExport = false;
 boolean guiExportNow = false;
 boolean sequencing = false;
 int seed = 0;
+int fps = 0;
 float mapValue = 0f;
 
 int abscount = 0;
@@ -521,6 +522,9 @@ void draw() {
   dropIMG.draw();
   dropNFO.draw();
  
+ if(showHELP) {
+   fpsLabel.setText(str((int)frameRate));
+ }
 }//DRAW END
 
 
