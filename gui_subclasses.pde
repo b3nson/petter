@@ -76,8 +76,11 @@ class GuiImage extends Canvas {
             e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
           }
       }
-
-      g.image(map.get(mapIndex), x, y, ww,  hh);
+      
+      try {
+        g.image(map.get(mapIndex), x, y, ww,  hh); //problem during svg-export
+      } catch(NullPointerException e) {}
+      
       wtmp = map.get(mapIndex).width;
      
       mx = mouseX-(int)main.getPosition()[0]-1;
@@ -475,4 +478,4 @@ class ScrollableListPlus extends ScrollableList {
   int getItemHover() {
     return itemHover;
   }
-}
+}//class ScrollableListPlus
