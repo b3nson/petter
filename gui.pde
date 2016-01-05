@@ -65,7 +65,7 @@ Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLast
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
-Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, lastguielem;
+Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
 Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel;
@@ -857,8 +857,15 @@ void setupGUI() {
     .setLineHeight(9)
     .setColorValue(color(0))
     .setGroup(helptextbox);
-  
-  if(helptext != null) {
+
+  fpsLabel = gui.addTextlabel("fps" )
+   .setSize(100, 30)
+   .setPosition(10, 10)
+   .setText("fps")
+   .setGroup(help)
+   ;
+     
+   if(helptext != null) {
     for (int i = 0; i < helptext.length; i++) {
       String s = helptext[i];
       if(s.equals("")) s = ".";
@@ -922,6 +929,7 @@ void setupGUI() {
   cprop.remove(lastguielem);
   cprop.remove(dragOffset);
   cprop.remove(zoomLabel);
+  cprop.remove(fpsLabel);
   
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
