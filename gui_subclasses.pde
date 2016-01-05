@@ -36,7 +36,9 @@ class GuiImage extends Canvas {
   boolean dragC3 = false;
   boolean insideCorner3 = false;
   boolean insideCorner1 = false;
-  
+  boolean startedInside = false;
+  boolean canStartDrag = false;
+
   int cornerCol;
   int colOver = color(16, 181, 198, 128);
   int colCorner = color(50);
@@ -52,11 +54,10 @@ class GuiImage extends Canvas {
     wtmp = 0;
   }  
 
-  public void draw(PGraphics g) {
-    pushStyle();
-    
+  public void draw(PGraphics g) {     
     if(map.size() != 0 && mapIndex < map.size()) {
       if(map.get(mapIndex) != null) {
+        pushStyle();
         if(wtmp != map.get(mapIndex).width) {
           hh = (int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(ww));
           imgMapHeight = hh;
@@ -108,9 +109,13 @@ class GuiImage extends Canvas {
           inside = false;
           insideCorner1 = false;
           insideCorner3 = false;
+          canStartDrag = false;
       }
-  
-      if(inside && mousePressed && !drag) {
+      if(inside && !mousePressed) {
+        canStartDrag = true;
+      } 
+      if(inside && canStartDrag && mousePressed && !drag) {
+        startedInside = true;
         drag = true;
         offsetx = mx-a;
         offsety = my-b;
@@ -125,7 +130,7 @@ class GuiImage extends Canvas {
       }
       
       if(drag) {
-        if(mousePressed) {
+        if(mousePressed && startedInside) {
           if(dragC1 == true) {   
             e = e-(mx-a)+offsetx;
             f = f-(my-b)+offsety;
@@ -146,6 +151,7 @@ class GuiImage extends Canvas {
             b = my-offsety; 
           }
         } else {
+          startedInside = false;
          inside = false;
          drag = false; 
          dragC1 = false;
@@ -163,9 +169,9 @@ class GuiImage extends Canvas {
       noStroke();
       triangle(a+1, b+1, a+cornerSize, b+1, a+1, b+cornerSize);
       triangle(a+e, b+f, a+e-cornerSize, b+f, a+e, b+f-cornerSize);
+      popStyle();
       }
     }
-  popStyle();
   }
 }
 
