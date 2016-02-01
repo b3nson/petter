@@ -255,27 +255,23 @@ public class ColorPicker extends PApplet {
   public void controlEvent(ControlEvent theEvent) {
     switch(theEvent.getId()) {
       case(0): //sat-bri
-      sat = (theEvent.getController().getArrayValue())[0];
-      bri = (theEvent.getController().getArrayValue())[1];
-      updatePreviewColor();
+        sat = (theEvent.getController().getArrayValue())[0];
+        bri = (theEvent.getController().getArrayValue())[1];
+        updatePreviewColor();
       break;
       case(1): //hue
-      hue = (theEvent.getController().getValue());
-      updatePreviewColor();
+        hue = (theEvent.getController().getValue());
+        updatePreviewColor();
       break;
       case(2): //OK
-      startCol=curCol;
-      srccol[0] = curCol;
-      hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+        closeAndApply();
       break;
       case(3): //X
-      curCol=startCol;
-      srccol[0] = startCol;
-      hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+        closeAndCancel();
       break;
       case(4): //PREVIEW
-      preview = boolean((int)theEvent.getController().getValue());
-      updatePreviewColor();
+        preview = boolean((int)theEvent.getController().getValue());
+        updatePreviewColor();
       break;
     }
   }
@@ -284,7 +280,7 @@ public class ColorPicker extends PApplet {
     startCol=curCol;
     srccol[0] = curCol;
     hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
-    
+    undo.setUndoStep();
   }
 
   private void closeAndCancel() {
