@@ -333,6 +333,7 @@ void draw() {
   tileheight = svg.get(0).height * tilescale;
 
   if (nfo != null && showNfo && !nfoOnTop) {
+    shapeMode(CENTER); 
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
     scale(zoom);
@@ -460,6 +461,7 @@ void draw() {
   // ---------------------------------------------------
   
   if (nfo != null && showNfo && nfoOnTop) {
+    shapeMode(CENTER); 
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
     scale(zoom);

@@ -435,7 +435,8 @@ class DropTargetNFO extends DropListener {
       }
       if (path.toLowerCase().endsWith(".svg")) {
         println("SVG: " +path);
-        nfo = loadShape(path);        
+        nfo = loadShape(path); 
+        showNfoToggle.setState(true);
       }
   }
   
