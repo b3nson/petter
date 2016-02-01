@@ -328,29 +328,6 @@ class DropTargetIMG extends DropListener {
     boolean url = theDropEvent.isURL();
     boolean file = theDropEvent.isFile();
     boolean img = theDropEvent.isImage();  
-  
-  //println("------------------------------------------");
-  //println("isURL: " +theDropEvent.isURL()); 
-  //println("isFil: " +theDropEvent.isFile()); 
-  //println("isIMG: " +theDropEvent.isImage()); 
-  
-    /*
-    File droppedFile = theDropEvent.file();
-    String path = theDropEvent.filePath();
-    String file = droppedFile.getPath();
-    println("PATH");
-    println(path);
-     println("FILE");
-     println(file);
-     
-     if((path == file) && (path != null)) {
-       println("local");
-     } else {
-        println("remote");
-     }
-     */
-     //println("after");
-
 
   //IMAGEMAP ======================================================  
    //somewhat complicated testing due to different behaviour on linux and osx
@@ -368,7 +345,7 @@ class DropTargetIMG extends DropListener {
         }
       }      
       if( (lastUrlDropped.equals(lastImgDropped)) == false) {
-        String path = theDropEvent.filePath();
+        String path = url ? theDropEvent.url() : theDropEvent.filePath();
         String p = path.substring(path.lastIndexOf('.') + 1);
         map.clear();
         mapIndex = 0;
@@ -376,7 +353,8 @@ class DropTargetIMG extends DropListener {
           ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
           map = tmpimg;
         } else {
-          map.add(theDropEvent.loadImage());
+          //map.add(theDropEvent.loadImage()); //fails in Processing 3.x
+          map.add(requestImage(path));
         }
         imgMap.setup(app);
         updateImgMap();
