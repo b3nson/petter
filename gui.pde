@@ -1089,12 +1089,48 @@ void callbackDropdownHover(CallbackEvent theEvent) {
   }
 }
 
+// UNDO-HANDLING -------------------------------------------------------------
+
+Controller tmpctrl;
+int tmpactn;
 
 void callbackUndoAction(CallbackEvent theEvent) {
-//println("CALLBACK: " +theEvent.getController() +"ACTION: " +theEvent.getAction());
-  if (theEvent.getAction() == ControlP5.ACTION_RELEASED || theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
-    if(theEvent.getController().getParent() != animate && 
-       theEvent.getController().getParent() != penner_anim) {
+  //println("CALLBACK: " +theEvent.getController() +"ACTION: " +theEvent.getAction());
+  Controller curctrl = theEvent.getController();
+  int curactn = theEvent.getAction();
+
+  //NO undo on colorpicker-buttons
+  if(curctrl instanceof Bang) {
+    return;
+  }
+  
+  //SELECT item of Listboxes
+  if(curctrl instanceof ScrollableList || curctrl instanceof ScrollableListPlus) {
+    if(curactn == ControlP5.ACTION_LEAVE && tmpactn == ControlP5.ACTION_CLICK ) {
+      undo.setUndoStep();
+    }
+    tmpactn = curactn;
+    return;
+  }
+
+  //SCROLLWHEEL on Sliders and Numberboxes
+  if(curctrl instanceof Slider || curctrl instanceof Numberbox) {
+    if (curactn == ControlP5.ACTION_WHEEL) {
+        tmpctrl = curctrl;
+        return;
+    }
+    if (tmpctrl != null && curactn == ControlP5.ACTION_LEAVE) {
+      if(curctrl == tmpctrl) {
+        tmpctrl = null;
+        undo.setUndoStep();
+      }
+    }
+  }
+  
+  //ALL others on RELEASE
+  if (curactn == ControlP5.ACTION_RELEASE || curactn == ControlP5.ACTION_RELEASE_OUTSIDE) {
+    if(curctrl.getParent() != animate && 
+       curctrl.getParent() != penner_anim) {
           undo.setUndoStep();      
        }
   }
