@@ -1286,13 +1286,13 @@ void toggleMenu() {
   showMENU = !(gui.getGroup("main").isOpen());
   insets = frame.getInsets();
   if (showMENU) {
-    surface.setSize(fwidth+guiwidth, fheight+insets.top);
-    //frame.setSize(fwidth+guiwidth, fheight+insets.top);
+    //surface.setSize(fwidth+guiwidth, fheight+insets.top);
+    frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.getGroup("main").open();
   } else {
-    surface.setSize(fwidth, fheight+insets.top);    
-    //frame.setSize(fwidth, fheight+insets.top);
+    //surface.setSize(fwidth, fheight+insets.top);    
+    frame.setSize(fwidth, fheight+insets.top);
     gui.getGroup("main").close();
   }
 }
@@ -1540,8 +1540,8 @@ void resizeFrame(int newW, int newH) {
     newH = fheight+insets.top;
   }
 
-  surface.setSize(newW, newH);
-  //frame.setSize(newW, newH);
+  //surface.setSize(newW, newH);
+  frame.setSize(newW, newH);
   gui.getGroup("main").setPosition(fwidth+12, main.getPosition()[1]);
   gui.getGroup("help").setSize(fwidth, fheight+1);
   gui.getGroup("helptextbox").setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2);
