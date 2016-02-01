@@ -358,7 +358,7 @@ void draw() {
           mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
           //mapValue = ( brightness(col) /255);
         } 
-        catch(ArrayIndexOutOfBoundsException e) {
+        catch(Exception e) { //ArrayIndexOutOfBoundsException | NullPointerException
           mapValue = 1f;
         }
       }
