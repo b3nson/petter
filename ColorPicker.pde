@@ -260,18 +260,14 @@ prop.remove(s2D);
         updatePreviewColor();
       break;
       case(2): //OK
-        startCol=curCol;
-        srccol[0] = curCol;
-        win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+        closeAndApply();
       break;
       case(3): //X
-        curCol=startCol;
-        srccol[0] = startCol;
-        win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+        closeAndCancel();
       break;
       case(4): //PREVIEW
-       preview = boolean((int)theEvent.getController().getValue());
-       updatePreviewColor();
+        preview = boolean((int)theEvent.getController().getValue());
+        updatePreviewColor();
       break;
     }
   }
@@ -279,7 +275,8 @@ prop.remove(s2D);
   private void closeAndApply() {
     startCol=curCol;
     srccol[0] = curCol;
-    win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+    hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+    undo.setUndoStep();
   }
 
   private void closeAndCancel() {
