@@ -624,7 +624,7 @@ void keyPressed() {
   } else if (keysDown['L']) {
     linebyline = !linebyline;
     linebylineSaveLabel.setValue((int(linebyline)));
-  } else if (keysDown['G']) {
+  } else if (keysDown['B']) {
     showRef = !showRef;
     showRefToggle.setState(showRef);
   } else if (keysDown['N']) {

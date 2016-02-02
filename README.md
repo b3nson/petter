@@ -53,7 +53,9 @@ CURSOR UP/DOWN		- add/remove tiles in y-space (+SHIFT: 10)
 
 R	- randomize tile-order (when multiple different tiles are used)
 X	- change cycle-order (L>R>T>B to T>B>L>R)
+L	- change rel-transformations from tile-by-tile to line-by-line
 N	- show/hide NFO-Graphic
+B	- show/hide REF-Graphic
 
 C	- show prev frame of animated-gif-imagemap
 V	- show next frame of animated-gif-imagemap
