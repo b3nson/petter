@@ -68,7 +68,7 @@ Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientat
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
-Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel;
+Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
 Slider offsetxSaveLabel, offsetySaveLabel;
 
 Controller currentOver; // still needed???
@@ -491,6 +491,13 @@ void setupGUI() {
   loopDirectionSaveLabel = gui.addNumberbox("loopDirectionSaveLabel" )
      .setPosition(0, 0)
      .setValue((int(loopDirection)))
+     .setGroup(main)
+     .hide()
+     ;
+     
+  linebylineSaveLabel = gui.addNumberbox("linebylineSaveLabel" )
+     .setPosition(0, 0)
+     .setValue((int(linebyline)))
      .setGroup(main)
      .hide()
      ;
@@ -1316,6 +1323,11 @@ void controlEvent(ControlEvent theEvent) {
     //float to bool in 2 lines, otherwise won't work in processing 2.2.1
     int val = int(loopDirectionSaveLabel.getValue());
     loopDirection = boolean(val);
+  }
+  else if (theEvent.isFrom(linebylineSaveLabel)) {
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(linebylineSaveLabel.getValue());
+    linebyline = boolean(val);
   }
   else if (theEvent.isFrom(offsetxSaveLabel)) {
     manualOffsetX = offsetxSaveLabel.getValue();

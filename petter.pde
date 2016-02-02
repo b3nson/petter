@@ -63,6 +63,7 @@ int manualNFOX = 0;
 int manualNFOY = 0;
 int xtilenum = 8;
 int ytilenum = 10;
+int tilecount;
 float manualOffsetX = 0;
 float manualOffsetY = 0;
 float tilewidth, tileheight, tilescale;
@@ -89,6 +90,7 @@ boolean strokeMode = true;
 boolean customStroke = true;
 boolean customFill = true;
 boolean random = false;
+boolean linebyline = false;
 boolean dragAllowed = false;
 boolean showRef = false;
 boolean showNfo = false;
@@ -325,13 +327,6 @@ void draw() {
     popStyle();
   }
 
-  abscount = 0;
-  pageOffset = int(absPageOffset * zoom);
-  
-  tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
-  tilescale = tilewidth / svg.get(0).width;
-  tileheight = svg.get(0).height * tilescale;
-
   if (nfo != null && showNfo && !nfoOnTop) {
     shapeMode(CENTER); 
     pushMatrix(); 
@@ -341,12 +336,21 @@ void draw() {
     popMatrix();
   }
   
+  
+  abscount = 0;
+  if(!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
+  else { tilecount = ytilenum-1; }
+  pageOffset = int(absPageOffset * zoom);
+  tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
+  tilescale = tilewidth / svg.get(0).width;
+  tileheight = svg.get(0).height * tilescale;
+  
   randomSeed(seed);
 
   // ---------------------------------------------------
   // MAIN LOOP
   // ---------------------------------------------------  
-  
+
   for (int i=0; i< (loopDirection?xtilenum:ytilenum); i++) {
     for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
       pushMatrix();
@@ -398,7 +402,7 @@ void draw() {
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {
-        translate(ease(TRA, abscount, -relTransX, relTransX, ((xtilenum*ytilenum)-1)), ease(TRA, abscount, relTransY, -relTransY, ((xtilenum*ytilenum)-1)));
+        translate(ease(TRA, abscount, -relTransX, relTransX, tilecount), ease(TRA, abscount, relTransY, -relTransY, tilecount));
       }
 
       rotate(radians(absRot));
@@ -410,7 +414,7 @@ void draw() {
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {
-        rotate(radians(ease(ROT, abscount, 0, relRot, ((xtilenum*ytilenum)-1))));
+        rotate(radians(ease(ROT, abscount, 0, relRot, tilecount)));
       }
 
       scale(absScale);
@@ -422,7 +426,7 @@ void draw() {
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {  
-        relsca = ease(SCA, abscount, 1.0, relScale, ((xtilenum*ytilenum)-1));
+        relsca = ease(SCA, abscount, 1.0, relScale, tilecount);
         scale(relsca);
       }
 
@@ -454,8 +458,13 @@ void draw() {
 
       popMatrix();
       popMatrix();
-      abscount++;
+      if(!linebyline) {
+        abscount++;
+      }
     } //for j
+    if(linebyline) {
+      abscount++;
+    }
   } //for i
   
   // ---------------------------------------------------
@@ -599,9 +608,6 @@ void keyPressed() {
     undo.undo();
   } else if (keysDown['Y']) {
     undo.redo();
-  } else if (keysDown['X']) {
-    loopDirection = !loopDirection;
-    loopDirectionSaveLabel.setValue((int(loopDirection)));
   } else if (keysDown['S']) {
     exportCurrentFrame = true;
     generateName();
@@ -610,8 +616,14 @@ void keyPressed() {
     toggleMenu();
   } else if (keysDown['0']) {
     toggleSettings();
+  } else if (keysDown['X']) {
+    loopDirection = !loopDirection;
+    loopDirectionSaveLabel.setValue((int(loopDirection)));
   } else if (keysDown['R']) {
     toggleRandom();
+  } else if (keysDown['L']) {
+    linebyline = !linebyline;
+    linebylineSaveLabel.setValue((int(linebyline)));
   } else if (keysDown['G']) {
     showRef = !showRef;
     showRefToggle.setState(showRef);
