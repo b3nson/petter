@@ -81,6 +81,10 @@ float relRot = 90;
 float absScale = 1.0;
 float relScale = 0.0;
 float relsca = 0.0;
+float totaltranslatex = 0.0;
+float totaltranslatey = 0.0;
+float totalscale = 0.0;
+float totalrotate = 0.0;
 float customStrokeWeight = 2.0;
 boolean mapScale = false;
 boolean mapRot = false;
@@ -376,7 +380,6 @@ void draw() {
           color col = map.get(mapIndex).pixels[(int)constrain(absScreenY, 0, map.get(mapIndex).height)*(int)map.get(mapIndex).width+(int)constrain(absScreenX, 0, map.get(mapIndex).width)];
           if (col == color(0, 255, 0)) {
             popMatrix();
-            popMatrix();
             abscount++;
             continue;
           }
@@ -389,47 +392,55 @@ void draw() {
         }
       }
 
-      scale(tilescale);
 
       float xx = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
       float yy = absTransY*(map(i, 0f, (float)ytilenum, 0, (float)ytilenum ));
-      translate(xx, yy );
+      totaltranslatex = xx;
+      totaltranslatey = yy;
       if (mapTra && map != null) {
         try {
           float tvx = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransX*10); 
           float tvy = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransY*10); 
-          translate( tvx, tvy );
+          totaltranslatex += tvx;
+          totaltranslatey += tvy;
         } 
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {
-        translate(ease(TRA, abscount, -relTransX, relTransX, tilecount), ease(TRA, abscount, relTransY, -relTransY, tilecount));
+        totaltranslatex += ease(TRA, abscount, -relTransX, relTransX, tilecount);
+        totaltranslatey += ease(TRA, abscount, relTransY, -relTransY, tilecount);
       }
-
-      rotate(radians(absRot));
+      translate(totaltranslatex, totaltranslatey);
+      
+    
+      totalrotate = absRot;
       if (mapRot && map != null) {
         try {
           float rv = mapValue * (relRot); 
-          rotate( rv );
+          totalrotate += rv;
         } 
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {
-        rotate(radians(ease(ROT, abscount, 0, relRot, tilecount)));
+        totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
       }
+      rotate(radians(totalrotate));
 
-      scale(absScale);
+
+      totalscale = absScale;
       if (mapScale && map != null) {
         try {
           relsca = mapValue * (relScale);
-          scale( invertMap ? (1-relsca) : relsca );
+          totalscale *= invertMap ? (1-relsca) : relsca;
         } 
         catch (ArrayIndexOutOfBoundsException e) {
         }
       } else {  
         relsca = ease(SCA, abscount, 1.0, relScale, tilecount);
-        scale(relsca);
+        totalscale *= relsca;
       }
+      scale(totalscale*tilescale);
+
 
       //setRelativeStrokeWeight
       if (customStyle && customStroke && !strokeMode) {

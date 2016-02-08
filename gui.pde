@@ -1832,10 +1832,13 @@ void printArrayList(ArrayList l) {
 float ease(int type, float a, float b, float c, float d) {
   if (type == ROT) {
     type = rotType;
+    if(c == 0f) { return 0f; }
   } else if (type == TRA) {
     type = traType;
+    if(c == 0f) { return 0f; }
   } else if (type == SCA) {
     type = scaType;
+    if(c == 0f) { return 1f; }
   } else /*if (type == ANM)*/ {
     type = animType;
   }
