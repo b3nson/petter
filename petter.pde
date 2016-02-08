@@ -347,15 +347,16 @@ void draw() {
   
   randomSeed(seed);
 
+  pushMatrix();
+  translate(pageOffset, pageOffset);
+  translate(manualOffsetX, manualOffsetY);
+      
   // ---------------------------------------------------
   // MAIN LOOP
   // ---------------------------------------------------  
 
   for (int i=0; i< (loopDirection?xtilenum:ytilenum); i++) {
     for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
-      pushMatrix();
-      translate(pageOffset, pageOffset);
-      translate(manualOffsetX, manualOffsetY);
       pushMatrix();
 
       translate( (tilewidth/2)+(tilewidth*(loopDirection?i:j)), (tileheight/2)+(tileheight*(loopDirection?j:i)) ); //swap i/j for xalign/yaligndraw
@@ -457,7 +458,6 @@ void draw() {
       }
 
       popMatrix();
-      popMatrix();
       if(!linebyline) {
         abscount++;
       }
@@ -466,6 +466,8 @@ void draw() {
       abscount++;
     }
   } //for i
+  
+  popMatrix();
   
   // ---------------------------------------------------
   
