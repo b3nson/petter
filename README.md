@@ -2,7 +2,7 @@ Petter
 ======
 a vector-graphic-based pattern generator.
 
-###Description:
+### Description:
 Petter is a experimental [Processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
 Use [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)-Files as input to generate, influence and export graphic patterns as PDF.    
 JPEG/PNG/GIF (also animated ones) can be used as a "ImageMap" to alter the pattern.    
@@ -15,7 +15,7 @@ See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
 ![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
 Animated PDF-sequences with (bottom) and without (top) animated-gif as ImageMap.
 
-###Keyboard Shortcuts:
+### Keyboard Shortcuts:
 ```
 SHORTCUTS
 ========================================================================
@@ -87,18 +87,18 @@ P	- view/testrun animation
 - `sojamo.drop` - http://www.sojamo.de/libraries/drop/
 - `gifAnimation` - http://extrapixel.github.io/gif-animation/ (>= [3.0](https://github.com/extrapixel/gif-animation/tree/3.0))
 
-###Command-Line-Options:
+### Command-Line-Options:
 soon...
 
 
-###Known Issues:    
+### Known Issues:    
 DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
 Use e.g. `Nautilus` instead.    
 "The root error is pcmanfm sends a null-terminated-string for file list"    
 https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
 
 
-###License: 
+### License: 
 ```
 Petter - vector-graphic-based pattern generator.
 http://www.lafkon.net/petter/
