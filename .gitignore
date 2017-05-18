@@ -11,3 +11,4 @@ application.macosx
 *.ser
 *.pdf
 
+o/*.svg
