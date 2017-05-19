@@ -257,15 +257,23 @@ class DropTargetSVG extends DropListener {
   
   void dropEvent(DropEvent theDropEvent) {
     ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
+    boolean lfknvdb = false;
   
   //SVGs ==========================================================
       String path = theDropEvent.toString();
       if (split(path, ".lafkon.net").length > 1) {
         path =  split(path, ".pdf")[0] +".svg";
+        lfknvdb = true;
       }
       if (path.toLowerCase().endsWith(".svg")) {
         println("SVG: " +path);
         PShape sh = loadShape(path);
+        
+        if(lfknvdb) {
+          int index = sh.getChildIndex(sh.getChild("disclaimer"));
+          sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
+        }
+        
         if(customStyle) sh.disableStyle();
         tmpsvg.add(sh);
         
