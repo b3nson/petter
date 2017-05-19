@@ -270,8 +270,10 @@ class DropTargetSVG extends DropListener {
         PShape sh = loadShape(path);
         
         if(lfknvdb) {
-          int index = sh.getChildIndex(sh.getChild("disclaimer"));
-          sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
+          try {
+            int index = sh.getChildIndex(sh.getChild("disclaimer"));
+            sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
+          } catch (ArrayIndexOutOfBoundsException e) {}
         }
         
         if(customStyle) sh.disableStyle();
