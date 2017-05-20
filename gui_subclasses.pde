@@ -185,6 +185,7 @@ class DropTargetSVG extends DropListener {
   PApplet app;
   boolean over = false;
   boolean addmode = false;
+  int margin = 20;
   int cw, ch;
   int x1,y1,w1,h1,x2,y2,w2,h2;
   int col = color(16, 181, 198, 150);
@@ -195,14 +196,14 @@ class DropTargetSVG extends DropListener {
     this.addmode = addmode;
     cw = fwidth;
     ch = fheight;
-    x1 = 10;
-    y1 = 10;
-    w1 = cw-20;
-    h1 = (ch/7)*3-5;
-    x2 = 10;
-    y2 = (ch/7)*3+5;
-    w2 = cw-20;
-    h2 = (ch/7)*3-15;
+    x1 = margin;
+    y1 = margin;
+    w1 = cw-(2*margin);
+    h1 = ((ch-(margin*2))/7)*3;
+    x2 = margin;
+    y2 = h1+margin;
+    w2 = w1;
+    h2 = h1;
     
     label = new Textlabel(gui,"ADD",100,100,400,200);
 
@@ -232,14 +233,15 @@ class DropTargetSVG extends DropListener {
   void updateTargetRect(int newwidth, int newheight) {
     cw = newwidth;
     ch = newheight;
-    x1 = 10;
-    y1 = 10;
-    w1 = cw-20;
-    h1 = (ch/7)*3-5;
-    x2 = 10;
-    y2 = (ch/7)*3+5;
-    w2 = cw-20;
-    h2 = (ch/7)*3-15;    
+    x1 = margin;
+    y1 = margin;
+    w1 = cw-(2*margin);
+    h1 = ((ch-(margin*2))/7)*3;
+    x2 = margin;
+    y2 = h1+margin;
+    w2 = w1;
+    h2 = h1;    
+    
     if(addmode) {
       setTargetRect(x1, y1, w1, h1);
     } else {
@@ -392,18 +394,20 @@ class DropTargetNFO extends DropListener {
   boolean over = false;
   int cw, ch;  
   int x1,y1,w1,h1;
+  int margin = 20;
   color col = color(60, 105, 97, 180);
   Textlabel label;
 
   
   DropTargetNFO(PApplet app) {
-    this.app = app;
+    this.app = app;    
     cw = fwidth;
     ch = fheight;
-    x1 = 10;
-    y1 = (ch/7)*6-10;
-    w1 = cw-20;
-    h1 = (ch/7)*1+5;    
+    x1 = margin;
+    h1 = (ch-(margin*2))/7;
+    y1 = ch-h1-margin;
+    w1 = cw-(2*margin);
+
     label = new Textlabel(gui,"NFO",100,100,400,200);
     setTargetRect(x1, y1, w1, h1);
   }
@@ -421,10 +425,10 @@ class DropTargetNFO extends DropListener {
   void updateTargetRect(int newwidth, int newheight) {
     cw = newwidth;
     ch = newheight;
-    x1 = 10;
-    y1 = (ch/7)*6-10;
-    w1 = cw-20;
-    h1 = (ch/7)*1+5;    
+    x1 = margin;
+    h1 = (ch-(margin*2))/7;
+    y1 = ch-h1-margin;
+    w1 = cw-(2*margin);
     setTargetRect(x1, y1, w1, h1);
   }
   
