@@ -1620,8 +1620,8 @@ void resizeFrame(int newW, int newH) {
   
   dropSVGadd.updateTargetRect(fwidth, fheight);
   dropSVGrep.updateTargetRect(fwidth, fheight);
+  dropSVGnfo.updateTargetRect(fwidth, fheight);
   dropIMG.updateTargetRect(fwidth, fheight);
-  dropNFO.updateTargetRect(fwidth, fheight);
   
   reorderGuiElements();
   

@@ -176,79 +176,74 @@ class GuiImage extends Canvas {
 }
 
 
+
 // ---------------------------------------------------------------------------
-//  DROPTARGETSVG
+//  DROPTARGETSVG - ADD/REPLACE/NFO
 // ---------------------------------------------------------------------------
+
+static int ADDSVG = 0;
+static int REPLACESVG = 1;
+static int NFOSVG = 2;
 
 class DropTargetSVG extends DropListener {
-  
+
   PApplet app;
   boolean over = false;
-  boolean addmode = false;
+  int mode = -1;
   int margin = 20;
   int cw, ch;
-  int x1,y1,w1,h1,x2,y2,w2,h2;
-  int col = color(16, 181, 198, 150);
+  int x,y,w,h;
+  int col;
+  int colTile = color(16, 181, 198, 150);
+  int colNfo  = color(60, 105, 97, 180);
   Textlabel label;
   
-  DropTargetSVG(PApplet app, boolean addmode) {
+  DropTargetSVG(PApplet app, int mode) {
     this.app = app;
-    this.addmode = addmode;
-    cw = fwidth;
-    ch = fheight;
-    x1 = margin;
-    y1 = margin;
-    w1 = cw-(2*margin);
-    h1 = ((ch-(margin*2))/7)*3;
-    x2 = margin;
-    y2 = h1+margin;
-    w2 = w1;
-    h2 = h1;
-    
-    label = new Textlabel(gui,"ADD",100,100,400,200);
-
-    if(addmode) {
-      setTargetRect(x1, y1, w1, h1);
-    } else {
-      setTargetRect(x2, y2, w2, h2);
-    }
+    this.mode = mode;
+    setTargetRect(fwidth, fheight, mode);
   }
   
   void draw() {
     if(over) {
       fill(col);
-      if(addmode) {
-        rect(x1, y1, w1, h1);
-        label.setPosition(cw/2-5, h1/2);
-        label.setText("ADD");
-      } else {
-        rect(x2, y2, w2, h2);
-        label.setPosition(cw/2-20, (h1/2)+h1);
-        label.setText("REPLACE");
-      }
+      rect(x, y, w, h);
       label.draw(app);
     }
   }
   
   void updateTargetRect(int newwidth, int newheight) {
-    cw = newwidth;
-    ch = newheight;
-    x1 = margin;
-    y1 = margin;
-    w1 = cw-(2*margin);
-    h1 = ((ch-(margin*2))/7)*3;
-    x2 = margin;
-    y2 = h1+margin;
-    w2 = w1;
-    h2 = h1;    
-    
-    if(addmode) {
-      setTargetRect(x1, y1, w1, h1);
-    } else {
-      setTargetRect(x2, y2, w2, h2);
-    }
+    setTargetRect(newwidth, newheight, mode);
   }
 
+  private void setTargetRect(int ww, int hh, int mode) {
+    cw = ww;
+    ch = hh;
+    if(mode == ADDSVG) {
+      x = margin;
+      y = margin;
+      w = cw-(2*margin);
+      h = ((ch-(margin*2))/7)*3;
+      label = new Textlabel(gui,"ADD",cw/2-5, h/2,400,200);
+      col = colTile;
+    } else if(mode == REPLACESVG) {
+      x = margin;
+      w = cw-(2*margin);
+      h = ((ch-(margin*2))/7)*3;
+      y = h+margin;
+      label = new Textlabel(gui,"REPLACE",cw/2-20, (h/2)+h,400,200);
+      col = colTile;
+    } else if(mode == NFOSVG) {
+      x = margin;
+      h = (ch-(margin*2))/7;
+      y = ch-h-margin;
+      w = cw-(2*margin);
+      label = new Textlabel(gui,"NFO",cw/2-20, (h/2)+y-10,400,200);
+      col = colNfo;
+    } 
+    setTargetRect(x, y, w, h);
+  }
+  
   void dropEnter() {
     over = true;
   }
@@ -261,39 +256,51 @@ class DropTargetSVG extends DropListener {
     ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
     boolean lfknvdb = false;
   
-  //SVGs ==========================================================
-      String path = theDropEvent.toString();
-      if (split(path, ".lafkon.net").length > 1) {
-        path =  split(path, ".pdf")[0] +".svg";
-        lfknvdb = true;
+    String path = theDropEvent.toString();
+    
+    if(split(path, ".lafkon.net").length > 1) {
+      path =  split(path, ".pdf")[0] +".svg";
+      lfknvdb = true;
+    } else if(split(path, "LAFKON_").length > 1) { 
+      lfknvdb = true;
+    }
+    
+    if (path.toLowerCase().endsWith(".svg")) {
+      PShape sh = loadShape(path);
+      
+      if(lfknvdb) {
+        try {
+          int index = sh.getChildIndex(sh.getChild("disclaimer"));
+          sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
+        } catch (ArrayIndexOutOfBoundsException e) {}
       }
-      if (path.toLowerCase().endsWith(".svg")) {
-        println("SVG: " +path);
-        PShape sh = loadShape(path);
-        
-        if(lfknvdb) {
-          try {
-            int index = sh.getChildIndex(sh.getChild("disclaimer"));
-            sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
-          } catch (ArrayIndexOutOfBoundsException e) {}
-        }
-        
+      
+      if(mode  == ADDSVG || mode  == REPLACESVG) {
         if(customStyle) sh.disableStyle();
         tmpsvg.add(sh);
-        
-        if (addmode) {
-          svg.addAll(tmpsvg);
-        } else {
-          if(over) {
-            svg = tmpsvg;
-          } else {
-            svg.addAll(tmpsvg);
-          }
-        }
       }
+      
+      if (mode  == ADDSVG) {
+        svg.addAll(tmpsvg);
+        print("ADDSVG: ");
+      } else if(mode == REPLACESVG) {
+        print("RPLSVG: ");
+        if(over) {
+          svg = tmpsvg;
+        } else {
+          svg.addAll(tmpsvg);
+        }
+      } else if(mode == NFOSVG) {
+        print("NFOSVG: ");
+        nfo = sh; 
+        showNfoToggle.setState(true);
+      }
+      println(path);
+    }
   }
-  
-}//class DropTarget
+}//class DropTargetSVG
+
+
 
 
 // ---------------------------------------------------------------------------
@@ -383,78 +390,6 @@ class DropTargetIMG extends DropListener {
   
 }//class DropTarget
 
-
-// ---------------------------------------------------------------------------
-//  DROPTARGETNFO
-// ---------------------------------------------------------------------------
-
-class DropTargetNFO extends DropListener {
-  
-  PApplet app;
-  boolean over = false;
-  int cw, ch;  
-  int x1,y1,w1,h1;
-  int margin = 20;
-  color col = color(60, 105, 97, 180);
-  Textlabel label;
-
-  
-  DropTargetNFO(PApplet app) {
-    this.app = app;    
-    cw = fwidth;
-    ch = fheight;
-    x1 = margin;
-    h1 = (ch-(margin*2))/7;
-    y1 = ch-h1-margin;
-    w1 = cw-(2*margin);
-
-    label = new Textlabel(gui,"NFO",100,100,400,200);
-    setTargetRect(x1, y1, w1, h1);
-  }
-  
-  void draw() {
-    if(over) {
-      fill(col);
-      rect(x1, y1, w1, h1);
-      
-      label.setPosition(cw/2-20, (h1/2)+y1-10);
-      label.draw(app);
-    }
-  }
-  
-  void updateTargetRect(int newwidth, int newheight) {
-    cw = newwidth;
-    ch = newheight;
-    x1 = margin;
-    h1 = (ch-(margin*2))/7;
-    y1 = ch-h1-margin;
-    w1 = cw-(2*margin);
-    setTargetRect(x1, y1, w1, h1);
-  }
-  
-  void dropEnter() {
-    over = true;
-  }
-
-  void dropLeave() {
-    over = false;
-  }
-  
-  void dropEvent(DropEvent theDropEvent) {
-  
-  //SVGs ==========================================================
-      String path = theDropEvent.toString();
-      if (split(path, ".lafkon.net").length > 1) {
-        path =  split(path, ".pdf")[0] +".svg";
-      }
-      if (path.toLowerCase().endsWith(".svg")) {
-        println("SVG: " +path);
-        nfo = loadShape(path); 
-        showNfoToggle.setState(true);
-      }
-  }
-  
-}//class DropTarget
 
 
 // ---------------------------------------------------------------------------

@@ -34,10 +34,8 @@ final static boolean[] keysDown = new boolean[KEYS];
 
 ControlP5 gui;
 SDrop drop;
-DropTargetSVG dropSVGadd;
-DropTargetSVG dropSVGrep;
+DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 DropTargetIMG dropIMG;
-DropTargetNFO dropNFO;
 ColorPicker bg_copi, stroke_copi, shape_copi;
 Memento undo;
 PGraphics pdf; 
@@ -164,14 +162,14 @@ void setup() {
   
   drop = new SDrop((Component)this.surface.getNative(), this);
   //drop = new SDrop(this);  
-  dropSVGadd = new DropTargetSVG(this, true);
-  dropSVGrep = new DropTargetSVG(this, false);
+  dropSVGadd = new DropTargetSVG(this, ADDSVG);
+  dropSVGrep = new DropTargetSVG(this, REPLACESVG);
+  dropSVGnfo = new DropTargetSVG(this, NFOSVG);
   dropIMG = new DropTargetIMG(this); 
-  dropNFO = new DropTargetNFO(this);  
   drop.addDropListener(dropSVGadd);
   drop.addDropListener(dropSVGrep);
+  drop.addDropListener(dropSVGnfo);
   drop.addDropListener(dropIMG);
-  drop.addDropListener(dropNFO);
   
   undo = new Memento(gui, 50);
 
@@ -543,8 +541,8 @@ void draw() {
   
   dropSVGadd.draw();
   dropSVGrep.draw();
+  dropSVGnfo.draw();
   dropIMG.draw();
-  dropNFO.draw();
  
  if(showHELP) {
    fpsLabel.setText(str((int)frameRate));
