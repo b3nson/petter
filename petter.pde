@@ -72,6 +72,7 @@ float absScreenY;
 
 float zoom = 1.0;
 float tmpzoom = 0;
+float nfoscale = 1.0;
 float relTransX = 0;
 float relTransY = 0;
 float absRot = 0;
@@ -334,6 +335,7 @@ void draw() {
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
     scale(zoom);
+    scale(nfoscale);
     shape(nfo);
     popMatrix();
   }
@@ -485,6 +487,7 @@ void draw() {
     pushMatrix(); 
     translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
     scale(zoom);
+    scale(nfoscale);
     shape(nfo);
     popMatrix();
   }
@@ -675,8 +678,12 @@ void keyReleased() {
 
 void mouseWheel(MouseEvent event) {
   float e = event.getAmount();
-  menuScroll((int)e);
-  gui.setMouseWheelRotation((int)e);
+  if (keysDown[CONTROL]) {
+    nfoscale += e/100;
+  } else {
+    menuScroll((int)e);
+    gui.setMouseWheelRotation((int)e);
+  }
 }
 
 static void processKey(int k, boolean set) {

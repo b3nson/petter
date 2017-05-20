@@ -31,6 +31,7 @@ DRAG'N'DROP IMG-FILE (on menu)
 
 LEFTCLICK-DRAG THE CANVAS	- repos artwork
 RIGHTCLICK-DRAG THE CANVAS	- repos nfo-graphic
+CTRL-SCROLL	- scale nfo-graphic
 
 CURSOR LEFT/RIGHT	- add/remove tiles in x-space (+SHIFT: 10)
 CURSOR UP/DOWN		- add/remove tiles in y-space (+SHIFT: 10)
