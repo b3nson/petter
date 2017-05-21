@@ -57,8 +57,6 @@ PShape s;
 int mapIndex = 0;
 int absPageOffset = 25;
 int pageOffset = 25;
-int manualNFOX = 0;
-int manualNFOY = 0;
 int xtilenum = 8;
 int ytilenum = 10;
 int tilecount;
@@ -140,6 +138,8 @@ int pdfwidth = 595;
 int pdfheight = 842;
 int guiwidth = 310;
 
+int manualNFOX = fwidth/2;
+int manualNFOY = fheight/6*5;
 
 // ---------------------------------------------------------------------------
 //  SETUP
@@ -332,9 +332,9 @@ void draw() {
 
   if (nfo != null && showNfo && !nfoOnTop) {
     shapeMode(CENTER); 
-    pushMatrix(); 
-    translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
+    pushMatrix();
     scale(zoom);
+    translate(manualNFOX, manualNFOY);
     scale(nfoscale);
     shape(nfo);
     popMatrix();
@@ -484,9 +484,9 @@ void draw() {
   
   if (nfo != null && showNfo && nfoOnTop) {
     shapeMode(CENTER); 
-    pushMatrix(); 
-    translate(fwidth/2+manualNFOX, fheight/4*3+manualNFOY);
+    pushMatrix();
     scale(zoom);
+    translate(manualNFOX, manualNFOY);
     scale(nfoscale);
     shape(nfo);
     popMatrix();
