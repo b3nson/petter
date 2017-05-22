@@ -48,6 +48,7 @@ String[] helptext;
 String name;
 
 ArrayList<PShape> svg;
+ArrayList<String> svgpath;
 ArrayList<PImage> map;
 PShape ref;
 PShape nfo;
@@ -175,8 +176,10 @@ void setup() {
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
+  svgpath = new ArrayList<String>();
   map = new ArrayList<PImage>();
   try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+  try { svgpath.add(sketchPath() +"/i/default.svg");}  catch(NullPointerException e) {}
   try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
   try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}

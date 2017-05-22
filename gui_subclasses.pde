@@ -254,6 +254,7 @@ class DropTargetSVG extends DropListener {
   
   void dropEvent(DropEvent theDropEvent) {
     ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
+    ArrayList<String> tmppath = new ArrayList<String>();
     boolean lfknvdb = false;
   
     String path = theDropEvent.toString();
@@ -278,17 +279,21 @@ class DropTargetSVG extends DropListener {
       if(mode  == ADDSVG || mode  == REPLACESVG) {
         if(customStyle) sh.disableStyle();
         tmpsvg.add(sh);
+        tmppath.add(path);
       }
       
       if (mode  == ADDSVG) {
         svg.addAll(tmpsvg);
+        svgpath.addAll(tmppath);
         print("ADDSVG: ");
       } else if(mode == REPLACESVG) {
         print("RPLSVG: ");
         if(over) {
           svg = tmpsvg;
+          svgpath = tmppath;
         } else {
           svg.addAll(tmpsvg);
+          svgpath.addAll(tmppath);
         }
       } else if(mode == NFOSVG) {
         print("NFOSVG: ");
