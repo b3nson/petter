@@ -80,7 +80,7 @@ Controller currentOver; // still needed???
 void setupGUI() {
   gui.setColorActive(c1);
   gui.setColorBackground(color(100));
-  gui.setColorForeground(color(50));
+  gui.setColorForeground(color(30));
   //gui.setColorLabel(color(0, 255, 0));
   //gui.setColorValue(color(255, 0, 0));
   gui.setColorCaptionLabel(color(255, 255, 255));
@@ -1458,6 +1458,17 @@ void changeshapecolor(float i) {
     PApplet.runSketch(args, shape_copi);
   } else {
     shape_copi.show(); 
+  }
+}
+
+void openTileEditor() {
+  if(tileEditor == null) {
+    tileEditor = new TileEditor(this, 500, 500);
+    String[] args = {"Petter - TILEEDITOR"};
+    PApplet.runSketch(args, tileEditor);
+    tileEditor.setTileList(svgpath, svg);
+  } else {
+    tileEditor.show(); 
   }
 }
 

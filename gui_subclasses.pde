@@ -300,6 +300,15 @@ class DropTargetSVG extends DropListener {
         nfo = sh; 
         showNfoToggle.setState(true);
       }
+      
+      if(tileEditor != null) {
+       int tmpmode = mode;
+       if(mode == REPLACESVG && !over) {
+         tmpmode = ADDSVG;
+       }
+       tileEditor.updateTileList(svgpath, svg, tmpmode);
+      }      
+     
       println(path);
     }
   }

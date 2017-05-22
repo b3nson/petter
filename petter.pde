@@ -37,6 +37,7 @@ SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 DropTargetIMG dropIMG;
 ColorPicker bg_copi, stroke_copi, shape_copi;
+TileEditor tileEditor;
 Memento undo;
 PGraphics pdf; 
 
@@ -671,8 +672,9 @@ void keyPressed() {
     prevImgMapFrame();
   } else if (keysDown['V']) {
     nextImgMapFrame();
-  }
-  
+  } else if (keysDown['T']) {
+    openTileEditor();
+  }  
 }
 
 void keyReleased() {
