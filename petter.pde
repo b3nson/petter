@@ -12,7 +12,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
- 
+
 import processing.pdf.*;
 import processing.svg.*;
 import penner.easing.*;
@@ -121,17 +121,17 @@ String formatName = "";
 
 boolean customStyle = false;
 
-color[] bgcolor = {color(random(255),random(255),random(255))};
-color[] strokecolor = {color(0,0,0)};
-color[] shapecolor = {color(255,255,255)};
+color[] bgcolor = {color(random(255), random(255), random(255))};
+color[] strokecolor = {color(0, 0, 0)};
+color[] shapecolor = {color(255, 255, 255)};
 
 boolean pageOrientation = true;
 String[][] formats = { 
-  { "A5", "437", "613" },
-  { "A4", "595", "842" },
-  { "A3", "842", "1191" },
-  { "A2", "1191", "1684" },
-  { "Q1", "800", "800" },
+  { "A5", "437", "613" }, 
+  { "A4", "595", "842" }, 
+  { "A3", "842", "1191" }, 
+  { "A2", "1191", "1684" }, 
+  { "Q1", "800", "800" }, 
   { "FullHD", "1920", "1080" }
 };
 int fwidth = 595;
@@ -149,22 +149,20 @@ int manualNFOY = fheight/6*5;
 
 void setup() {  
   frameRate(25);
-  //size(fwidth+(showMENU?guiwidth:0), fheight, JAVA2D);
   size(905, 842, JAVA2D);
   surface.setResizable(true);
   surface.setSize(905, 842);
 
   smooth();
   shapeMode(CENTER);
-  
+
   PFont pfont = createFont("i/fonts/PFArmaFive.ttf", 8, false);
   ControlFont font = new ControlFont(pfont);
 
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
-  
+
   drop = new SDrop((Component)this.surface.getNative(), this);
-  //drop = new SDrop(this);  
   dropSVGadd = new DropTargetSVG(this, ADDSVG);
   dropSVGrep = new DropTargetSVG(this, REPLACESVG);
   dropSVGnfo = new DropTargetSVG(this, NFOSVG);
@@ -173,7 +171,7 @@ void setup() {
   drop.addDropListener(dropSVGrep);
   drop.addDropListener(dropSVGnfo);
   drop.addDropListener(dropIMG);
-  
+
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
@@ -202,7 +200,7 @@ void setup() {
   last = null;
 
   undo.setUndoStep();
-  
+
   println("  , _");
   println(" /|/ \\ __|__|_  _  ,_");
   println("  |__/|/ |  |  |/ /  |");
@@ -210,7 +208,7 @@ void setup() {
   println(" ");
   println("  Press M for menu");
   println("        H for help");
-  
+
   checkArgs();
   ControlP5.DEBUG = false;
 }
@@ -222,8 +220,8 @@ void setup() {
 
 void draw() {
 
-  if(sequencing) {
-    animate();  
+  if (sequencing) {
+    animate();
   }
 
   if (keyPressed && key == CODED && keyCode == SHIFT && !shiftPressed) {
@@ -236,29 +234,29 @@ void draw() {
   }
 
   if (customStyle) {
-    if(customStroke) {
+    if (customStroke) {
       stroke(strokecolor[0]);
       strokeWeight(customStrokeWeight);
     } else {
-       noStroke(); 
+      noStroke();
     }
-    if(customFill) {
+    if (customFill) {
       fill(shapecolor[0]);
     } else {
-      noFill(); 
+      noFill();
     }
   } 
 
   if (exportCurrentFrame) {
-    if(!guiExportNow) {
+    if (!guiExportNow) {
       formatName = pdfwidth +"x" +pdfheight;
-      if(!sequencing && !batchmode) {
+      if (!sequencing && !batchmode) {
         saveSettings(timestamp +"_" +name);
       }
     }
-    if(!guiExportNow) {
+    if (!guiExportNow) {
       filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname;
-      if(exportFormat) {
+      if (exportFormat) {
         filename += ".pdf";
         pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
       } else {
@@ -267,70 +265,69 @@ void draw() {
       }
     } else {
       filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI";
-      if(exportFormat) {
+      if (exportFormat) {
         filename += ".pdf";
-        pdf = (PGraphicsPDF) createGraphics(pdfwidth+guiwidth, pdfheight, PDF, filename);        
+        pdf = (PGraphicsPDF) createGraphics(pdfwidth+guiwidth, pdfheight, PDF, filename);
       } else {
         filename += ".svg";
         pdf = (PGraphicsSVG) createGraphics(pdfwidth+guiwidth, pdfheight, SVG, filename);
       }
-
     }
-    
+
     beginRecord(pdf); 
     pdf.shapeMode(CENTER);   
     pdf.pushStyle();
     if (customStyle) {
-      if(customStroke) {
+      if (customStroke) {
         pdf.stroke(strokecolor[0]);
         pdf.strokeWeight(customStrokeWeight);
       } else {
-        pdf.noStroke(); 
+        pdf.noStroke();
       }
-      if(customFill) {
+      if (customFill) {
         pdf.fill(shapecolor[0]);
       } else {
-        pdf.noFill(); 
+        pdf.noFill();
       }
     }
-   
-    if(guiExportNow) { //reset scale to 1 for guiexport
+
+    if (guiExportNow) { //reset scale to 1 for guiexport
       tmpzoom = zoom;
       scaleGUI(1f);
     }    
-    
+
     pdf.pushMatrix();  
     pdf.scale(1f/zoom);
-    
+
     //saveFrame("frame.png");
   }
 
-  if(bg_copi != null && bg_copi.isOpen()) {
+  if (bg_copi != null && bg_copi.isOpen()) {
     bgcolorBang.setColorForeground(bgcolor[0]);
     bgcolorSaveLabel.setValue((bgcolor[0]));
   }
-  if(customStyle) {
-    if(stroke_copi != null && stroke_copi.isOpen()) {
+  if (customStyle) {
+    if (stroke_copi != null && stroke_copi.isOpen()) {
       strokecolorBang.setColorForeground(strokecolor[0]);
       strokecolorSaveLabel.setValue((strokecolor[0]));
     }
-    if(shape_copi != null && shape_copi.isOpen()) {
+    if (shape_copi != null && shape_copi.isOpen()) {
       shapecolorBang.setColorForeground(shapecolor[0]);
       shapecolorSaveLabel.setValue((shapecolor[0]));
     }
   }
-  
+
   pushStyle();
-    fill(bgcolor[0]);
-    noStroke();
-    rect(0, 0, fwidth, fheight);
+  fill(bgcolor[0]);
+  noStroke();
+  rect(0, 0, fwidth, fheight);
   popStyle();
-  
-  if(!exportCurrentFrame || (exportCurrentFrame && guiExportNow)) {
+
+  if (!exportCurrentFrame || (exportCurrentFrame && guiExportNow)) {
     pushStyle();
-      fill(50);
-      noStroke();
-      rect(fwidth, 0, guiwidth, fheight);
+    fill(50);
+    noStroke();
+    rect(fwidth, 0, guiwidth, fheight);
     popStyle();
   }
 
@@ -343,22 +340,22 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-  
-  
+
+
   abscount = 0;
-  if(!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
+  if (!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
   else { tilecount = ytilenum-1; }
   pageOffset = int(absPageOffset * zoom);
   tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
-  
+
   randomSeed(seed);
 
   pushMatrix();
   translate(pageOffset, pageOffset);
   translate(manualOffsetX, manualOffsetY);
-      
+
   // ---------------------------------------------------
   // MAIN LOOP
   // ---------------------------------------------------  
@@ -415,8 +412,8 @@ void draw() {
         totaltranslatey += ease(TRA, abscount, relTransY, -relTransY, tilecount);
       }
       translate(totaltranslatex, totaltranslatey);
-      
-    
+
+
       totalrotate = absRot;
       if (mapRot && map != null) {
         try {
@@ -449,10 +446,10 @@ void draw() {
       //setRelativeStrokeWeight
       if (customStyle && customStroke && !strokeMode) {
         float sw = ((relsca)*(absScale)*(tilescale));
-        if(sw != 0f) {
+        if (sw != 0f) {
           sw = abs(customStrokeWeight*(1/sw));
         } else {
-          sw = 0f; 
+          sw = 0f;
         }
 
         stroke(strokecolor[0]);
@@ -473,19 +470,19 @@ void draw() {
       }
 
       popMatrix();
-      if(!linebyline) {
+      if (!linebyline) {
         abscount++;
       }
     } //for j
-    if(linebyline) {
+    if (linebyline) {
       abscount++;
     }
   } //for i
-  
+
   popMatrix();
-  
+
   // ---------------------------------------------------
-  
+
   if (nfo != null && showNfo && nfoOnTop) {
     shapeMode(CENTER); 
     pushMatrix();
@@ -495,8 +492,8 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-  
-  if(exportCurrentFrame && guiExportNow) { 
+
+  if (exportCurrentFrame && guiExportNow) { 
     if (ref != null && showRef) {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
@@ -511,20 +508,20 @@ void draw() {
     pdf.popStyle();
     endRecord();  
     println(filename +" exported!");
-    if(batchmode && batchnow) {
-      exit();  
+    if (batchmode && batchnow) {
+      exit();
     }
-    if(guiExport && !guiExportNow) {
+    if (guiExport && !guiExportNow) {
       guiExportNow = true;
-    } else if(guiExport && guiExportNow){
+    } else if (guiExport && guiExportNow) {
       guiExportNow = false;
       exportCurrentFrame = false;
-    } else if(!guiExport) {
+    } else if (!guiExport) {
       exportCurrentFrame = false;
     }
   }
 
-  if(!exportCurrentFrame) {
+  if (!exportCurrentFrame) {
     if (ref != null && showRef) {
       shapeMode(CORNER);
       shape(ref, 0, 0, fwidth, fheight);
@@ -532,9 +529,9 @@ void draw() {
     gui.draw();
   }
 
-  if(batchmode) {
-    if(batchwait > 0) {
-       batchwait--; 
+  if (batchmode) {
+    if (batchwait > 0) {
+      batchwait--;
     } else {
       generateName();
       generateTimestamp();
@@ -542,18 +539,18 @@ void draw() {
       exportCurrentFrame = true;
     }
   }
-  
+
   shapeMode(CENTER);
   noStroke();
-  
+
   dropSVGadd.draw();
   dropSVGrep.draw();
   dropSVGnfo.draw();
   dropIMG.draw();
- 
- if(showHELP) {
-   fpsLabel.setText(str((int)frameRate));
- }
+
+  if (showHELP) {
+    fpsLabel.setText(str((int)frameRate));
+  }
 }//DRAW END
 
 
@@ -590,7 +587,7 @@ void mouseDragged ( ) {
     dragOffset.setText("OFFSET: " +(int)manualOffsetX +" x " +(int)manualOffsetY);
     offsetxSaveLabel.setValue(manualOffsetX);
     offsetySaveLabel.setValue(manualOffsetY);
-  } else if(dragAllowed && mouseButton == RIGHT) {
+  } else if (dragAllowed && mouseButton == RIGHT) {
     manualNFOX -= pmouseX-mouseX;
     manualNFOY -= pmouseY-mouseY;
   }
@@ -674,7 +671,7 @@ void keyPressed() {
     nextImgMapFrame();
   } else if (keysDown['T']) {
     openTileEditor();
-  }  
+  }
 }
 
 void keyReleased() {

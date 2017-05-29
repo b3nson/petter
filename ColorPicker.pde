@@ -71,7 +71,7 @@ public class ColorPicker extends PApplet {
 
   public void settings() {
     //surface.setSize(380, 285);
-    size(380, 285);
+    size(380, 285, P2D);
   }
 
   void setup() {    

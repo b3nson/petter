@@ -16,17 +16,23 @@ class TileEditor extends PApplet {
   boolean preview = true;
   boolean drag = false;
   boolean reset = false;
+  boolean customStyleChanged = true;
+  boolean tmpStyle = false;
 
   int svgindex = -1;
   int svglength = 0;
   int time = -1;
   int TIMEOUT = 300;
+  int updateSvgDebounce = 0;
+  int updateXmlDebounce = 0;
 
   PShapeSVG bot, svg, tmp;
   XML xml;
   String[] viewbox;
-  int dragx, dragy, vbx, vby, vbw, vbh;  
-  float scalefactor = 1.0;
+  int vbx, vby, vbw, vbh;
+  float dragx, dragy;
+  float scalefactor = 0.5;
+  float zoom = 1f;
   ArrayList<PShape> shapelistOrg;
   ArrayList<String> pathlistOrg;
   XML[] xmllistOwn;
@@ -34,7 +40,8 @@ class TileEditor extends PApplet {
   
   Button okButton, cancelButton, nextTileButton, prevTileButton, resetTileButton;
   Toggle previewToggle;
-  Textlabel viewboxlabel;
+  Textfield tileCountLabel;
+  Textlabel tezoomLabel;
 
 //---------------------------------------------------------------------------------- SETUP
   
@@ -46,7 +53,7 @@ class TileEditor extends PApplet {
   }
 
   public void settings() {
-    size(w, h, JAVA2D);
+    size(w, h, P2D); //JAVA2D
   }
 
   public void setup() {
@@ -58,7 +65,7 @@ class TileEditor extends PApplet {
 
     previewToggle = cp5.addToggle("preview")
       .setLabel("LIVE PREVIEW")
-      .setPosition(w-140, h-10-14)
+      .setPosition(w-10-72, h-60)
       .setSize(10, 10)
       .setValue(true)
       .setId(4)
@@ -78,30 +85,50 @@ class TileEditor extends PApplet {
     prevTileButton = cp5.addButton("PREV")
       .setLabel("<")
       .setPosition(0, 0)
-      .setSize(w/2, 30)
+      .setSize(w/2-20-1, 30)
       .setId(0)
       ;
       
     nextTileButton = cp5.addButton("NEXT")
       .setLabel(">")
-      .setPosition(w/2+1, 0)
+      .setPosition(w/2+20+1, 0)
       .setSize(w/2, 30)
       .setId(1)
       ;
 
-    resetTileButton = cp5.addButton("RESET")
-      .setLabel("RESET")
-      .setPosition(10, h-40)
+    tileCountLabel = cp5.addTextfield("TILECOUNT" )
+      .setPosition(w/2 -20, 0)
+      .setSize(40, 30)
+      .setText("      1 / 1") 
+      .setLock(true)
+      .setFocus(false)
+      .setColor(0xffffffff)
+      .setColorBackground(color(80))
+      .setColorForeground(color(80))
+      .setLabelVisible(false)
+      .setLabel("")
+      ;   
+      
+    resetTileButton = cp5.addButton("RESET TILE")
+      .setLabel("RESET TILE")
+      .setPosition(w-50-60-10, h-40)
       .setSize(60, 30)
       .setId(5)
       ;
       
+    tezoomLabel = cp5.addTextlabel("tezoomlabel" )
+     .setPosition(10, h-22)
+     .setText("ZOOM:  1.0")
+     ;
+     
     ControllerProperties prop = cp5.getProperties();
     prop.remove(okButton);
     prop.remove(previewToggle);
     prop.remove(prevTileButton);
     prop.remove(nextTileButton);
     prop.remove(resetTileButton);
+    prop.remove(tezoomLabel);
+    prop.remove(tileCountLabel);
 
     show();
     smooth();
@@ -113,7 +140,7 @@ class TileEditor extends PApplet {
 
   void draw() {
     background(50);
-
+    
     if ( time != -1 ) {
       if (millis() > time+TIMEOUT) {
         time = -1;
@@ -124,13 +151,37 @@ class TileEditor extends PApplet {
     if (svg != null) {
       pushMatrix();
       translate(w/2, h/2);
+      scale(zoom);
+
+      strokeWeight(1f/zoom);
 
       //viewbox fill
       fill(200, 100);
       noStroke();
       rect(0, 0, svg.width, svg.height);
       
-      shape(svg, dragx, dragy);
+      pushStyle();
+        if(customStyle) {
+          svg.disableStyle();
+          
+          if (customStroke) {
+            stroke(strokecolor[0]);
+            strokeWeight(customStrokeWeight);
+          } else {
+            noStroke();
+          }
+          if (customFill) {
+            fill(shapecolor[0]);
+          } else {
+            noFill();
+          }
+          
+        } else {
+          svg.enableStyle();
+        }
+        
+        shape(svg, dragx, dragy);
+      popStyle();
       
       //viewbox stroke
       noFill();
@@ -142,7 +193,6 @@ class TileEditor extends PApplet {
       rect(0, 0, refw, refh );
       line(-refw/2, -refh/2, refw/2, refh/2 );
       line(refw/2, -refh/2, -refw/2, refh/2 );
-      
       popMatrix();
     }
   }//draw
@@ -172,6 +222,7 @@ class TileEditor extends PApplet {
       xmllistOwn = new XML[shapelistOrg.size()];
       loadXML(svgindex);
     }
+    setCountLabel();
   }
   
   private void resetToOriginal(int index) {
@@ -207,15 +258,13 @@ class TileEditor extends PApplet {
       xml.setString("viewBox", "0 0 " +w +" " +h);
       viewbox = split( xml.getString("viewBox"), ' ');
     }
-    if(index == 0) {
-      refx = float(split( xml.getString("viewBox"), ' ')[0]);
-      refy = float(split( xml.getString("viewBox"), ' ')[1]);
-      refw = float(split( xml.getString("viewBox"), ' ')[2]);
-      refh = float(split( xml.getString("viewBox"), ' ')[3]);
+    if(index == 0) {      
+      refw = float(  split(xml.getString("width"), "px")[0] );
+      refh = float(  split(xml.getString("height"), "px")[0] );
     }
     
     svg = new PShapeSVG(xml);
-    
+      
     scalefactor = (svg.width / int(viewbox[2]) );
     vbx = int(viewbox[0]);
     vby = int(viewbox[1]);
@@ -223,44 +272,65 @@ class TileEditor extends PApplet {
     vbh = int(viewbox[3]);
   }
 
-
   void updateSVG() {
+    if( millis() - updateSvgDebounce >= 50 ) {
+      updateSvgDebounce = millis();
+      if(customStyle) {
+        tmp.disableStyle();
+      } else {
+        tmp.enableStyle();
+      }
     shapelistOrg.set(svgindex, tmp);
+    }
   }
-
 
   void updateXML() {
-    vbx = int(int(viewbox[0])-(dragx/scalefactor));
-    vby = int(int(viewbox[1])-(dragy/scalefactor));
-    String vb = (  vbx +" " +vby +" " +vbw +" " +vbh ) ;
-    xml.setString("viewBox", vb) ;
+    if( millis() - updateXmlDebounce >= 50 ) {
+      updateXmlDebounce = millis();
+      float f = dragx/zoom;
+      float g = dragy/zoom;
+      vbx = int(int(viewbox[0])-(dragx/scalefactor));
+      vby = int(int(viewbox[1])-(dragy/scalefactor));
+      //vbx = int(int(viewbox[0])-(dragx/scalefactor));
+      //vby = int(int(viewbox[1])-(dragy/scalefactor));
+      String vb = (  vbx +" " +vby +" " +vbw +" " +vbh ) ;
+      xml.setString("viewBox", vb) ;
 
-    try {
       tmp = new PShapeSVG(xml);
-    } 
-    catch(ArrayIndexOutOfBoundsException e) {
-      e.printStackTrace();
+
+      if(customStyle) {
+        tmp.disableStyle();
+      } else {
+        tmp.enableStyle();
+      }
+      
     }
-    //println(xml.getString("viewBox") );
   }
   
-  
+ 
   private void prevTile() {
     int size = pathlistOrg.size();
-    svgindex = (svgindex-1)%size;
-    if(svgindex == -1) svgindex = size-1;
+    if(size > 1) {
+      svgindex = (svgindex-1)%size;
+      if(svgindex == -1) svgindex = size-1;
+      setCountLabel();
+      loadXML(svgindex);
+    }
 
-    loadXML(svgindex);
   }
 
   private void nextTile() {
     int size = pathlistOrg.size();
-    svgindex = (svgindex+1)%size;
-
-    loadXML(svgindex);
+    if(size > 1) {
+      svgindex = (svgindex+1)%size;
+      setCountLabel();
+      loadXML(svgindex);
+    }
   }
 
-
+  private void setCountLabel() {
+     tileCountLabel.setText("      " +(svgindex+1) +" / " +pathlistOrg.size());  
+  }
 
 //---------------------------------------------------------------------------------- CALLBACK
 
@@ -309,7 +379,23 @@ class TileEditor extends PApplet {
     hide(); 
     //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
   }
-  
+
+  void scaleGUI(boolean bigger) {
+    if(bigger) {
+      this.zoom += .1;
+    } else {
+      if(this.zoom > 0.1) {
+        this.zoom -= .1;
+      }
+    }
+    tezoomLabel.setText("ZOOM:  " +nf(zoom, 1, 1));
+  }
+
+  void scaleGUI(float newzoom) {
+    this.zoom = newzoom;
+    tezoomLabel.setText("ZOOM:  " +nf(zoom, 1, 1));
+  }
+
 //---------------------------------------------------------------------------------- UIINPUT
 
   void mousePressed() {
@@ -317,11 +403,10 @@ class TileEditor extends PApplet {
     pmouseY = mouseY;
   }
 
-
   void mouseDragged ( ) {
     drag = true;
-    dragx -= pmouseX-mouseX;
-    dragy -= pmouseY-mouseY;
+    dragx -= pmouseX/zoom - mouseX/zoom;
+    dragy -= pmouseY/zoom - mouseY/zoom;
 
     if (preview) {
       updateXML();
@@ -337,7 +422,6 @@ class TileEditor extends PApplet {
       updateSVG();
       viewbox = split( xml.getString("viewBox"), ' ');
       svg = tmp;
-  
       dragx = 0;
       dragy = 0;
     }
@@ -353,10 +437,10 @@ class TileEditor extends PApplet {
     vbh += e;
 
     updateXML();
+    
     if (preview) {
       updateSVG();
     }
-    //viewbox = split( xml.getString("viewBox"), ' ');
     svg = tmp;
     scalefactor = (svg.width / vbw );
   }
@@ -371,7 +455,11 @@ class TileEditor extends PApplet {
       keyCode=0;
       //cancelButton.trigger();
       closeAndCancel();
-    }
+    } else if (keyCode == 93 || keyCode == 107) { //PLUS
+      this.scaleGUI(true);
+    } else if (keyCode == 47 || keyCode == 109) { //MINUS
+      this.scaleGUI(false);
+    } 
 
     if (key == CODED) {
       if (keyCode == LEFT) {
@@ -385,13 +473,6 @@ class TileEditor extends PApplet {
         previewToggle.setState(preview);
       }
       
-    }
-  }
-
-  void keyTyped() {
-    if (keyCode==ESC || key == ESC) { 
-      key = 0; 
-      keyCode = 0;
     }
   }
 }
