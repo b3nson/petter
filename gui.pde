@@ -273,7 +273,7 @@ void setupGUI() {
      .setLabel("global trans X")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(-4000,4000)
+     .setRange(-1000,1000)
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.004)
@@ -289,7 +289,7 @@ void setupGUI() {
      .setLabel("global trans Y")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(-4000,4000)
+     .setRange(-1000,1000)
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.004)
@@ -305,7 +305,7 @@ void setupGUI() {
      .setLabel("relative trans x")
      .setPosition(indentX,ypos)
      .setSize(w,h)
-     .setRange(-4000, 4000)
+     .setRange(-1000, 1000)
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.005)
@@ -321,7 +321,7 @@ void setupGUI() {
      .setLabel("relative trans y")
      .setPosition(indentX,ypos)
      .setSize(w,h)
-     .setRange(-4000, 4000)
+     .setRange(-1000, 1000)
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.005)
@@ -1463,10 +1463,10 @@ void changeshapecolor(float i) {
 
 void openTileEditor() {
   if(tileEditor == null) {
-    tileEditor = new TileEditor(this, 500, 500);
+    tileEditor = new TileEditor(this, 500, 600);
     String[] args = {"Petter - TILEEDITOR"};
     PApplet.runSketch(args, tileEditor);
-    tileEditor.setTileList(svgpath, svg);
+    tileEditor.setTileList(svg);
   } else {
     tileEditor.show(); 
   }

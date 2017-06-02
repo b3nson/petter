@@ -33,6 +33,7 @@ final static int KEYS = 0500;
 final static boolean[] keysDown = new boolean[KEYS];
 
 ControlP5 gui;
+ControlFont font;
 SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 DropTargetIMG dropIMG;
@@ -157,7 +158,7 @@ void setup() {
   shapeMode(CENTER);
 
   PFont pfont = createFont("i/fonts/PFArmaFive.ttf", 8, false);
-  ControlFont font = new ControlFont(pfont);
+  font = new ControlFont(pfont);
 
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
@@ -177,10 +178,11 @@ void setup() {
   svg = new ArrayList<PShape>();
   svgpath = new ArrayList<String>();
   map = new ArrayList<PImage>();
-  try { svg.add(loadShape("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+  
+  try { svg.add(new Tile("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
   try { svgpath.add(sketchPath() +"/i/default.svg");}  catch(NullPointerException e) {}
   try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
-  try { nfo = loadShape("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
+  try { nfo = new Tile("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
   try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
 

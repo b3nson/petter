@@ -13,6 +13,219 @@
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
  
+
+// ---------------------------------------------------------------------------
+//  DROPTARGETSVG - ADD/REPLACE/NFO
+// ---------------------------------------------------------------------------
+
+static int ADDSVG = 0;
+static int REPLACESVG = 1;
+static int NFOSVG = 2;
+
+class DropTargetSVG extends DropListener {
+
+  PApplet app;
+  boolean over = false;
+  int mode = -1;
+  int margin = 20;
+  int cw, ch;
+  int x,y,w,h;
+  int col;
+  int colTile = color(16, 181, 198, 150);
+  int colNfo  = color(60, 105, 97, 180);
+  Textlabel label;
+  
+  DropTargetSVG(PApplet app, int mode) {
+    this.app = app;
+    this.mode = mode;
+    setTargetRect(fwidth, fheight, mode);
+  }
+  
+  void draw() {
+    if(over) {
+      fill(col);
+      rect(x, y, w, h);
+      label.draw(app);
+    }
+  }
+  
+  void updateTargetRect(int newwidth, int newheight) {
+    setTargetRect(newwidth, newheight, mode);
+  }
+
+  private void setTargetRect(int ww, int hh, int mode) {
+    cw = ww;
+    ch = hh;
+    if(mode == ADDSVG) {
+      x = margin;
+      y = margin;
+      w = cw-(2*margin);
+      h = ((ch-(margin*2))/7)*3;
+      label = new Textlabel(gui,"ADD",cw/2-5, h/2,400,200);
+      col = colTile;
+    } else if(mode == REPLACESVG) {
+      x = margin;
+      w = cw-(2*margin);
+      h = ((ch-(margin*2))/7)*3;
+      y = h+margin;
+      label = new Textlabel(gui,"REPLACE",cw/2-20, (h/2)+h,400,200);
+      col = colTile;
+    } else if(mode == NFOSVG) {
+      x = margin;
+      h = (ch-(margin*2))/7;
+      y = ch-h-margin;
+      w = cw-(2*margin);
+      label = new Textlabel(gui,"NFO",cw/2-20, (h/2)+y-10,400,200);
+      col = colNfo;
+    } 
+    setTargetRect(x, y, w, h);
+  }
+  
+  void dropEnter() {
+    over = true;
+  }
+
+  void dropLeave() {
+    over = false;
+  }
+  
+  void dropEvent(DropEvent theDropEvent) {
+    ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
+    ArrayList<String> tmppath = new ArrayList<String>();
+    String path = theDropEvent.toString();
+    
+    if (path.toLowerCase().endsWith(".svg")) {
+      PShape sh = new Tile(path);
+      
+      if(mode  == ADDSVG || mode  == REPLACESVG) {
+        if(customStyle) sh.disableStyle(); 
+        tmpsvg.add(sh);
+        tmppath.add(path);
+      }
+      
+      if (mode  == ADDSVG) {
+        svg.addAll(tmpsvg);
+        svgpath.addAll(tmppath);
+        print("ADDSVG: ");
+      } else if(mode == REPLACESVG) {
+        print("RPLSVG: ");
+        if(over) {
+          svg = tmpsvg;
+          svgpath = tmppath;
+        } else {
+          svg.addAll(tmpsvg);
+          svgpath.addAll(tmppath);
+        }
+      } else if(mode == NFOSVG) {
+        print("NFOSVG: ");
+        nfo = sh; 
+        showNfoToggle.setState(true);
+      }
+      
+      if(tileEditor != null) {
+       int tmpmode = mode;
+       if(mode == REPLACESVG && !over) {
+         tmpmode = ADDSVG;
+       }
+       tileEditor.updateTileList(svg, tmpmode);
+      }      
+      println(path);
+    }
+  }
+}//class DropTargetSVG
+
+
+
+
+// ---------------------------------------------------------------------------
+//  DROPTARGETIMG
+// ---------------------------------------------------------------------------
+
+class DropTargetIMG extends DropListener {
+  
+  PApplet app;
+  boolean over = false;
+  int cw, ch;  
+  int col = color(16, 181, 198, 150);
+  
+  DropTargetIMG(PApplet app) {
+    this.app = app;
+    cw = fwidth;
+    ch = fheight;
+    setTargetRect(cw+10,10,guiwidth-20, height-20);
+  }
+  
+  void draw() {
+    if(over) {
+      fill(col);
+      rect(cw+10,10,guiwidth-20, height-20);
+    }
+  }
+  
+  void updateTargetRect(int newwidth, int newheight) {
+    cw = newwidth;
+    ch = newheight;
+    setTargetRect(cw+10,10,guiwidth-20, height-20);
+  }
+  
+  void dropEnter() {
+    over = true;
+  }
+
+  void dropLeave() {
+    over = false;
+  }
+  
+  String lastImgDropped = "x";
+  String lastUrlDropped = "y";
+  
+  void dropEvent(DropEvent theDropEvent) {
+    
+    boolean url = theDropEvent.isURL();
+    boolean file = theDropEvent.isFile();
+    boolean img = theDropEvent.isImage();  
+
+  //IMAGEMAP ======================================================  
+   //somewhat complicated testing due to different behaviour on linux and osx
+   //there seems to be a bug in sDrop (not correctly working in linux)
+    if ((url&&!file&&img) || (!url&&file&&img)) {
+      if(!url&&file&&img) {
+        lastImgDropped = trim(theDropEvent.filePath());
+      }
+      if(url&&!file&&img) {
+        lastUrlDropped = theDropEvent.url();
+        try {
+        lastUrlDropped = trim(split(lastUrlDropped, "file://")[1]);
+        } catch(ArrayIndexOutOfBoundsException e) {
+          lastUrlDropped = "";
+        }
+      }      
+      if( (lastUrlDropped.equals(lastImgDropped)) == false) {
+        String path = url ? theDropEvent.url() : theDropEvent.filePath();
+        String p = path.substring(path.lastIndexOf('.') + 1);
+        map.clear();
+        mapIndex = 0;
+        if(p.equals("gif")) {
+          ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
+          map = tmpimg;
+        } else {
+          //map.add(theDropEvent.loadImage()); //fails in Processing 3.x
+          map.add(requestImage(path));
+        }
+        imgMap.setup(app);
+        updateImgMap();
+
+      } else {
+        lastImgDropped = "x";
+        lastUrlDropped = "y"; 
+      }
+    } 
+  }
+}//class DropTargetIMG
+
+
+
+
 // ---------------------------------------------------------------------------
 //  GUIIMAGE
 // ---------------------------------------------------------------------------
@@ -175,234 +388,6 @@ class GuiImage extends Canvas {
   }
 }
 
-
-
-// ---------------------------------------------------------------------------
-//  DROPTARGETSVG - ADD/REPLACE/NFO
-// ---------------------------------------------------------------------------
-
-static int ADDSVG = 0;
-static int REPLACESVG = 1;
-static int NFOSVG = 2;
-
-class DropTargetSVG extends DropListener {
-
-  PApplet app;
-  boolean over = false;
-  int mode = -1;
-  int margin = 20;
-  int cw, ch;
-  int x,y,w,h;
-  int col;
-  int colTile = color(16, 181, 198, 150);
-  int colNfo  = color(60, 105, 97, 180);
-  Textlabel label;
-  
-  DropTargetSVG(PApplet app, int mode) {
-    this.app = app;
-    this.mode = mode;
-    setTargetRect(fwidth, fheight, mode);
-  }
-  
-  void draw() {
-    if(over) {
-      fill(col);
-      rect(x, y, w, h);
-      label.draw(app);
-    }
-  }
-  
-  void updateTargetRect(int newwidth, int newheight) {
-    setTargetRect(newwidth, newheight, mode);
-  }
-
-  private void setTargetRect(int ww, int hh, int mode) {
-    cw = ww;
-    ch = hh;
-    if(mode == ADDSVG) {
-      x = margin;
-      y = margin;
-      w = cw-(2*margin);
-      h = ((ch-(margin*2))/7)*3;
-      label = new Textlabel(gui,"ADD",cw/2-5, h/2,400,200);
-      col = colTile;
-    } else if(mode == REPLACESVG) {
-      x = margin;
-      w = cw-(2*margin);
-      h = ((ch-(margin*2))/7)*3;
-      y = h+margin;
-      label = new Textlabel(gui,"REPLACE",cw/2-20, (h/2)+h,400,200);
-      col = colTile;
-    } else if(mode == NFOSVG) {
-      x = margin;
-      h = (ch-(margin*2))/7;
-      y = ch-h-margin;
-      w = cw-(2*margin);
-      label = new Textlabel(gui,"NFO",cw/2-20, (h/2)+y-10,400,200);
-      col = colNfo;
-    } 
-    setTargetRect(x, y, w, h);
-  }
-  
-  void dropEnter() {
-    over = true;
-  }
-
-  void dropLeave() {
-    over = false;
-  }
-  
-  void dropEvent(DropEvent theDropEvent) {
-    ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
-    ArrayList<String> tmppath = new ArrayList<String>();
-    boolean lfknvdb = false;
-  
-    String path = theDropEvent.toString();
-    
-    if(split(path, ".lafkon.net").length > 1) {
-      path =  split(path, ".pdf")[0] +".svg";
-      lfknvdb = true;
-    } else if(split(path, "LAFKON_").length > 1) { 
-      lfknvdb = true;
-    }
-    
-    if (path.toLowerCase().endsWith(".svg")) {
-      PShape sh = loadShape(path);
-      
-      if(lfknvdb) {
-        try {
-          int index = sh.getChildIndex(sh.getChild("disclaimer"));
-          sh.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
-        } catch (ArrayIndexOutOfBoundsException e) {}
-      }
-      
-      if(mode  == ADDSVG || mode  == REPLACESVG) {
-        if(customStyle) sh.disableStyle();
-        tmpsvg.add(sh);
-        tmppath.add(path);
-      }
-      
-      if (mode  == ADDSVG) {
-        svg.addAll(tmpsvg);
-        svgpath.addAll(tmppath);
-        print("ADDSVG: ");
-      } else if(mode == REPLACESVG) {
-        print("RPLSVG: ");
-        if(over) {
-          svg = tmpsvg;
-          svgpath = tmppath;
-        } else {
-          svg.addAll(tmpsvg);
-          svgpath.addAll(tmppath);
-        }
-      } else if(mode == NFOSVG) {
-        print("NFOSVG: ");
-        nfo = sh; 
-        showNfoToggle.setState(true);
-      }
-      
-      if(tileEditor != null) {
-       int tmpmode = mode;
-       if(mode == REPLACESVG && !over) {
-         tmpmode = ADDSVG;
-       }
-       tileEditor.updateTileList(svgpath, svg, tmpmode);
-      }      
-     
-      println(path);
-    }
-  }
-}//class DropTargetSVG
-
-
-
-
-// ---------------------------------------------------------------------------
-//  DROPTARGETIMG
-// ---------------------------------------------------------------------------
-
-class DropTargetIMG extends DropListener {
-  
-  PApplet app;
-  boolean over = false;
-  int cw, ch;  
-  int col = color(16, 181, 198, 150);
-  
-  DropTargetIMG(PApplet app) {
-    this.app = app;
-    cw = fwidth;
-    ch = fheight;
-    setTargetRect(cw+10,10,guiwidth-20, height-20);
-  }
-  
-  void draw() {
-    if(over) {
-      fill(col);
-      rect(cw+10,10,guiwidth-20, height-20);
-    }
-  }
-  
-  void updateTargetRect(int newwidth, int newheight) {
-    cw = newwidth;
-    ch = newheight;
-    setTargetRect(cw+10,10,guiwidth-20, height-20);
-  }
-  
-  void dropEnter() {
-    over = true;
-  }
-
-  void dropLeave() {
-    over = false;
-  }
-  
-  String lastImgDropped = "x";
-  String lastUrlDropped = "y";
-  
-  void dropEvent(DropEvent theDropEvent) {
-    
-    boolean url = theDropEvent.isURL();
-    boolean file = theDropEvent.isFile();
-    boolean img = theDropEvent.isImage();  
-
-  //IMAGEMAP ======================================================  
-   //somewhat complicated testing due to different behaviour on linux and osx
-   //there seems to be a bug in sDrop (not correctly working in linux)
-    if ((url&&!file&&img) || (!url&&file&&img)) {
-      if(!url&&file&&img) {
-        lastImgDropped = trim(theDropEvent.filePath());
-      }
-      if(url&&!file&&img) {
-        lastUrlDropped = theDropEvent.url();
-        try {
-        lastUrlDropped = trim(split(lastUrlDropped, "file://")[1]);
-        } catch(ArrayIndexOutOfBoundsException e) {
-          lastUrlDropped = "";
-        }
-      }      
-      if( (lastUrlDropped.equals(lastImgDropped)) == false) {
-        String path = url ? theDropEvent.url() : theDropEvent.filePath();
-        String p = path.substring(path.lastIndexOf('.') + 1);
-        map.clear();
-        mapIndex = 0;
-        if(p.equals("gif")) {
-          ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
-          map = tmpimg;
-        } else {
-          //map.add(theDropEvent.loadImage()); //fails in Processing 3.x
-          map.add(requestImage(path));
-        }
-        imgMap.setup(app);
-        updateImgMap();
-
-      } else {
-        lastImgDropped = "x";
-        lastUrlDropped = "y"; 
-      }
-    } 
-  }
-  
-}//class DropTarget
 
 
 
