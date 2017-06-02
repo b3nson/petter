@@ -233,7 +233,7 @@ void setupGUI() {
      .setLabel("pageOffset")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(0,250) // values can range from big to small as well
+     .setRange(0,250) 
      .setSliderMode(Slider.FLEXIBLE)
      .setNumberOfTickMarks(tickMarks)
      .showTickMarks(false)   
@@ -247,7 +247,7 @@ void setupGUI() {
      .setLabel("xtilenum")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(0,180) // values can range from big to small as well
+     .setRange(0,180) 
      .setSliderMode(Slider.FLEXIBLE)
      .setGroup(main)
      ;
@@ -259,7 +259,7 @@ void setupGUI() {
      .setLabel("ytilenum")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(0,260) // values can range from big to small as well
+     .setRange(0,260) 
      .setSliderMode(Slider.FLEXIBLE)
      .setGroup(main)
      ;   
@@ -412,7 +412,7 @@ void setupGUI() {
      .setLabel("global scale")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(-5.0,5.0) // values can range from big to small as well
+     .setRange(-5.0,5.0) 
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.01)
@@ -428,7 +428,7 @@ void setupGUI() {
      .setLabel("relative scale")
      .setPosition(indentX, ypos)
      .setSize(w,h)
-     .setRange(-5.0,5.0) // values can range from big to small as well
+     .setRange(-5.0,5.0) 
      .setSliderMode(Slider.FLEXIBLE)
      .setDecimalPrecision(1)
      .setScrollSensitivity(0.01)
@@ -1140,7 +1140,7 @@ void callbackUndoAction(CallbackEvent theEvent) {
         tmpctrl = null;
         undo.setUndoStep();
       }
-    }
+    }    
   }
   
   //ALL others on RELEASE
@@ -1157,6 +1157,7 @@ void controlEvent(ControlEvent theEvent) {
 
   if(theEvent.isController() && theEvent.getController() instanceof Slider) {
    Slider tmp =  (Slider)theEvent.getController();
+   
    if(tmp != xTileNumSlider && tmp != yTileNumSlider) {
       last = tmp;
       if(shiftPressed && !shiftProcessed) {
@@ -1469,6 +1470,24 @@ void openTileEditor() {
     tileEditor.setTileList(svg);
   } else {
     tileEditor.show(); 
+  }
+}
+
+void changeSliderRange(boolean increase) {
+  if(gui.isMouseOver()) {
+    try {
+      ControllerInterface c = gui.getMouseOverList().get(0);
+      if(c instanceof Slider) {
+        Slider tmp = (Slider)c;
+        if(increase) {
+          tmp.setMin(tmp.getMin()*2f);
+          tmp.setMax(tmp.getMax()*2f);
+        } else {
+          tmp.setMax(tmp.getMax()*0.5f);
+          tmp.setMin(tmp.getMin()*0.5f);
+        }
+      }
+    } catch(IndexOutOfBoundsException e) {}
   }
 }
 

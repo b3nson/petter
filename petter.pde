@@ -673,6 +673,10 @@ void keyPressed() {
     nextImgMapFrame();
   } else if (keysDown['T']) {
     openTileEditor();
+  } else if (keysDown[',']) {
+    changeSliderRange(false);
+  } else if (keysDown['.']) {
+    changeSliderRange(true);
   }
 }
 
