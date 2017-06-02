@@ -63,7 +63,7 @@ ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableList penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
-Bang bgcolorBang, strokecolorBang, shapecolorBang;
+Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem;
 Numberbox wBox, hBox, animFrameNumBox;
@@ -108,10 +108,9 @@ void setupGUI() {
   formatDropdown = gui.addScrollableList("formats")
      .setGroup(main)
      .setPosition(indentX, ypos)
-     .setSize(54, 300)
+     .setSize(46, 300)
      .setItemHeight(h)
      .setBarHeight(h)
-     //.activateEvent(true)
      .setBackgroundColor(color(190))
      .setType(ControlP5.DROPDOWN)
      .close();
@@ -121,7 +120,7 @@ void setupGUI() {
 
      
   wBox = gui.addNumberbox("width")
-     .setPosition(indentX+67, ypos)
+     .setPosition(indentX+54, ypos)
      .setSize(34, h)
      .setLabel("")
      .setRange(20,2000)
@@ -134,7 +133,7 @@ void setupGUI() {
      ;
 
   hBox = gui.addNumberbox("height")
-     .setPosition(indentX +107, ypos)
+     .setPosition(indentX +94, ypos)
      .setSize(34, h)
      .setLabel("")
      .setRange(20,2000)
@@ -145,7 +144,16 @@ void setupGUI() {
      .setGroup(main)
      ;
 
-   pageOrientationToggle = gui.addToggle("pageOrientation")
+  tileeditorBang = gui.addBang("tileEditor")
+     .setLabel("TE")
+     .setPosition(indentX +134, ypos)
+     .setSize(h, h)
+     .setGroup(main)
+     ;
+     tileeditorBang.getCaptionLabel().setPadding(6,-14);
+     tileeditorBang.setColorForeground(color(100));
+
+  pageOrientationToggle = gui.addToggle("pageOrientation")
      .setLabel("p/l")
      .setPosition(indentX+8*h, ypos)
      .setSize(h, h)
@@ -349,11 +357,6 @@ void setupGUI() {
   //penner_tra.getCaptionLabel().getStyle().marginTop = h/4+1;
 
   ypos += sep;
-
-
-
-
-
 
 
 
@@ -922,6 +925,7 @@ void setupGUI() {
   
   ControllerProperties cprop = gui.getProperties();
   cprop.remove(closeImgMapButton);
+  cprop.remove(tileeditorBang);
   cprop.remove(bgcolorBang);
   cprop.remove(strokecolorBang);
   cprop.remove(shapecolorBang);
@@ -1245,7 +1249,7 @@ void controlEvent(ControlEvent theEvent) {
   else if (theEvent.isFrom(mapRotToggle)) {
     mapRot = ((Toggle)theEvent.getController()).getState();
     updateImgMap();
-  }   
+  }
   else if (theEvent.isFrom(mapTraToggle)) {
     mapTra = ((Toggle)theEvent.getController()).getState();
     updateImgMap();
@@ -1255,6 +1259,9 @@ void controlEvent(ControlEvent theEvent) {
   } 
   else if (theEvent.isFrom(hBox)) {
     canvasResize();
+  }
+  else if (theEvent.isFrom(tileeditorBang)) {
+    toggleTileEditor();
   }
   else if(theEvent.isFrom("animate")) {
     if(gui.getGroup("animate").isOpen())
@@ -1462,14 +1469,18 @@ void changeshapecolor(float i) {
   }
 }
 
-void openTileEditor() {
+void toggleTileEditor() {
   if(tileEditor == null) {
     tileEditor = new TileEditor(this, 500, 600);
     String[] args = {"Petter - TILEEDITOR"};
     PApplet.runSketch(args, tileEditor);
     tileEditor.setTileList(svg);
   } else {
-    tileEditor.show(); 
+    if(tileEditor.opened) {
+      tileEditor.hide(); 
+    } else {
+      tileEditor.show();
+    }
   }
 }
 

@@ -59,10 +59,10 @@ class TileEditor extends PApplet {
   }
 
   public void setup() { 
-    surface.setLocation(10, 10);
+    //surface.setLocation(10, 10);
     shapeMode(CENTER);
     rectMode(CENTER);
-      
+    
     cp5 = new ControlP5(this, font);
 
     previewToggle = cp5.addToggle("preview")
@@ -78,7 +78,7 @@ class TileEditor extends PApplet {
     l.getStyle().setPadding(2, 2, 2, 2);
     l.getStyle().setMargin(-15, 0, 0, 14);
 
-    okButton = cp5.addButton("OK")
+    okButton = cp5.addButton("CLOSE")
       .setPosition(w-40-10, h-30-10)
       .setSize(40, 30)
       .setId(2)
@@ -224,7 +224,6 @@ class TileEditor extends PApplet {
       stroke(0, 150, 255, 80);
       rect(0, 0, shapelist.get(0).width, shapelist.get(0).height);
 
-      
       //viewbox
       stroke(150, 80);
       rect(0, 0, svg.width, svg.height);
@@ -392,6 +391,7 @@ class TileEditor extends PApplet {
     this.loop();
     opened = true;
     surface.setVisible(true);
+    keysDown[lastKey] = false; //reset missing keyRelease
     
     setDeleteButtonStatus();
     setMoveButtonStatus();
@@ -530,6 +530,8 @@ class TileEditor extends PApplet {
       if (key == 'p') {
         preview = !preview;
         previewToggle.setState(preview);
+      } else if (key == 't') {
+        hide();
       }
     }
   }

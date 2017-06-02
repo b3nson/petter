@@ -29,6 +29,7 @@ static int TRA = 1;
 static int SCA = 2;
 static int ANM = 3;
 
+static int lastKey = ' ';
 final static int KEYS = 0500;
 final static boolean[] keysDown = new boolean[KEYS];
 
@@ -672,7 +673,7 @@ void keyPressed() {
   } else if (keysDown['V']) {
     nextImgMapFrame();
   } else if (keysDown['T']) {
-    openTileEditor();
+    toggleTileEditor();
   } else if (keysDown[',']) {
     changeSliderRange(false);
   } else if (keysDown['.']) {
@@ -695,5 +696,6 @@ void mouseWheel(MouseEvent event) {
 }
 
 static void processKey(int k, boolean set) {
+  if(set) lastKey = k;
   if (k < KEYS)  keysDown[k] = set;
 }
