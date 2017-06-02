@@ -27,15 +27,15 @@ GENERAL
 M		-	Show/Hide MAIN-MENU
 H		- 	Show/Hide this HELP
 T		- 	Show/Hide TileEditor
-+ / - 	- 	ZOOM IN / OUT
-Z / Y 	- 	UNDO / REDO
++ / - 		- 	ZOOM IN / OUT
+Z / Y 		- 	UNDO / REDO
 
 SHIFT on Sliders	-	bigger steps
 SCROLL on Sliders	-	finer steps
 . / ; on Sliders	-	in/decrease sliderrange
 
 0 (ZERO)	-	Load previous Settings
-S			-	Save PDF
+S		-	Save PDF
 
 ------------------------------------------------------------------------
 CREATE
