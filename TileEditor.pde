@@ -506,33 +506,41 @@ class TileEditor extends PApplet {
 
 
   void keyPressed() {
-    if (key == RETURN || key == ENTER) {
-      //okButton.trigger();
-      closeAndApply();
-    } else if (key == ESC || keyCode==ESC) {
-      key=0;
-      keyCode=0;
-      //cancelButton.trigger();
-      closeAndCancel();
-    } else if (keyCode == 93 || keyCode == 107) { //PLUS
-      this.scaleGUI(true);
-    } else if (keyCode == 47 || keyCode == 109) { //MINUS
-      this.scaleGUI(false);
-    } 
-
     if (key == CODED) {
       if (keyCode == LEFT) {
         prevTile();
       } else if (keyCode == RIGHT) {
         nextTile();
+      } else if (keyCode == 93 || keyCode == 107) { //PLUS
+        this.scaleGUI(true);
+      } else if (keyCode == 47 || keyCode == 109) { //MINUS
+        this.scaleGUI(false);
+      } else { //forward to pettermain
+        parent.key=key;
+        parent.keyCode=keyCode;
+        parent.keyPressed(); 
       }
     } else {
-      if (key == 'p') {
+      if (key == RETURN || key == ENTER) {
+        closeAndApply();
+      } else if (key == ESC || keyCode==ESC) {
+        key=0;
+        keyCode=0;
+        closeAndCancel();
+      } else if (key == 'p') {
         preview = !preview;
         previewToggle.setState(preview);
       } else if (key == 't') {
         hide();
+      } else { //forward to pettermain
+        parent.key = key;
+        parent.keyCode = keyCode;
+        parent.keyPressed(); 
       }
     }
+  }
+  
+  void keyReleased() {
+    processKey(keyCode, false); //debounce parent
   }
 }
