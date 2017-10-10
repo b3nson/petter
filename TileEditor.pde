@@ -511,10 +511,6 @@ class TileEditor extends PApplet {
         prevTile();
       } else if (keyCode == RIGHT) {
         nextTile();
-      } else if (keyCode == 93 || keyCode == 107) { //PLUS
-        this.scaleGUI(true);
-      } else if (keyCode == 47 || keyCode == 109) { //MINUS
-        this.scaleGUI(false);
       } else { //forward to pettermain
         parent.key=key;
         parent.keyCode=keyCode;
@@ -532,6 +528,10 @@ class TileEditor extends PApplet {
         previewToggle.setState(preview);
       } else if (key == 't') {
         hide();
+      } else if (keyCode == 93 || keyCode == 107) { //PLUS
+        this.scaleGUI(true);
+      } else if (keyCode == 47 || keyCode == 109) { //MINUS
+        this.scaleGUI(false);
       } else { //forward to pettermain
         parent.key = key;
         parent.keyCode = keyCode;
