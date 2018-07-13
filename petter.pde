@@ -180,10 +180,10 @@ void setup() {
   svgpath = new ArrayList<String>();
   map = new ArrayList<PImage>();
   
-  try { svg.add(new Tile("i/default.svg"));}  catch(NullPointerException e) {svg.add(createShape(RECT, 0, 0, 50, 50));}
+  try { svg.add(new TileSVG("i/default.svg"));}  catch(NullPointerException e) {svg.add(new TileShape(createShape(RECT, 0, 0, 50, 50),50f,50f));}
   try { svgpath.add(sketchPath() +"/i/default.svg");}  catch(NullPointerException e) {}
   try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
-  try { nfo = new Tile("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
+  try { nfo = new TileSVG("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
   try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
   try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
 

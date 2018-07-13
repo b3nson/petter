@@ -214,7 +214,7 @@ class TileEditor extends PApplet {
       if (preview) {
         shape(svg);        
       } else {
-        shape(svg, tmpx-((Tile)( shapelist.get(svgindex) )).offsetx, tmpy-((Tile)( shapelist.get(svgindex) )).offsety );
+        shape(svg, tmpx-((Tile)( shapelist.get(svgindex) )).getOffsetX(), tmpy-((Tile)( shapelist.get(svgindex) )).getOffsetY() );
       }
 
       popStyle();
@@ -264,13 +264,15 @@ class TileEditor extends PApplet {
   }
 
   private void updateScale() {    
-    ((Tile)( shapelist.get(svgindex) )).scalex = scalex;
-    ((Tile)( shapelist.get(svgindex) )).scaley = scaley;
+    ((Tile)( shapelist.get(svgindex) )).setScaleX(scalex);
+    ((Tile)( shapelist.get(svgindex) )).setScaleY(scaley);
   }
 
   private void updateTranslate() {
-    ((Tile)( shapelist.get(svgindex) )).offsetx -= offsetx;
-    ((Tile)( shapelist.get(svgindex) )).offsety -= offsety;
+    float xo = ((Tile)( shapelist.get(svgindex) )).getOffsetX();
+    float yo = ((Tile)( shapelist.get(svgindex) )).getOffsetY();
+    ((Tile)( shapelist.get(svgindex) )).setOffsetX( xo - offsetx);
+    ((Tile)( shapelist.get(svgindex) )).setOffsetY( yo - offsety);
   }
 
   private void moveTileOrder(int index, boolean direction) {
@@ -314,8 +316,8 @@ class TileEditor extends PApplet {
       if (svgindex == -1) svgindex = svglength-1;
       setCountLabel();
 
-      ((Tile)( svg )).offsetx = tmpx; //vorsichtshalber, wenn prev before dragrelease
-      ((Tile)( svg )).offsety = tmpy;
+      ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
+      ((Tile)( svg )).setOffsetY(tmpy);
 
       svg = shapelist.get(svgindex);
       updateLocalValuesfromTile();
@@ -328,8 +330,8 @@ class TileEditor extends PApplet {
       svgindex = (svgindex+1)%svglength;
       setCountLabel();
 
-      ((Tile)( svg )).offsetx = tmpx; //vorsichtshalber, wenn next before dragrelease
-      ((Tile)( svg )).offsety = tmpy;
+      ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
+      ((Tile)( svg )).setOffsetY(tmpy);
 
       svg = shapelist.get(svgindex);
       updateLocalValuesfromTile();
@@ -338,10 +340,10 @@ class TileEditor extends PApplet {
   }
 
   private void updateLocalValuesfromTile() {
-    tmpx = ((Tile)( svg )).offsetx;
-    tmpy = ((Tile)( svg )).offsety;
-    scalex = ((Tile)( svg )).scalex;
-    scaley = ((Tile)( svg )).scaley;    
+    tmpx = ((Tile)( svg )).getOffsetX();
+    tmpy = ((Tile)( svg )).getOffsetY();
+    scalex = ((Tile)( svg )).getScaleX();
+    scaley = ((Tile)( svg )).getScaleY();    
   }
   
   
@@ -481,8 +483,8 @@ class TileEditor extends PApplet {
       reset = false;
 
       if (!preview) {
-        ((Tile)( shapelist.get(svgindex) )).offsetx = tmpx;
-        ((Tile)( shapelist.get(svgindex) )).offsety = tmpy;
+        ((Tile)( shapelist.get(svgindex) )).setOffsetX(tmpx);
+        ((Tile)( shapelist.get(svgindex) )).setOffsetY(tmpy);
         offsetx = 0;
         offsety = 0;
         updateTranslate();

@@ -95,7 +95,7 @@ class DropTargetSVG extends DropListener {
     String path = theDropEvent.toString();
     
     if (path.toLowerCase().endsWith(".svg")) {
-      PShape sh = new Tile(path);
+      PShape sh = new TileSVG(path);
       
       if(mode  == ADDSVG || mode  == REPLACESVG) {
         if(customStyle) sh.disableStyle(); 
