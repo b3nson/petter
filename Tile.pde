@@ -45,7 +45,7 @@ public class TileSVG extends PShapeSVG implements Tile {
   public TileSVG(String path) {
     super(loadXML(path));
     filepath = path;
-    removeVdbDisclaimer();
+    handleLFKN_VDB();
   }
 
 
@@ -77,29 +77,19 @@ public class TileSVG extends PShapeSVG implements Tile {
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
 
-
-
-  private void removeVdbDisclaimer() {
-    //----------------------VDB
+  private void handleLFKN_VDB() {
     boolean lfknvdb = false;
 
     if (split(filepath, ".lafkon.net").length > 1) {
       filepath =  split(filepath, ".pdf")[0] +".svg";
-      lfknvdb = true;
-    } else if (split(filepath, "LAFKON_").length > 1) { 
-      lfknvdb = true;
     }
-
-    if (lfknvdb) {
-      try {
-        int index = this.getChildIndex(this.getChild("disclaimer"));
-        this.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
-      } 
-      catch (ArrayIndexOutOfBoundsException e) {
-      }
+    try {
+      int index = this.getChildIndex(this.getChild("disclaimer"));
+      this.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
+    } 
+    catch (ArrayIndexOutOfBoundsException e) { println("CATCH" +e);
     }
   }
-
 
 }
 
