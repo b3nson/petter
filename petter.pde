@@ -208,7 +208,7 @@ void setup() {
   println("  , _");
   println(" /|/ \\ __|__|_  _  ,_");
   println("  |__/|/ |  |  |/ /  |");
-  println("  |   |_/|_/|_/|_/   |/ v0.3");
+  println("  |   |_/|_/|_/|_/   |/ v0.4");
   println(" ");
   println("  Press M for menu");
   println("        H for help");
