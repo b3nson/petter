@@ -227,10 +227,16 @@ class TileEditor extends PApplet {
       pushStyle();
       if (customStyle) {
         svg.disableStyle();
-
-        if (customStroke) {
+        if (customStroke && strokeMode) {
           stroke(strokecolor[0]);
           strokeWeight(customStrokeWeight);
+        } else if(customStroke && !strokeMode) {          
+          stroke(strokecolor[0]);
+          float sw = ((Tile)svg).getScaleX();
+          if (sw != 0f) {
+            sw = abs(customStrokeWeight*(1/sw));
+          }
+          strokeWeight(sw);
         } else {
           noStroke();
         }
@@ -397,6 +403,11 @@ class TileEditor extends PApplet {
       }
     }
     setExplodeButtonStatus();
+    if(customStyle) {
+      enableCustomStyle();  
+    } else {
+      disableCustomStyle();
+    }
   }
 
   private void explodeTile(Tile t, boolean recursive) {

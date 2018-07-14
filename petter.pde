@@ -117,6 +117,7 @@ int traType = 0;
 int animType = 0;
 
 boolean exportCurrentFrame = false;
+boolean exportOnNextLoop = false;
 String timestamp = "";
 String filename = "";
 String formatName = "";
@@ -249,7 +250,11 @@ void draw() {
       noFill();
     }
   } 
-
+  
+  if(exportOnNextLoop) {
+    exportCurrentFrame = true;
+    exportOnNextLoop = false;
+  }
   if (exportCurrentFrame) {
     if (!guiExportNow) {
       formatName = pdfwidth +"x" +pdfheight;
@@ -445,10 +450,15 @@ void draw() {
       }
       scale(totalscale*tilescale);
 
-
+      if (random) {
+        s = svg.get(int(random(svg.size())));
+      } else {
+        s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
+      }
+      
       //setRelativeStrokeWeight
       if (customStyle && customStroke && !strokeMode) {
-        float sw = ((relsca)*(absScale)*(tilescale));
+        float sw = ((relsca)*(absScale)*(tilescale)*((Tile)s).getScaleX());
         if (sw != 0f) {
           sw = abs(customStrokeWeight*(1/sw));
         } else {
@@ -463,11 +473,6 @@ void draw() {
         }
       }
 
-      if (random) {
-        s = svg.get(int(random(svg.size())));
-      } else {
-        s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
-      }
       if (s != null) {
         shape(s);
       }
@@ -627,7 +632,7 @@ void keyPressed() {
   } else if (keysDown['Y']) {
     undo.redo();
   } else if (keysDown['S']) {
-    exportCurrentFrame = true;
+    exportOnNextLoop = true;
     generateName();
     generateTimestamp();
   } else if (keysDown['M']) {
