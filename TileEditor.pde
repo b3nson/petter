@@ -21,11 +21,13 @@ class TileEditor extends PApplet {
   private ControlP5 cp5;
 
   PShape svg;
-  
+  Tile explodeOrigin;
+
   boolean opened = true;
   boolean preview = true;
   boolean drag = false;
   boolean reset = false;
+  boolean recursive = false;
 
   int w, h;
   int svgindex = -1;
@@ -37,15 +39,15 @@ class TileEditor extends PApplet {
   float scalex = 1f;
   float scaley = 1f;
   float zoom = 1f;
-  
+
   ArrayList<PShape> shapelist;
 
   Button okButton, cancelButton, nextTileButton, prevTileButton, resetTileButton;
-  Button deleteTileButton, moveTileBackButton, moveTileForeButton;
-  Toggle previewToggle;
+  Button deleteTileButton, moveTileBackButton, moveTileForeButton, explodeTileButton;
+  Toggle previewToggle, recursiveToggle;
   Textfield tileCountLabel;
   Textlabel tezoomLabel;
-  
+
 
   public TileEditor(PApplet theParent, int theWidth, int theHeight) {
     super();   
@@ -58,16 +60,21 @@ class TileEditor extends PApplet {
     size(w, h, JAVA2D); //P2D/JAVA2D
   }
 
+
+// ---------------------------------------------------------------------------
+//  GUI SETUP
+// ---------------------------------------------------------------------------
+
   public void setup() { 
     //surface.setLocation(10, 10);
     shapeMode(CENTER);
     rectMode(CENTER);
-    
+
     cp5 = new ControlP5(this, font);
 
     previewToggle = cp5.addToggle("preview")
       .setLabel("LIVE PREVIEW")
-      .setPosition(144, h-21)
+      .setPosition(85, h-21)
       .setSize(10, 10)
       .setValue(true)
       .setId(4)
@@ -117,14 +124,36 @@ class TileEditor extends PApplet {
       .setSize(60, 30)
       .setId(5)
       ;
-    
+
     deleteTileButton = cp5.addButton("DELETE TILE")
       .setLabel("DELETE TILE")
-      .setPosition(w-50-120-20, h-40)
+      .setPosition(w-50-190-20, h-40)
       .setSize(60, 30)
       .setId(6)
       .hide()
       ;
+      
+    explodeTileButton = cp5.addButton("EXPLODE")
+      .setLabel("EXPLODE")
+      .setPosition(w-50-120-20, h-40)
+      .setSize(60, 18)
+      .setId(9)
+      //.hide()
+      ;
+
+    recursiveToggle = cp5.addToggle("recursive")
+      .setLabel("RECURSIVE")
+      .setPosition(w-50-120-20, h-40+22)
+      .setSize(8, 8)
+      .setValue(recursive)
+      .setId(10)
+      ;
+
+    controlP5.Label lr = recursiveToggle.getCaptionLabel();
+    lr.setHeight(10);
+    lr.getStyle().setPadding(2, 2, 2, 2);
+    lr.getStyle().setMargin(-15, 0, 0, 14);
+
 
     moveTileForeButton = cp5.addButton("<")
       .setLabel("<")
@@ -133,7 +162,7 @@ class TileEditor extends PApplet {
       .setId(7)
       .hide()
       ;
-      
+
     moveTileBackButton = cp5.addButton(">")
       .setLabel(">")
       .setPosition(45, h-40)
@@ -141,19 +170,21 @@ class TileEditor extends PApplet {
       .setId(8)
       .hide()
       ;
-      
+
     tezoomLabel = cp5.addTextlabel("tezoomlabel" )
-      .setPosition(85, h-20)
+      .setPosition(172, h-20)
       .setText("ZOOM:  1.0")
       ;
 
     ControllerProperties prop = cp5.getProperties();
     prop.remove(okButton);
     prop.remove(previewToggle);
+    prop.remove(recursiveToggle);
     prop.remove(prevTileButton);
     prop.remove(nextTileButton);
     prop.remove(resetTileButton);
     prop.remove(deleteTileButton);
+    prop.remove(explodeTileButton);
     prop.remove(moveTileBackButton);
     prop.remove(moveTileForeButton);
     prop.remove(tezoomLabel);
@@ -164,8 +195,9 @@ class TileEditor extends PApplet {
   }//end setup
 
 
-  //---------------------------------------------------------------------------------- DRAW
-
+// ---------------------------------------------------------------------------
+//  DRAW
+// ---------------------------------------------------------------------------
 
   void draw() {
     background(50);
@@ -180,7 +212,7 @@ class TileEditor extends PApplet {
 
     if (svg != null) {
       //shapeMode(CENTER);
-      
+
       pushMatrix();
       translate(w/2, h/2);
       scale(zoom);
@@ -212,7 +244,7 @@ class TileEditor extends PApplet {
       }
 
       if (preview) {
-        shape(svg);        
+        shape(svg);
       } else {
         shape(svg, tmpx-((Tile)( shapelist.get(svgindex) )).getOffsetX(), tmpy-((Tile)( shapelist.get(svgindex) )).getOffsetY() );
       }
@@ -221,7 +253,11 @@ class TileEditor extends PApplet {
 
       //viewbox refsize
       noFill();
-      stroke(0, 150, 255, 80);
+      if(svgindex == 0) {
+        stroke(0, 255, 150, 150);
+      } else {
+        stroke(0, 150, 255, 80); 
+      }
       rect(0, 0, shapelist.get(0).width, shapelist.get(0).height);
 
       //viewbox
@@ -234,8 +270,9 @@ class TileEditor extends PApplet {
   }//draw
 
 
-  //---------------------------------------------------------------------------------- FUNCTIONS
-
+// ---------------------------------------------------------------------------
+//  TILE ACTIONS
+// ---------------------------------------------------------------------------
 
   public void setTileList(ArrayList<PShape> slist) {
     shapelist = slist;
@@ -244,7 +281,7 @@ class TileEditor extends PApplet {
     svg = shapelist.get(svgindex);
     //setCountLabel();
   }
-  
+
   public void updateTileList(ArrayList<PShape> slist, int mode) {
     shapelist = slist;
     svglength = shapelist.size();
@@ -261,6 +298,7 @@ class TileEditor extends PApplet {
     setCountLabel();
     setDeleteButtonStatus();
     setMoveButtonStatus();
+    setExplodeButtonStatus();
   }
 
   private void updateScale() {    
@@ -278,18 +316,18 @@ class TileEditor extends PApplet {
   private void moveTileOrder(int index, boolean direction) {
     PShape tmp = shapelist.get(svgindex);
     shapelist.remove(index);
-    
-    if(direction) { //move left
+
+    if (direction) { //move left
       shapelist.add(svgindex-1, tmp);
-      prevTile();  
+      prevTile();
     } else {        //move right
       shapelist.add(svgindex+1, tmp);
       nextTile();
-    } 
+    }
   }
-  
+
   private void resetTile(int index) {
-    ((Tile)( shapelist.get(svgindex) )).reset();
+    ((Tile)( shapelist.get(index) )).reset();
     tmpx = 0;
     tmpy = 0;
     scalex = 1;
@@ -299,17 +337,18 @@ class TileEditor extends PApplet {
   private void deleteTile(int index) {
     shapelist.remove(index);
     svglength = shapelist.size();
-    if(svgindex > svglength-1) {
+    if (svgindex > svglength-1) {
       svgindex--;
     } 
     svg = shapelist.get(svgindex);
     updateLocalValuesfromTile();
-    
+
     setCountLabel();
     setDeleteButtonStatus();
     setMoveButtonStatus();
+    setExplodeButtonStatus();
   }
-
+  
   private void prevTile() {
     if (svglength > 1) {
       svgindex = (svgindex-1)%svglength;
@@ -322,6 +361,7 @@ class TileEditor extends PApplet {
       svg = shapelist.get(svgindex);
       updateLocalValuesfromTile();
       setMoveButtonStatus();
+      setExplodeButtonStatus();
     }
   }
 
@@ -336,6 +376,7 @@ class TileEditor extends PApplet {
       svg = shapelist.get(svgindex);
       updateLocalValuesfromTile();
       setMoveButtonStatus();
+      setExplodeButtonStatus();
     }
   }
 
@@ -343,12 +384,65 @@ class TileEditor extends PApplet {
     tmpx = ((Tile)( svg )).getOffsetX();
     tmpy = ((Tile)( svg )).getOffsetY();
     scalex = ((Tile)( svg )).getScaleX();
-    scaley = ((Tile)( svg )).getScaleY();    
+    scaley = ((Tile)( svg )).getScaleY();
   }
   
-  
-  //---------------------------------------------------------------------------------- CALLBACK
+  private void explodeimplode(int svgindex, boolean recursive) {
+    Tile t = (Tile)shapelist.get(svgindex);
+    if( t.getOrigin() != null ) {
+        implodeTile(t);
+    } else {
+      if(t instanceof TileSVG) {
+        explodeTile(t, recursive);
+      }
+    }
+    setExplodeButtonStatus();
+  }
 
+  private void explodeTile(Tile t, boolean recursive) {
+    explodeOrigin = (Tile)t;
+    getSubShapes((PShape)t, t.getWidth(), t.getHeight());
+    deleteTile(shapelist.indexOf(explodeOrigin));
+    explodeOrigin = null;
+  }
+  
+  private void implodeTile(Tile src) {
+    Tile commonOrigin = src.getOrigin();
+    shapelist.add(svgindex, (PShape)commonOrigin);
+    for (int i = 0; i < shapelist.size(); i++) {
+      Tile t = ((Tile)shapelist.get(i));
+      if(t.getOrigin() != null && t.getOrigin().equals(commonOrigin)) {
+        deleteTile(i);
+        i--;
+      }
+    }    
+    svgindex = shapelist.indexOf(commonOrigin); 
+    svg = shapelist.get(svgindex);
+  }
+  
+  private void getSubShapes(PShape s, float w, float h) {
+    PShape[] children = s.getChildren();
+
+    for (int i = children.length-1; i >= 0; i--) {
+      int t = children[i].getFamily();
+      if (t == PShape.PATH || t == PShape.PRIMITIVE || t == PShape.GEOMETRY) {
+        shapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
+      } else if (t == PConstants.GROUP) {
+        if (recursive) {
+          getSubShapes(children[i], w, h);
+        } else {
+          if(children[i].getChildCount() != 0) {
+            shapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
+          }
+        }
+      } 
+    }
+  }
+
+
+// ---------------------------------------------------------------------------
+//  GUI EVENTHANDLING
+// ---------------------------------------------------------------------------
 
   public void controlEvent(ControlEvent theEvent) {
     switch(theEvent.getId()) {
@@ -360,9 +454,6 @@ class TileEditor extends PApplet {
       break;
       case(2): //OK
       closeAndApply();
-      break;
-      case(3): //X
-      closeAndCancel();
       break;
       case(4): //PREVIEW
       //togglePreview();
@@ -379,8 +470,16 @@ class TileEditor extends PApplet {
       case(8): //MOVEBACK
       moveTileOrder(svgindex, false);
       break;
+      case(9): //EXPLODE/IMPLODE
+      explodeimplode(svgindex, recursive);
+      break;
     }
   }
+
+
+// ---------------------------------------------------------------------------
+//  GUI ACTIONS
+// ---------------------------------------------------------------------------
 
   public void hide() {
     this.noLoop();
@@ -394,7 +493,7 @@ class TileEditor extends PApplet {
     opened = true;
     surface.setVisible(true);
     keysDown[lastKey] = false; //reset missing keyRelease
-    
+
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setCountLabel();
@@ -402,11 +501,6 @@ class TileEditor extends PApplet {
   }
 
   private void closeAndApply() {
-    hide(); 
-    //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
-  }
-
-  private void closeAndCancel() {
     hide(); 
     //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
   }
@@ -432,22 +526,22 @@ class TileEditor extends PApplet {
   }
 
   private void setDeleteButtonStatus() {
-    if(svglength <= 1) {
+    if (svglength <= 1) {
       deleteTileButton.hide();
     } else {
-      deleteTileButton.show();    
+      deleteTileButton.show();
     }
   }
 
   private void setMoveButtonStatus() {
-    if(svglength == 1) {
+    if (svglength == 1) {
       moveTileForeButton.hide();
       moveTileBackButton.hide();
     } else {
-      if(svgindex == 0) {
+      if (svgindex == 0) {
         moveTileForeButton.hide();
         moveTileBackButton.show();
-      } else if(svgindex == svglength-1) {
+      } else if (svgindex == svglength-1) {
         moveTileBackButton.hide();
         moveTileForeButton.show();
       } else {
@@ -456,11 +550,26 @@ class TileEditor extends PApplet {
       }
     }
   }
-  
-  
-  
-  //---------------------------------------------------------------------------------- UIINPUT
 
+  private void setExplodeButtonStatus() {
+    Tile t = (Tile)shapelist.get(svgindex);
+    if( t.getOrigin() != null ) {
+        explodeTileButton.setLabel("IMPLODE");
+        explodeTileButton.setHeight(30);
+        recursiveToggle.hide();
+    } else {
+      if(t instanceof TileSVG) {
+        explodeTileButton.setLabel("EXPLODE");
+        explodeTileButton.setHeight(18);
+        recursiveToggle.show();
+      }
+    }
+  }
+
+
+// ---------------------------------------------------------------------------
+//  INPUT EVENTS
+// ---------------------------------------------------------------------------
 
   void mousePressed() {}
 
@@ -497,7 +606,7 @@ class TileEditor extends PApplet {
       time = millis();
     }
     float e = event.getAmount();
-    
+
     scalex -= e*0.01;
     scaley -= e*0.01;
 
@@ -505,7 +614,6 @@ class TileEditor extends PApplet {
       updateScale();
     }
   }
-
 
   void keyPressed() {
     if (key == CODED) {
@@ -516,7 +624,7 @@ class TileEditor extends PApplet {
       } else { //forward to pettermain
         parent.key=key;
         parent.keyCode=keyCode;
-        parent.keyPressed(); 
+        parent.keyPressed();
       }
     } else {
       if (key == RETURN || key == ENTER) {
@@ -524,7 +632,7 @@ class TileEditor extends PApplet {
       } else if (key == ESC || keyCode==ESC) {
         key=0;
         keyCode=0;
-        closeAndCancel();
+        closeAndApply();
       } else if (key == 'p') {
         preview = !preview;
         previewToggle.setState(preview);
@@ -537,11 +645,11 @@ class TileEditor extends PApplet {
       } else { //forward to pettermain
         parent.key = key;
         parent.keyCode = keyCode;
-        parent.keyPressed(); 
+        parent.keyPressed();
       }
     }
   }
-  
+
   void keyReleased() {
     processKey(keyCode, false); //debounce parent
   }

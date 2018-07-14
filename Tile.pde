@@ -25,6 +25,9 @@ public interface Tile {
   public float getOffsetY();
   public float getScaleX();
   public float getScaleY();
+  public float getWidth();
+  public float getHeight();
+  public Tile getOrigin();
 }
 
 
@@ -40,6 +43,7 @@ public class TileSVG extends PShapeSVG implements Tile {
   float offsety = 0f;
 
   String filepath = null;
+  Tile origin = null;
 
 
   public TileSVG(String path) {
@@ -47,7 +51,6 @@ public class TileSVG extends PShapeSVG implements Tile {
     filepath = path;
     handleLFKN_VDB();
   }
-
 
   public void draw(PGraphics g) {
     g.pushMatrix();
@@ -76,10 +79,9 @@ public class TileSVG extends PShapeSVG implements Tile {
   public float getOffsetY() { return offsety; }
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
-
+  public Tile getOrigin() { return null; };
+  
   private void handleLFKN_VDB() {
-    boolean lfknvdb = false;
-
     if (split(filepath, ".lafkon.net").length > 1) {
       filepath =  split(filepath, ".pdf")[0] +".svg";
     }
@@ -87,8 +89,7 @@ public class TileSVG extends PShapeSVG implements Tile {
       int index = this.getChildIndex(this.getChild("disclaimer"));
       this.removeChild(index); // remove disclaimer from LFKN-VDB-svgs
     } 
-    catch (ArrayIndexOutOfBoundsException e) { println("CATCH" +e);
-    }
+    catch (ArrayIndexOutOfBoundsException e) {}
   }
 
 }
@@ -105,6 +106,7 @@ public class TileShape extends PShape implements Tile {
   float offsetx = 0f;
   float offsety = 0f;
 
+  Tile origin = null;
 
   public TileShape(PShape s, float w, float h) {
     super();
@@ -113,6 +115,14 @@ public class TileShape extends PShape implements Tile {
     this.height = h;
   }
 
+  public TileShape(PShape s, float w, float h, Tile origin) {
+    this(s, w, h);
+    this.origin = origin;
+    setOffsetX(origin.getOffsetX());
+    setOffsetY(origin.getOffsetY());
+    setScaleX(origin.getScaleX());
+    setScaleY(origin.getScaleY());
+  }
 
   public void draw(PGraphics g) {
     g.pushMatrix();
@@ -141,5 +151,6 @@ public class TileShape extends PShape implements Tile {
   public float getOffsetY() { return offsety; }
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
-
+  public Tile getOrigin() { return origin; };
+  
 }
