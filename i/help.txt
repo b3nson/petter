@@ -1,4 +1,4 @@
-PETTER v0.3
+PETTER v0.4
 Vector-Graphic-based Pattern Generator.
 
 SHORTCUTS

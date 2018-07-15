@@ -43,6 +43,7 @@ TileEditor tileEditor;
 Memento undo;
 PGraphics pdf; 
 
+String version = "0.4";
 String settingspath = "i/settings/";
 String outputpath = "o/";
 String subfolder = "";
@@ -155,6 +156,10 @@ void setup() {
   size(905, 842, JAVA2D);
   surface.setResizable(true);
   surface.setSize(905, 842);
+  surface.setTitle("petter " +version);
+
+  PImage pettericon = loadImage("i/icon.png");
+  surface.setIcon(pettericon);
 
   smooth();
   shapeMode(CENTER);
@@ -208,7 +213,7 @@ void setup() {
   println("  , _");
   println(" /|/ \\ __|__|_  _  ,_");
   println("  |__/|/ |  |  |/ /  |");
-  println("  |   |_/|_/|_/|_/   |/ v0.4");
+  println("  |   |_/|_/|_/|_/   |/ v" +version);
   println(" ");
   println("  Press M for menu");
   println("        H for help");
