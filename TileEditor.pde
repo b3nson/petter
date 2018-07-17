@@ -47,7 +47,7 @@ class TileEditor extends PApplet {
   Button deleteTileButton, moveTileBackButton, moveTileForeButton, explodeTileButton;
   Toggle previewToggle, recursiveToggle;
   Textfield tileCountLabel;
-  Textlabel tezoomLabel;
+  Textlabel tezoomLabel, sLabel, rLabel, pLabel;
 
 
   public TileEditor(PApplet theParent, int theWidth, int theHeight) {
@@ -177,6 +177,22 @@ class TileEditor extends PApplet {
       .setText("ZOOM:  1.0")
       ;
 
+    sLabel = cp5.addTextlabel("sLabel" )
+      .setPosition(172, h-30)
+      .setText("S:  1.0")
+      ;
+
+    rLabel = cp5.addTextlabel("rLabel" )
+      .setPosition(172, h-40)
+      .setText("R:  0.0")
+      ;
+      
+    pLabel = cp5.addTextlabel("pLabel" )
+      .setPosition(172, h-50)
+      .setText("P:  0.0 x 0.0")
+      ;
+
+
     ControllerProperties prop = cp5.getProperties();
     prop.remove(okButton);
     prop.remove(previewToggle);
@@ -189,6 +205,9 @@ class TileEditor extends PApplet {
     prop.remove(moveTileBackButton);
     prop.remove(moveTileForeButton);
     prop.remove(tezoomLabel);
+    prop.remove(sLabel);
+    prop.remove(rLabel);
+    prop.remove(pLabel);
     prop.remove(tileCountLabel);
 
     show();
@@ -308,15 +327,18 @@ class TileEditor extends PApplet {
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setExplodeButtonStatus();
+    setValueLabels();
   }
 
   private void updateScale() {    
     ((Tile)( shapelist.get(svgindex) )).setScaleX(scalex);
     ((Tile)( shapelist.get(svgindex) )).setScaleY(scaley);
+    sLabel.setText("S:  " +nf(scalex, 1, 2));
   }
   
   private void updateRotation() {    
     ((Tile)( shapelist.get(svgindex) )).setRotation(rotation);
+    rLabel.setText("R:  " +nf(rotation, 1, 2));
   }
   
   private void updateTranslate() {
@@ -324,6 +346,7 @@ class TileEditor extends PApplet {
     float yo = ((Tile)( shapelist.get(svgindex) )).getOffsetY();
     ((Tile)( shapelist.get(svgindex) )).setOffsetX( xo - offsetx);
     ((Tile)( shapelist.get(svgindex) )).setOffsetY( yo - offsety);
+    pLabel.setText("P:  " +nf(xo - offsetx, 1, 0) +" X " +nf(yo - offsety, 1, 0));
   }
 
   private void moveTileOrder(int index, boolean direction) {
@@ -346,6 +369,7 @@ class TileEditor extends PApplet {
     scalex = 1;
     scaley = 1;
     rotation = 0;
+    setValueLabels();
   }
 
   private void deleteTile(int index) {
@@ -361,6 +385,7 @@ class TileEditor extends PApplet {
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setExplodeButtonStatus();
+    setValueLabels();
   }
   
   private void prevTile() {
@@ -376,6 +401,7 @@ class TileEditor extends PApplet {
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
+      setValueLabels();
     }
   }
 
@@ -391,6 +417,7 @@ class TileEditor extends PApplet {
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
+      setValueLabels();
     }
   }
 
@@ -584,6 +611,12 @@ class TileEditor extends PApplet {
         recursiveToggle.show();
       }
     }
+  }
+  
+  private void setValueLabels() {
+    pLabel.setText("P:  " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetX(), 1, 0) +" X " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetY(), 1, 0));
+    rLabel.setText("R:  " +nf(rotation, 1, 2));
+    sLabel.setText("S:  " +nf(scalex, 1, 2));
   }
 
 
