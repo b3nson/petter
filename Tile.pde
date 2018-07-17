@@ -21,10 +21,12 @@ public interface Tile {
   public void setOffsetY(float oy);
   public void setScaleX(float sx);
   public void setScaleY(float sy);
+  public void setRotation(float ro);
   public float getOffsetX();
   public float getOffsetY();
   public float getScaleX();
   public float getScaleY();
+  public float getRotation();
   public float getWidth();
   public float getHeight();
   public Tile getOrigin();
@@ -41,6 +43,7 @@ public class TileSVG extends PShapeSVG implements Tile {
   float scaley = 1f;
   float offsetx = 0f;
   float offsety = 0f;
+  float rotation = 0f;
 
   String filepath = null;
   Tile origin = null;
@@ -57,6 +60,7 @@ public class TileSVG extends PShapeSVG implements Tile {
     g.translate(offsetx, offsety);    
     g.translate(width/2, height/2);
     g.scale(scalex, scaley);
+    g.rotate(rotation);
     g.translate(-width/2, -height/2);
     
     super.draw(g);
@@ -69,16 +73,19 @@ public class TileSVG extends PShapeSVG implements Tile {
     scaley = 1f; 
     offsetx = 0f;
     offsety = 0f;
+    rotation = 0f;
   }
   
   public void setOffsetX(float ox) { offsetx = ox; }
   public void setOffsetY(float oy) { offsety = oy; }
   public void setScaleX(float sx) { scalex = sx; }
   public void setScaleY(float sy) { scaley = sy; }
+  public void setRotation(float ro) { rotation = ro; }
   public float getOffsetX() { return offsetx; }
   public float getOffsetY() { return offsety; }
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
+  public float getRotation() { return rotation; }
   public Tile getOrigin() { return null; };
   
   private void handleLFKN_VDB() {
@@ -105,6 +112,7 @@ public class TileShape extends PShape implements Tile {
   float scaley = 1f;
   float offsetx = 0f;
   float offsety = 0f;
+  float rotation = 0f;
 
   Tile origin = null;
 
@@ -122,6 +130,7 @@ public class TileShape extends PShape implements Tile {
     setOffsetY(origin.getOffsetY());
     setScaleX(origin.getScaleX());
     setScaleY(origin.getScaleY());
+    setRotation(origin.getRotation());
   }
 
   public void draw(PGraphics g) {
@@ -129,6 +138,7 @@ public class TileShape extends PShape implements Tile {
     g.translate(offsetx, offsety);    
     g.translate(width/2, height/2);
     g.scale(scalex, scaley);
+    g.rotate(rotation);
     g.translate(-width/2, -height/2);
     
     super.draw(g);
@@ -141,16 +151,19 @@ public class TileShape extends PShape implements Tile {
     scaley = 1f; 
     offsetx = 0f;
     offsety = 0f;
+    rotation = 0f;
   }
   
   public void setOffsetX(float ox) { offsetx = ox; }
   public void setOffsetY(float oy) { offsety = oy; }
   public void setScaleX(float sx) { scalex = sx; }
   public void setScaleY(float sy) { scaley = sy; }
+  public void setRotation(float ro) { rotation = ro; }
   public float getOffsetX() { return offsetx; }
   public float getOffsetY() { return offsety; }
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
+  public float getRotation() { return rotation; }
   public Tile getOrigin() { return origin; };
   
 }

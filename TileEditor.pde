@@ -38,6 +38,7 @@ class TileEditor extends PApplet {
   float offsetx, offsety, tmpx, tmpy;
   float scalex = 1f;
   float scaley = 1f;
+  float rotation = 0f;
   float zoom = 1f;
 
   ArrayList<PShape> shapelist;
@@ -207,6 +208,7 @@ class TileEditor extends PApplet {
       if (millis() > time+TIMEOUT) {
         time = -1;
         updateScale();
+        updateRotation();
       }
     }
 
@@ -297,6 +299,7 @@ class TileEditor extends PApplet {
       offsety = 0;
       scalex = 1;
       scaley = 1;
+      rotation = 0;
       tmpx = 0;
       tmpy = 0;
     }
@@ -311,7 +314,11 @@ class TileEditor extends PApplet {
     ((Tile)( shapelist.get(svgindex) )).setScaleX(scalex);
     ((Tile)( shapelist.get(svgindex) )).setScaleY(scaley);
   }
-
+  
+  private void updateRotation() {    
+    ((Tile)( shapelist.get(svgindex) )).setRotation(rotation);
+  }
+  
   private void updateTranslate() {
     float xo = ((Tile)( shapelist.get(svgindex) )).getOffsetX();
     float yo = ((Tile)( shapelist.get(svgindex) )).getOffsetY();
@@ -338,6 +345,7 @@ class TileEditor extends PApplet {
     tmpy = 0;
     scalex = 1;
     scaley = 1;
+    rotation = 0;
   }
 
   private void deleteTile(int index) {
@@ -391,6 +399,7 @@ class TileEditor extends PApplet {
     tmpy = ((Tile)( svg )).getOffsetY();
     scalex = ((Tile)( svg )).getScaleX();
     scaley = ((Tile)( svg )).getScaleY();
+    rotation = ((Tile)( svg )).getRotation();
   }
   
   private void explodeimplode(int svgindex, boolean recursive) {
@@ -618,11 +627,13 @@ class TileEditor extends PApplet {
     }
     float e = event.getAmount();
 
-    scalex -= e*0.01;
-    scaley -= e*0.01;
-
-    if (preview) {
-      updateScale();
+    if (keysDown[ALT]) {
+      rotation -= e*0.01;
+      if (preview) { updateRotation(); }
+    } else {
+      scalex -= e*0.01;
+      scaley -= e*0.01;
+      if (preview) { updateScale(); }
     }
   }
 
