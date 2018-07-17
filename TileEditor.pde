@@ -24,7 +24,6 @@ class TileEditor extends PApplet {
   Tile explodeOrigin;
 
   boolean opened = true;
-  boolean preview = true;
   boolean drag = false;
   boolean reset = false;
   boolean recursive = false;
@@ -45,7 +44,7 @@ class TileEditor extends PApplet {
 
   Button okButton, cancelButton, nextTileButton, prevTileButton, resetTileButton;
   Button deleteTileButton, moveTileBackButton, moveTileForeButton, explodeTileButton;
-  Toggle previewToggle, recursiveToggle;
+  Toggle recursiveToggle;
   Textfield tileCountLabel;
   Textlabel tezoomLabel, sLabel, rLabel, pLabel;
 
@@ -72,19 +71,6 @@ class TileEditor extends PApplet {
     rectMode(CENTER);
 
     cp5 = new ControlP5(this, font);
-
-    previewToggle = cp5.addToggle("preview")
-      .setLabel("LIVE PREVIEW")
-      .setPosition(85, h-21)
-      .setSize(10, 10)
-      .setValue(true)
-      .setId(4)
-      ;
-
-    controlP5.Label l = previewToggle.getCaptionLabel();
-    l.setHeight(10);
-    l.getStyle().setPadding(2, 2, 2, 2);
-    l.getStyle().setMargin(-15, 0, 0, 14);
 
     okButton = cp5.addButton("CLOSE")
       .setPosition(w-40-10, h-30-10)
@@ -158,7 +144,7 @@ class TileEditor extends PApplet {
 
     moveTileForeButton = cp5.addButton("<")
       .setLabel("<")
-      .setPosition(10, h-40)
+      .setPosition(150, h-40)
       .setSize(30, 30)
       .setId(7)
       .hide()
@@ -166,36 +152,35 @@ class TileEditor extends PApplet {
 
     moveTileBackButton = cp5.addButton(">")
       .setLabel(">")
-      .setPosition(45, h-40)
+      .setPosition(195, h-40)
       .setSize(30, 30)
       .setId(8)
       .hide()
       ;
 
     tezoomLabel = cp5.addTextlabel("tezoomlabel" )
-      .setPosition(172, h-20)
+      .setPosition(70, h-20)
       .setText("ZOOM:  1.0")
       ;
 
     sLabel = cp5.addTextlabel("sLabel" )
-      .setPosition(172, h-30)
+      .setPosition(10, h-20)
       .setText("S:  1.0")
       ;
 
     rLabel = cp5.addTextlabel("rLabel" )
-      .setPosition(172, h-40)
+      .setPosition(10, h-30)
       .setText("R:  0.0")
       ;
       
     pLabel = cp5.addTextlabel("pLabel" )
-      .setPosition(172, h-50)
+      .setPosition(10, h-40)
       .setText("P:  0.0 x 0.0")
       ;
 
 
     ControllerProperties prop = cp5.getProperties();
     prop.remove(okButton);
-    prop.remove(previewToggle);
     prop.remove(recursiveToggle);
     prop.remove(prevTileButton);
     prop.remove(nextTileButton);
@@ -270,11 +255,7 @@ class TileEditor extends PApplet {
         svg.enableStyle();
       }
 
-      if (preview) {
-        shape(svg);
-      } else {
-        shape(svg, tmpx-((Tile)( shapelist.get(svgindex) )).getOffsetX(), tmpy-((Tile)( shapelist.get(svgindex) )).getOffsetY() );
-      }
+      shape(svg);
 
       popStyle();
 
@@ -338,7 +319,7 @@ class TileEditor extends PApplet {
   
   private void updateRotation() {    
     ((Tile)( shapelist.get(svgindex) )).setRotation(rotation);
-    rLabel.setText("R:  " +nf(rotation, 1, 2));
+    rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
   }
   
   private void updateTranslate() {
@@ -502,9 +483,6 @@ class TileEditor extends PApplet {
       case(2): //OK
       closeAndApply();
       break;
-      case(4): //PREVIEW
-      //togglePreview();
-      break;
       case(5): //RESETTILE
       resetTile(svgindex);
       break;
@@ -615,7 +593,7 @@ class TileEditor extends PApplet {
   
   private void setValueLabels() {
     pLabel.setText("P:  " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetX(), 1, 0) +" X " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetY(), 1, 0));
-    rLabel.setText("R:  " +nf(rotation, 1, 2));
+    rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
     sLabel.setText("S:  " +nf(scalex, 1, 2));
   }
 
@@ -634,39 +612,26 @@ class TileEditor extends PApplet {
     tmpx -= offsetx;
     tmpy -= offsety;
 
-    if (preview) {
-      updateTranslate();
-    }
+    updateTranslate();
   }  
 
   void mouseReleased() {
     if (drag || reset) {
       drag = false;
       reset = false;
-
-      if (!preview) {
-        ((Tile)( shapelist.get(svgindex) )).setOffsetX(tmpx);
-        ((Tile)( shapelist.get(svgindex) )).setOffsetY(tmpy);
-        offsetx = 0;
-        offsety = 0;
-        updateTranslate();
-      }
     }
   }
 
   void mouseWheel(MouseEvent event) {
-    if (!preview) {
-      time = millis();
-    }
     float e = event.getAmount();
 
     if (keysDown[ALT]) {
-      rotation -= e*0.01;
-      if (preview) { updateRotation(); }
+      rotation -= e*0.0174533;
+      updateRotation();
     } else {
       scalex -= e*0.01;
       scaley -= e*0.01;
-      if (preview) { updateScale(); }
+      updateScale();
     }
   }
 
@@ -688,9 +653,6 @@ class TileEditor extends PApplet {
         key=0;
         keyCode=0;
         closeAndApply();
-      } else if (key == 'p') {
-        preview = !preview;
-        previewToggle.setState(preview);
       } else if (key == 't') {
         hide();
       } else if (keyCode == 93 || keyCode == 107) { //PLUS
