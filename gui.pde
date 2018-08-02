@@ -51,6 +51,7 @@ float mapheight = 0;
 color c1 = color(16, 181, 198);    // blue
 color c2 = color(60, 105, 97, 180);// green
 color c3 = color(200, 200, 200);  //lightgray for separatorlines
+color bg = color(100);
 
 ArrayList settingFiles;
 
@@ -60,7 +61,7 @@ Boolean shiftProcessed = false;
 Group main, style, animate, help, helptextbox, info;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
-ScrollableList penner_anim, formatDropdown;
+ScrollableListPlus penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
@@ -79,7 +80,7 @@ Controller currentOver; // still needed???
 
 void setupGUI() {
   gui.setColorActive(c1);
-  gui.setColorBackground(color(100));
+  gui.setColorBackground(bg);
   gui.setColorForeground(color(30));
   //gui.setColorLabel(color(0, 255, 0));
   //gui.setColorValue(color(255, 0, 0));
@@ -104,8 +105,8 @@ void setupGUI() {
    
   ypos += 20;
   
-  //formatDropdown = new ScrollableList(gui, "formats");
-  formatDropdown = gui.addScrollableList("formats")
+  formatDropdown = new ScrollableListPlus(gui, "formats");
+  formatDropdown
      .setGroup(main)
      .setPosition(indentX, ypos)
      .setSize(46, 300)
@@ -342,7 +343,7 @@ void setupGUI() {
   ypos += gapY;
   
   penner_tra = new ScrollableListPlus(gui, "traType");
-  penner_tra// = gui.addScrollableList("traType")
+  penner_tra
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -395,7 +396,7 @@ void setupGUI() {
   ypos += gapY;
 
   penner_rot = new ScrollableListPlus(gui, "rotType");
-  penner_rot// = gui.addScrollableList("rotType")
+  penner_rot
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -444,7 +445,7 @@ void setupGUI() {
   ypos += gapY;
 
   penner_sca = new ScrollableListPlus(gui, "scaType");
-  penner_sca// = gui.addScrollableList("scaType")
+  penner_sca
      .setGroup(main)
      .setPosition(indentX,ypos)
      .setSize(w, 300)
@@ -753,8 +754,8 @@ void setupGUI() {
   clearInOutValuesButton.getCaptionLabel().setPadding(3,-14);
   
   
-  //penner_anim = new ScrollableList(gui, "animType");
-  penner_anim = gui.addScrollableList("animType")
+  penner_anim = new ScrollableListPlus(gui, "animType");
+  penner_anim
      .setPosition(indentX+4*h, ypos)
      .setSize(104, 70)
      .setItemHeight(12)
@@ -1169,6 +1170,12 @@ void controlEvent(ControlEvent theEvent) {
       }
     }
   }
+  
+  if(theEvent.isController() && theEvent.getController() instanceof ScrollableListPlus) {
+    ScrollableListPlus slp = (ScrollableListPlus)theEvent.getController();
+    slp.updateHighlight(slp.getItem((int)slp.getValue()));
+  }
+  
   if (theEvent.isFrom("formats")) {
     int num = (int)theEvent.getController().getValue();
 

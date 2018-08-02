@@ -12,7 +12,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
- 
+
 
 // ---------------------------------------------------------------------------
 //  DROPTARGETSVG - ADD/REPLACE/NFO
@@ -29,26 +29,26 @@ class DropTargetSVG extends DropListener {
   int mode = -1;
   int margin = 20;
   int cw, ch;
-  int x,y,w,h;
+  int x, y, w, h;
   int col;
   int colTile = color(16, 181, 198, 150);
   int colNfo  = color(60, 105, 97, 180);
   Textlabel label;
-  
+
   DropTargetSVG(PApplet app, int mode) {
     this.app = app;
     this.mode = mode;
     setTargetRect(fwidth, fheight, mode);
   }
-  
+
   void draw() {
-    if(over) {
+    if (over) {
       fill(col);
       rect(x, y, w, h);
       label.draw(app);
     }
   }
-  
+
   void updateTargetRect(int newwidth, int newheight) {
     setTargetRect(newwidth, newheight, mode);
   }
@@ -56,31 +56,31 @@ class DropTargetSVG extends DropListener {
   private void setTargetRect(int ww, int hh, int mode) {
     cw = ww;
     ch = hh;
-    if(mode == ADDSVG) {
+    if (mode == ADDSVG) {
       x = margin;
       y = margin;
       w = cw-(2*margin);
       h = ((ch-(margin*2))/7)*3;
-      label = new Textlabel(gui,"ADD",cw/2-5, h/2,400,200);
+      label = new Textlabel(gui, "ADD", cw/2-5, h/2, 400, 200);
       col = colTile;
-    } else if(mode == REPLACESVG) {
+    } else if (mode == REPLACESVG) {
       x = margin;
       w = cw-(2*margin);
       h = ((ch-(margin*2))/7)*3;
       y = h+margin;
-      label = new Textlabel(gui,"REPLACE",cw/2-20, (h/2)+h,400,200);
+      label = new Textlabel(gui, "REPLACE", cw/2-20, (h/2)+h, 400, 200);
       col = colTile;
-    } else if(mode == NFOSVG) {
+    } else if (mode == NFOSVG) {
       x = margin;
       h = (ch-(margin*2))/7;
       y = ch-h-margin;
       w = cw-(2*margin);
-      label = new Textlabel(gui,"NFO",cw/2-20, (h/2)+y-10,400,200);
+      label = new Textlabel(gui, "NFO", cw/2-20, (h/2)+y-10, 400, 200);
       col = colNfo;
     } 
     setTargetRect(x, y, w, h);
   }
-  
+
   void dropEnter() {
     over = true;
   }
@@ -88,46 +88,46 @@ class DropTargetSVG extends DropListener {
   void dropLeave() {
     over = false;
   }
-  
+
   void dropEvent(DropEvent theDropEvent) {
     ArrayList<PShape> tmpsvg = new ArrayList<PShape>();
     ArrayList<String> tmppath = new ArrayList<String>();
     String path = theDropEvent.toString();
-    
+
     if (path.toLowerCase().endsWith(".svg")) {
       PShape sh = new TileSVG(path);
-      
-      if(mode  == ADDSVG || mode  == REPLACESVG) {
-        if(customStyle) sh.disableStyle(); 
+
+      if (mode  == ADDSVG || mode  == REPLACESVG) {
+        if (customStyle) sh.disableStyle(); 
         tmpsvg.add(sh);
         tmppath.add(path);
       }
-      
+
       if (mode  == ADDSVG) {
         svg.addAll(tmpsvg);
         svgpath.addAll(tmppath);
         print("ADDSVG: ");
-      } else if(mode == REPLACESVG) {
+      } else if (mode == REPLACESVG) {
         print("RPLSVG: ");
-        if(over) {
+        if (over) {
           svg = tmpsvg;
           svgpath = tmppath;
         } else {
           svg.addAll(tmpsvg);
           svgpath.addAll(tmppath);
         }
-      } else if(mode == NFOSVG) {
+      } else if (mode == NFOSVG) {
         print("NFOSVG: ");
         nfo = sh; 
         showNfoToggle.setState(true);
       }
-      
-      if(tileEditor != null) {
-       int tmpmode = mode;
-       if(mode == REPLACESVG && !over) {
-         tmpmode = ADDSVG;
-       }
-       tileEditor.updateTileList(svg, tmpmode);
+
+      if (tileEditor != null) {
+        int tmpmode = mode;
+        if (mode == REPLACESVG && !over) {
+          tmpmode = ADDSVG;
+        }
+        tileEditor.updateTileList(svg, tmpmode);
       }      
       println(path);
     }
@@ -142,32 +142,32 @@ class DropTargetSVG extends DropListener {
 // ---------------------------------------------------------------------------
 
 class DropTargetIMG extends DropListener {
-  
+
   PApplet app;
   boolean over = false;
   int cw, ch;  
   int col = color(16, 181, 198, 150);
-  
+
   DropTargetIMG(PApplet app) {
     this.app = app;
     cw = fwidth;
     ch = fheight;
-    setTargetRect(cw+10,10,guiwidth-20, height-20);
+    setTargetRect(cw+10, 10, guiwidth-20, height-20);
   }
-  
+
   void draw() {
-    if(over) {
+    if (over) {
       fill(col);
-      rect(cw+10,10,guiwidth-20, height-20);
+      rect(cw+10, 10, guiwidth-20, height-20);
     }
   }
-  
+
   void updateTargetRect(int newwidth, int newheight) {
     cw = newwidth;
     ch = newheight;
-    setTargetRect(cw+10,10,guiwidth-20, height-20);
+    setTargetRect(cw+10, 10, guiwidth-20, height-20);
   }
-  
+
   void dropEnter() {
     over = true;
   }
@@ -175,37 +175,38 @@ class DropTargetIMG extends DropListener {
   void dropLeave() {
     over = false;
   }
-  
+
   String lastImgDropped = "x";
   String lastUrlDropped = "y";
-  
+
   void dropEvent(DropEvent theDropEvent) {
-    
+
     boolean url = theDropEvent.isURL();
     boolean file = theDropEvent.isFile();
     boolean img = theDropEvent.isImage();  
 
-  //IMAGEMAP ======================================================  
-   //somewhat complicated testing due to different behaviour on linux and osx
-   //there seems to be a bug in sDrop (not correctly working in linux)
+    //IMAGEMAP ======================================================  
+    //somewhat complicated testing due to different behaviour on linux and osx
+    //there seems to be a bug in sDrop (not correctly working in linux)
     if ((url&&!file&&img) || (!url&&file&&img)) {
-      if(!url&&file&&img) {
+      if (!url&&file&&img) {
         lastImgDropped = trim(theDropEvent.filePath());
       }
-      if(url&&!file&&img) {
+      if (url&&!file&&img) {
         lastUrlDropped = theDropEvent.url();
         try {
-        lastUrlDropped = trim(split(lastUrlDropped, "file://")[1]);
-        } catch(ArrayIndexOutOfBoundsException e) {
+          lastUrlDropped = trim(split(lastUrlDropped, "file://")[1]);
+        } 
+        catch(ArrayIndexOutOfBoundsException e) {
           lastUrlDropped = "";
         }
       }      
-      if( (lastUrlDropped.equals(lastImgDropped)) == false) {
+      if ( (lastUrlDropped.equals(lastImgDropped)) == false) {
         String path = url ? theDropEvent.url() : theDropEvent.filePath();
         String p = path.substring(path.lastIndexOf('.') + 1);
         map.clear();
         mapIndex = 0;
-        if(p.equals("gif")) {
+        if (p.equals("gif")) {
           ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(app, path)));
           map = tmpimg;
         } else {
@@ -214,12 +215,11 @@ class DropTargetIMG extends DropListener {
         }
         imgMap.setup(app);
         updateImgMap();
-
       } else {
         lastImgDropped = "x";
-        lastUrlDropped = "y"; 
+        lastUrlDropped = "y";
       }
-    } 
+    }
   }
 }//class DropTargetIMG
 
@@ -238,11 +238,11 @@ class GuiImage extends Canvas {
   int ww = 0;
 
   int wtmp = 0;
- 
-  int mx, my ,offsetx, offsety;
+
+  int mx, my, offsetx, offsety;
   int a, b, e, f ;
   int cornerSize = 12;
-  
+
   boolean inside = false;  
   boolean drag = false;
   boolean dragC1 = false;
@@ -257,7 +257,7 @@ class GuiImage extends Canvas {
   int colCorner = color(50);
   int colCornerActive = color(100);
   int colCornerOver = color(5, 255, 190);
-  
+
   public GuiImage(int xx, int yy) {
     x = xx;
     y = yy;
@@ -268,20 +268,20 @@ class GuiImage extends Canvas {
   }  
 
   public void draw(PGraphics g) {     
-    if(map.size() != 0 && mapIndex < map.size()) {
-      if(map.get(mapIndex) != null) {
+    if (map.size() != 0 && mapIndex < map.size()) {
+      if (map.get(mapIndex) != null) {
         pushStyle();
-        if(wtmp != map.get(mapIndex).width) {
+        if (wtmp != map.get(mapIndex).width) {
           hh = (int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(ww));
           imgMapHeight = hh;
           updateImgMap();
           a = 0;
           b = y;
-  
-          if(map.get(mapIndex).height > map.get(mapIndex).width) {
+
+          if (map.get(mapIndex).height > map.get(mapIndex).width) {
             e = ww;
             f = (int) ((float)ww * ((float)fheight) / (float)fwidth);
-            if(f > hh) {
+            if (f > hh) {
               f = hh;
               e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
             }
@@ -289,100 +289,102 @@ class GuiImage extends Canvas {
             f = hh;
             e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
           }
-      }
-      
-      try {
-        g.image(map.get(mapIndex), x, y, ww,  hh); //problem during svg-export
-      } catch(NullPointerException e) {}
-      
-      wtmp = map.get(mapIndex).width;
-     
-      mx = mouseX-(int)main.getPosition()[0]-1;
-      my = mouseY-(int)main.getPosition()[1]-3;
-  
-      stroke(c1);
-      strokeWeight(1f);
-      cornerCol = colCorner;
-          
-      if( (mx >= a && mx <= a+e) && (my >= b && my <= b+f)  ) {
-        fill(colOver);
-        cornerCol = colCornerActive;
-        inside = true;
-        insideCorner1 = false;
-        insideCorner3 = false;
-  
-        if(mx >= a+e-cornerSize && my >= b+f-cornerSize) {
-          insideCorner3 = true;
-          cornerCol = colCornerOver;
-        } else if(mx <= a+cornerSize && my <= b+cornerSize) {
-          insideCorner1 = true;
-          cornerCol = colCornerOver;
         }
-      } else {
+
+        try {
+          g.image(map.get(mapIndex), x, y, ww, hh); //problem during svg-export
+        } 
+        catch(NullPointerException e) {
+        }
+
+        wtmp = map.get(mapIndex).width;
+
+        mx = mouseX-(int)main.getPosition()[0]-1;
+        my = mouseY-(int)main.getPosition()[1]-3;
+
+        stroke(c1);
+        strokeWeight(1f);
+        cornerCol = colCorner;
+
+        if ( (mx >= a && mx <= a+e) && (my >= b && my <= b+f)  ) {
+          fill(colOver);
+          cornerCol = colCornerActive;
+          inside = true;
+          insideCorner1 = false;
+          insideCorner3 = false;
+
+          if (mx >= a+e-cornerSize && my >= b+f-cornerSize) {
+            insideCorner3 = true;
+            cornerCol = colCornerOver;
+          } else if (mx <= a+cornerSize && my <= b+cornerSize) {
+            insideCorner1 = true;
+            cornerCol = colCornerOver;
+          }
+        } else {
           inside = false;
           insideCorner1 = false;
           insideCorner3 = false;
           canStartDrag = false;
-      }
-      if(inside && !mousePressed) {
-        canStartDrag = true;
-      } 
-      if(inside && canStartDrag && mousePressed && !drag) {
-        startedInside = true;
-        drag = true;
-        offsetx = mx-a;
-        offsety = my-b;
-        if(insideCorner1 == true) {
-          dragC1 = true; 
         }
-        if(insideCorner3 == true) {
-          dragC3 = true;
-          offsetx = e-offsetx;
-          offsety = f-offsety;
+        if (inside && !mousePressed) {
+          canStartDrag = true;
+        } 
+        if (inside && canStartDrag && mousePressed && !drag) {
+          startedInside = true;
+          drag = true;
+          offsetx = mx-a;
+          offsety = my-b;
+          if (insideCorner1 == true) {
+            dragC1 = true;
+          }
+          if (insideCorner3 == true) {
+            dragC3 = true;
+            offsetx = e-offsetx;
+            offsety = f-offsety;
+          }
         }
-      }
-      
-      if(drag) {
-        if(mousePressed && startedInside) {
-          if(dragC1 == true) {   
-            e = e-(mx-a)+offsetx;
-            f = f-(my-b)+offsety;
-            a = mx-offsetx;
-            b = my-offsety;
-          } else if(dragC3 == true) {
-            //a = mx;
-            //b = my;          
-            e = mx-a+(offsetx);
-            if(shiftPressed) {
-              stroke(colCornerOver);
-              f = (int) ((float)e * ((float)fheight) / (float)fwidth);
+
+        if (drag) {
+          if (mousePressed && startedInside) {
+            if (dragC1 == true) {   
+              e = e-(mx-a)+offsetx;
+              f = f-(my-b)+offsety;
+              a = mx-offsetx;
+              b = my-offsety;
+            } else if (dragC3 == true) {
+              //a = mx;
+              //b = my;          
+              e = mx-a+(offsetx);
+              if (shiftPressed) {
+                stroke(colCornerOver);
+                f = (int) ((float)e * ((float)fheight) / (float)fwidth);
+              } else {
+                f = my-b+(offsety);
+              }
             } else {
-              f = my-b+(offsety);
+              a = mx-offsetx;
+              b = my-offsety;
             }
           } else {
-            a = mx-offsetx;
-            b = my-offsety; 
+            startedInside = false;
+            inside = false;
+            drag = false; 
+            dragC1 = false;
+            dragC3 = false;       
+            insideCorner1 = false;
+            insideCorner3 = false;
           }
-        } else {
-          startedInside = false;
-         inside = false;
-         drag = false; 
-         dragC1 = false;
-         dragC3 = false;       
-         insideCorner1 = false;
-         insideCorner3 = false;
         }
-      }
-      a = constrain(a, x-e,ww);
-      b = constrain(b, y-f, y+hh);
-      
-      rect(a, b, e, f);
-      fill(cornerCol);
-      
-      noStroke();
-      triangle(a+1, b+1, a+cornerSize, b+1, a+1, b+cornerSize);
-      triangle(a+e, b+f, a+e-cornerSize, b+f, a+e, b+f-cornerSize);
-      popStyle();
+        a = constrain(a, x-e, ww);
+        b = constrain(b, y-f, y+hh);
+
+        rect(a, b, e, f);
+        fill(cornerCol);
+
+        noStroke();
+        triangle(a+1, b+1, a+cornerSize, b+1, a+1, b+cornerSize);
+        triangle(a+e, b+f, a+e-cornerSize, b+f, a+e, b+f-cornerSize);
+        popStyle();
       }
     }
   }
@@ -397,7 +399,12 @@ class GuiImage extends Canvas {
 
 class ScrollableListPlus extends ScrollableList {
 
-  ScrollableListPlus( ControlP5 theControlP5, String theName ) {
+  CColor activeColor = new CColor().setBackground(c1);
+  CColor passiveColor = new CColor().setBackground(bg);
+  Map< String, Object > newselected = null;
+  Map< String, Object > oldselected = null;
+
+  public ScrollableListPlus( ControlP5 theControlP5, String theName ) {
     super(theControlP5, theName);
     registerProperty( "value" );
   }
@@ -407,7 +414,19 @@ class ScrollableListPlus extends ScrollableList {
     return this;
   }
 
-  int getItemHover() {
+  public void updateHighlight(Map< String, Object > item) {
+    newselected = item;
+
+    if (!newselected.equals(oldselected)) {
+      newselected.put("color", activeColor); 
+      if (oldselected != null) {
+        oldselected.put("color", passiveColor);
+      }
+    }
+    oldselected = newselected;
+  }
+
+  public int getItemHover() {
     return itemHover;
   }
 }//class ScrollableListPlus
