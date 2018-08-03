@@ -30,6 +30,7 @@ public interface Tile {
   public float getWidth();
   public float getHeight();
   public Tile getOrigin();
+  public Object clone() throws CloneNotSupportedException;
 }
 
 
@@ -37,7 +38,7 @@ public interface Tile {
 //  TileSVG
 // ---------------------------------------------------------------------------
 
-public class TileSVG extends PShapeSVG implements Tile {
+public class TileSVG extends PShapeSVG implements Tile, Cloneable {
 
   float scalex = 1f;
   float scaley = 1f;
@@ -88,6 +89,10 @@ public class TileSVG extends PShapeSVG implements Tile {
   public float getRotation() { return rotation; }
   public Tile getOrigin() { return null; };
   
+  public Object clone() throws CloneNotSupportedException {
+      return super.clone();
+  }
+    
   private void handleLFKN_VDB() {
     if (split(filepath, ".lafkon.net").length > 1) {
       filepath =  split(filepath, ".pdf")[0] +".svg";
@@ -106,7 +111,7 @@ public class TileSVG extends PShapeSVG implements Tile {
 //  TileShape
 // ---------------------------------------------------------------------------
 
-public class TileShape extends PShape implements Tile {
+public class TileShape extends PShape implements Tile, Cloneable {
 
   float scalex = 1f;
   float scaley = 1f;
@@ -166,4 +171,9 @@ public class TileShape extends PShape implements Tile {
   public float getRotation() { return rotation; }
   public Tile getOrigin() { return origin; };
   
+  public Object clone() throws CloneNotSupportedException {
+    Object copy = super.clone();
+    ((TileShape)copy).origin = null;
+    return copy;
+  }
 }

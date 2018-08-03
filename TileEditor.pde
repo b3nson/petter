@@ -625,6 +625,19 @@ class TileEditor extends PApplet {
     setValueLabels();
   }
 
+  private void duplicateTile(int index) {
+    try {
+      Tile copy = (Tile) ( (Tile)shapelist.get(svgindex) ).clone();
+      shapelist.add(index+1, (PShape)copy);
+      svglength = shapelist.size();
+
+      nextTile();
+    } catch(Exception e) {
+      println("Could not duplicate this tile. Sorry!");
+      println(e);
+    }
+  }
+  
   private void prevTile() {
     if (svglength > 1) {
       svgindex = (svgindex-1)%svglength;
@@ -820,6 +833,9 @@ class TileEditor extends PApplet {
       break;
       case(9): //EXPLODE/IMPLODE
       explodeimplode(svgindex, recursive);
+      break;
+      case(12): //DUPLICATE
+      duplicateTile(svgindex);
       break;
       case(11): //TYPETILEDITOR
       if (!typeEditorOpened) {
