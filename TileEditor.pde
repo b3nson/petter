@@ -52,13 +52,15 @@ class TileEditor extends PApplet {
 
   String fontname = "Monospaced";
   char lastchar = 'P';
+  color[] typecolor = {color(0, 0, 0)};
 
   ArrayList<PShape> shapelist;
 
-  Group mainGroup, typeGroup;
-  Button okButton, cancelButton, nextTileButton, prevTileButton, resetTileButton;
+  Group mainGroup, mainTileGroup, mainSortGroup, mainAddGroup, mainInfoGroup, typeGroup;
+  Button closeButton, nextTileButton, prevTileButton, resetTileButton;
   Button deleteTileButton, moveTileBackButton, moveTileForeButton, explodeTileButton;
-  Button addTextButton;
+  Bang typecolorBang;
+  Button addTextButton, duplicateTileButton;
   Toggle recursiveToggle;
   Textfield tileCountLabel;
   Textlabel tezoomLabel, sLabel, rLabel, pLabel;
@@ -100,19 +102,7 @@ class TileEditor extends PApplet {
       .open()
       ;
 
-    okButton = cp5.addButton("CLOSE")
-      .setPosition(w-34-10, h-30-10)
-      .setSize(34, 30)
-      .setId(2)
-      .setGroup(mainGroup);
-    ;
-
-    addTextButton = cp5.addButton("+T")
-      .setPosition(w-40-30-10, h-40)
-      .setSize(30, 30)
-      .setId(11)
-      //.setGroup(mainGroup);
-      ;
+    // ---------------------------------------------------
 
     prevTileButton = cp5.addButton("PREV")
       .setLabel("<")
@@ -144,88 +134,178 @@ class TileEditor extends PApplet {
       .setGroup(mainGroup);
     ;   
 
-    resetTileButton = cp5.addButton("RESET TILE")
-      .setLabel("RESET TILE")
-      .setPosition(w-40-60-30-10, h-40)
-      .setSize(56, 30)
-      .setId(5)
+    // ---------------------------------------------------
+
+    closeButton = cp5.addButton("CLOSE")
+      .setPosition(w-70-10, this.h-52)
+      .setSize(70, 26)
+      .setId(2)
       .setGroup(mainGroup);
     ;
 
-    deleteTileButton = cp5.addButton("DELETE TILE")
-      .setLabel("DELETE TILE")
-      .setPosition(w-50-180-30-20, h-40)
-      .setSize(60, 30)
+    // --------------------------------------------------- 
+
+    mainTileGroup = cp5.addGroup("mainTileGroup")
+      .setLabel("TILE")
+      .setPosition(100, this.h-56)
+      .setWidth(199)
+      .hideArrow()
+      .disableCollapse()
+      .open()
+      .setBackgroundHeight(34)
+      //.setBackgroundColor(color(50))
+      .setColorBackground(color(60))
+      .setColorForeground(color(60))
+      .setGroup(mainGroup)
+      ;
+
+    deleteTileButton = cp5.addButton("DELETE")
+      .setLabel("DELETE")
+      .setPosition(0, 4) 
+      .setSize(44, 26)
       .setId(6)
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainTileGroup)
+      ;
+
+    resetTileButton = cp5.addButton("RESET")
+      .setLabel("RESET")
+      .setPosition(49, 4)     
+      .setSize(38, 26)
+      .setId(5)
+      .setGroup(mainTileGroup)
+      ;
+
+    duplicateTileButton = cp5.addButton("DUPLICATE")
+      .setLabel("DUPLICATE")
+      .setPosition(91, 4)
+      .setSize(54, 26)
+      .setId(12)
+      .setGroup(mainTileGroup)
+      ;
 
     explodeTileButton = cp5.addButton("EXPLODE")
       .setLabel("EXPLODE")
-      .setPosition(w-50-110-30-20, h-40)
-      .setSize(60, 18)
+      .setPosition(149, 4)
+      .setSize(50, 16)
       .setId(9)
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainTileGroup)
+      ;
 
     recursiveToggle = cp5.addToggle("recursive")
       .setLabel("RECURSIVE")
-      .setPosition(w-50-110-30-20, h-40+22)
-      .setSize(8, 8)
+      .setPosition(149, 22)
+      .setSize(50, 8)
       .setValue(recursive)
       .setId(10)
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainTileGroup)
+      ;
 
     controlP5.Label lr = recursiveToggle.getCaptionLabel();
     lr.setHeight(10);
     lr.getStyle().setPadding(2, 2, 2, 2);
-    lr.getStyle().setMargin(-15, 0, 0, 14);
+    lr.getStyle().setMargin(-15, 0, 0, 3);
 
+    // ---------------------------------------------------
+
+    mainSortGroup = cp5.addGroup("mainSortGroup")
+      .setLabel("SORT")
+      .setPosition(10, this.h-56)
+      .setWidth(64)
+      .hideArrow()
+      .disableCollapse()
+      .open()
+      .setBackgroundHeight(34)
+      //.setBackgroundColor(color(50))
+      .setColorBackground(color(60))
+      .setColorForeground(color(60))
+      .setGroup(mainGroup)
+      ;
 
     moveTileForeButton = cp5.addButton("<")
       .setLabel("<")
-      .setPosition(130, h-40)
-      .setSize(30, 30)
+      .setPosition(0, 4)
+      .setSize(30, 26)
       .setId(7)
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainSortGroup)
+      ;
 
     moveTileBackButton = cp5.addButton(">")
       .setLabel(">")
-      .setPosition(165, h-40)
-      .setSize(30, 30)
+      .setPosition(34, 4)
+      .setSize(30, 26)
       .setId(8)
-      .setGroup(mainGroup);
+      .setGroup(mainSortGroup);
     ;
 
-    tezoomLabel = cp5.addTextlabel("tezoomlabel" )
-      .setPosition(60, h-20)
-      .setText("ZOOM:  1.0")
-      //.setGroup(mainGroup);
+    // ---------------------------------------------------
+
+    mainAddGroup = cp5.addGroup("mainAddGroup")
+      .setLabel("ADD")
+      .setPosition(325, this.h-56)
+      .setWidth(30)
+      .hideArrow()
+      .disableCollapse()
+      .open()
+      .setBackgroundHeight(34)
+      //.setBackgroundColor(color(50))
+      .setColorBackground(color(60))
+      .setColorForeground(color(60))
+      .setGroup(mainGroup)
       ;
 
-    sLabel = cp5.addTextlabel("sLabel" )
-      .setPosition(10, h-20)
-      .setText("S:  1.0")
-      .setGroup(mainGroup);
+    addTextButton = cp5.addButton("+T")
+      .setPosition(0, 4)
+      .setSize(30, 26)
+      .setId(11)
+      .setGroup(mainAddGroup);
     ;
+
+    // ---------------------------------------------------      
+
+    mainInfoGroup = cp5.addGroup("mainInfoGroup")
+      .setLabel("INFO")
+      .setPosition(0, this.h-22)
+      .setSize(this.w, 22)
+      .hideBar()
+      .open()
+      .setBackgroundHeight(24)
+      .setBackgroundColor(color(45))
+      .setGroup(mainGroup)
+      ;
+
+    tezoomLabel = cp5.addTextlabel("tezoomlabel" )
+      .setPosition(this.w-60, 7)
+      .setText("ZOOM:  1.0")
+      .setGroup(mainInfoGroup);
+    ;
+
+    sLabel = cp5.addTextlabel("sLabel" )
+      .setPosition(10, 7)
+      .setText("S:  1.0")
+      .setGroup(mainInfoGroup)
+      ;
 
     rLabel = cp5.addTextlabel("rLabel" )
-      .setPosition(10, h-30)
+      .setPosition(55, 7)
       .setText("R:  0.0")
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainInfoGroup)
+      ;
 
     pLabel = cp5.addTextlabel("pLabel" )
-      .setPosition(10, h-40)
+      .setPosition(95, 7)
       .setText("P:  0.0 x 0.0")
-      .setGroup(mainGroup);
-    ;
+      .setGroup(mainInfoGroup)
+      ;
+
+    // ---------------------------------------------------
 
     ControllerProperties prop = cp5.getProperties();
     prop.remove(mainGroup);
-    prop.remove(okButton);
+    prop.remove(mainTileGroup);
+    prop.remove(mainSortGroup);
+    prop.remove(mainAddGroup);
+    prop.remove(mainInfoGroup);
+    prop.remove(closeButton);
     prop.remove(addTextButton);
     prop.remove(recursiveToggle);
     prop.remove(prevTileButton);
@@ -233,6 +313,7 @@ class TileEditor extends PApplet {
     prop.remove(resetTileButton);
     prop.remove(deleteTileButton);
     prop.remove(explodeTileButton);
+    prop.remove(duplicateTileButton);
     prop.remove(moveTileBackButton);
     prop.remove(moveTileForeButton);
     prop.remove(tezoomLabel);
@@ -296,6 +377,15 @@ class TileEditor extends PApplet {
       .setGroup(typeGroup)
       ;  
 
+    typecolorBang = gui.addBang("changetypecolor")
+      .setLabel("C")
+      .setPosition(320, 10)
+      .setSize(20, 20)
+      .setGroup(typeGroup)
+      ;
+    typecolorBang.getCaptionLabel().setPadding(8, -14);
+    typecolorBang.setColorForeground(typecolor[0]);
+
     createTypeTileButton = cp5.addButton("CREATE TILE")
       .setLabel("CREATE TILE")
       .setPosition(w-40-60, 10)
@@ -304,13 +394,13 @@ class TileEditor extends PApplet {
       .setGroup(typeGroup)
       ;
 
-
     ControllerProperties prop = cp5.getProperties();
     prop.remove(typeGroup);
     prop.remove(fontlist);
     prop.remove(fontsizeBox);     
     prop.remove(baselineBox);   
     prop.remove(createTypeTileButton);
+    prop.remove(typecolorBang);
 
     typeEditorCreated = true;
 
@@ -331,8 +421,8 @@ class TileEditor extends PApplet {
   // ---------------------------------------------------------------------------
   //  DRAW
   // ---------------------------------------------------------------------------
-  
-  
+
+
   void draw() {
     //timeout for scroll-scale without live-preview
     if ( time != -1 ) {
@@ -343,15 +433,15 @@ class TileEditor extends PApplet {
       }
     }
 
-   // --------------------------------------------------- draw tileditor
-   
+    // --------------------------------------------------- draw tileditor
+
     if (!typeEditorOpened) {
       background(50);
       shapeMode(CENTER);
-      
+
       if (svg != null) {
         pushMatrix();
-        
+
         translate(w/2, h/2);
         scale(zoom);
         strokeWeight(1f/zoom);
@@ -370,8 +460,11 @@ class TileEditor extends PApplet {
 
         //mastertilesizeBox stroke
         noFill();
-        if (svgindex == 0) { stroke(0, 255, 150, 150); } 
-        else { stroke(0, 150, 255, 80); }
+        if (svgindex == 0) { 
+          stroke(0, 255, 150, 150);
+        } else { 
+          stroke(0, 150, 255, 80);
+        }
         rect(0, 0, tw, th);
         //currenttilesizeBox
         stroke(150, 60);
@@ -380,18 +473,18 @@ class TileEditor extends PApplet {
         stroke(150, 100);
         line( -10, 0, 10, 0 );
         line( 0, -10, 0, 10 );
-        
+
         popMatrix();
       }
     } 
-    
-   // --------------------------------------------------- draw typeditor
-    
+
+    // --------------------------------------------------- draw typeditor
+
     else { //typeEditorOpened
       rectMode(CENTER);
       shapeMode(CORNER);
       background(50);
-      
+
       fill(180);
       noStroke();
       rect(w/2, h/2, w-20, h-20); //bg
@@ -424,7 +517,7 @@ class TileEditor extends PApplet {
           translate(0, -((float)fontsize / 100f) * baseline);
           popStyle();
         }
-        
+
         //typetilesizeBox stroke
         noFill();
         stroke(150, 80);
@@ -432,14 +525,12 @@ class TileEditor extends PApplet {
         //mastertilesizeBox stroke
         stroke(0, 150, 255, 80);
         rect(w/2, h/2, shapelist.get(0).width, shapelist.get(0).height);
-      
+
         popMatrix();
       }
-      
     }
-    
-   // ---------------------------------------------------
-   
+
+    // ---------------------------------------------------
   }//draw
 
 
@@ -648,7 +739,7 @@ class TileEditor extends PApplet {
     shapeMode(CORNER); //draws letters on correct y-baseline
     typeShape = typefont.getShape(lastchar, 0);
     typeShape.beginShape();
-    typeShape.fill(20);
+    typeShape.fill(0);
     typeShape.translate(-typeShape.width/2, typeypos); //x-center, because of shapeMode CORNER
     //s.translate(0, ((float)fontsize / 100f) * baseline); //wäre hier besser, aber muss dann jedesmal neu created werden
     typeShape.draw(g);
@@ -672,8 +763,10 @@ class TileEditor extends PApplet {
         stroke(strokecolor[0]);
         float sw = 1f;
         try {
-          sw = ((Tile)s).getScaleX();    //typeTiles don't cast to Tile before 
-        } catch(ClassCastException e) {} //they are actually *created* (as Tile)
+          sw = ((Tile)s).getScaleX();    //typeTiles don't cast to Tile before
+        } 
+        catch(ClassCastException e) {
+        } //they are actually *created* (as Tile)
         if (sw != 0f) {
           sw = abs(customStrokeWeight*(1/sw));
         }
@@ -784,12 +877,10 @@ class TileEditor extends PApplet {
       parent.thread("loadSystemFonts");
       setupTypeTileEditor();
     }
+    addTextButton.moveTo(typeGroup).setPosition(w-20-10-70, this.h-20-10-26)
+        .setSize(70, 26).bringToFront().setLabel("CLOSE");
     typeGroup.open();
     mainGroup.close();
-    addTextButton.bringToFront();
-    addTextButton.setWidth(70);
-    addTextButton.setLabel("CLOSE");
-    cp5.update();
     typeEditorOpened = true;
     if (fontlistLoaded) {
       createFont();
@@ -801,13 +892,11 @@ class TileEditor extends PApplet {
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setCountLabel();
+    addTextButton.moveTo(mainAddGroup).setPosition(0, 4)
+        .setSize(30, 26).bringToFront().setLabel("+T");
     mainGroup.open();
     typeGroup.close();
-    addTextButton.bringToFront();
-    addTextButton.setWidth(30);
-    addTextButton.setLabel("+T");
     typeEditorOpened = false;
-    cp5.update();
   }
 
   private void closeAndApply() {
@@ -866,16 +955,16 @@ class TileEditor extends PApplet {
     if ( t.getOrigin() != null ) {
       explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
       explodeTileButton.setLabel("IMPLODE");
-      explodeTileButton.setHeight(30);
+      explodeTileButton.setHeight(26);
       recursiveToggle.hide();
     } else if (t instanceof TileSVG) {
       explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
       explodeTileButton.setLabel("EXPLODE");
-      explodeTileButton.setHeight(18);
+      explodeTileButton.setHeight(16);
       recursiveToggle.show();
     } else {
       explodeTileButton.setLabel("EXPLODE");
-      explodeTileButton.setHeight(30);
+      explodeTileButton.setHeight(26);
       explodeTileButton.setBroadcast(false).setColorLabel(lockColor).setColorActive(bg).setColorForeground(bg);
       recursiveToggle.hide();
     }
