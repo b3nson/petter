@@ -49,6 +49,7 @@ String outputpath = "o/";
 String subfolder = "";
 String[] names;
 String[] helptext;
+String[] systemfonts;
 String name;
 
 ArrayList<PShape> svg;
@@ -152,7 +153,7 @@ int manualNFOY = fheight/6*5;
 // ---------------------------------------------------------------------------
 
 void setup() {  
-  frameRate(25);
+  frameRate(100);
   size(905, 842, JAVA2D);
   surface.setResizable(true);
   surface.setSize(905, 842);
@@ -217,6 +218,7 @@ void setup() {
   println(" ");
   println("  Press M for menu");
   println("        H for help");
+  println("");
 
   checkArgs();
   ControlP5.DEBUG = false;

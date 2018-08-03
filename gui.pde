@@ -1877,6 +1877,12 @@ void printArrayList(ArrayList l) {
   println("----------------------------------");
 }
 
+public void loadSystemFonts() {
+  print("Loading system fonts... ");
+  systemfonts = PFont.list();
+  println("DONE");
+}
+
 float ease(int type, float a, float b, float c, float d) {
   if (type == ROT) {
     type = rotType;
