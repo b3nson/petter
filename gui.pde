@@ -1159,7 +1159,6 @@ void callbackUndoAction(CallbackEvent theEvent) {
 
 
 void controlEvent(ControlEvent theEvent) {
-
   if(theEvent.isController() && theEvent.getController() instanceof Slider) {
    Slider tmp =  (Slider)theEvent.getController();
    
@@ -1310,8 +1309,13 @@ void controlEvent(ControlEvent theEvent) {
     lastImgMapFrame();
   } 
   else if (theEvent.isFrom(bgcolorSaveLabel)) {
-    bgcolor[0] = int(bgcolorSaveLabel.getValue());
-    bgcolorBang.setColorForeground(bgcolor[0]);
+    if( int(bgcolorSaveLabel.getValue()) == 0 ) {
+      randomSeed(mouseX*mouseY);
+      int c = color(random(255), random(255), random(255));
+      bgcolorSaveLabel.setValue(c);
+    }
+      bgcolor[0] = int(bgcolorSaveLabel.getValue());
+      bgcolorBang.setColorForeground(bgcolor[0]);
   }
   else if (theEvent.isFrom(strokecolorSaveLabel)) {
     strokecolor[0] = int(strokecolorSaveLabel.getValue());
@@ -1778,8 +1782,8 @@ void loadSettings(String filename, boolean close) {
   if(close) {
     settingsFilelist.close();
     settingsFilelist.hide();
+    undo.setUndoStep();
   }
-  
 }
 
 void saveSettings(String timestamp) {    
@@ -1788,9 +1792,9 @@ void saveSettings(String timestamp) {
 }
 
 void loadDefaultSettings() {
-  gui.loadProperties("default.json");
+  gui.loadProperties("i/settings/0000_Default.json");
+  undo.setUndoStep();
 }
-
 
 void findSettingFiles() {
   String[] allFiles = listFileNames(sketchPath("") +settingspath);

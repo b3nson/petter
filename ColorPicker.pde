@@ -220,11 +220,17 @@ public class ColorPicker extends PApplet {
   public void show() {
     this.loop();
     opened = true;
+    updateColor();
     initSliders(startCol);
     updatePreviewColor();
     surface.setVisible(true); //win.show();
   }
-
+  
+  void updateColor() {
+    startCol = srccol[0];
+    curCol = srccol[0];
+  }
+  
   void updatePreviewColor() {
     colorMode(HSB);
     curCol =  color(hue, sat, bri);

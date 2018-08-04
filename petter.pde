@@ -690,6 +690,8 @@ void keyPressed() {
     changeSliderRange(false);
   } else if (keysDown['.']) {
     changeSliderRange(true);
+  } else if (keysDown['D']) {
+    loadDefaultSettings();
   }
 }
 
