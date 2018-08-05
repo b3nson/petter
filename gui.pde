@@ -1310,7 +1310,7 @@ void controlEvent(ControlEvent theEvent) {
   } 
   else if (theEvent.isFrom(bgcolorSaveLabel)) {
     if( int(bgcolorSaveLabel.getValue()) == 0 ) {
-      randomSeed(mouseX*mouseY);
+      randomSeed(frameCount);
       int c = color(random(255), random(255), random(255));
       bgcolorSaveLabel.setValue(c);
     }
