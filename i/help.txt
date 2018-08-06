@@ -13,10 +13,12 @@ H		- 	Show/Hide this HELP
 T		- 	Show/Hide TileEditor
 + / - 	- 	ZOOM IN / OUT
 Z / Y 	- 	UNDO / REDO
+D 		-	RESET TO DEFAULT
 
 SHIFT on Sliders	-	bigger steps
 SCROLL on Sliders	-	finer steps
 . / ; on Sliders	-	in/decrease sliderrange
+D on Sliders		-	reset slider to default
 
 0 (ZERO)	-	Load previous Settings
 S	-	Save PDF
