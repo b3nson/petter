@@ -38,7 +38,7 @@ ControlFont font;
 SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 DropTargetIMG dropIMG;
-ColorPicker bg_copi, stroke_copi, shape_copi;
+ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
 Memento undo;
 PGraphics pdf; 
@@ -129,6 +129,7 @@ boolean customStyle = false;
 color[] bgcolor = {color(random(255), random(255), random(255))};
 color[] strokecolor = {color(0, 0, 0)};
 color[] shapecolor = {color(255, 255, 255)};
+color[] typecolor = {color(0, 0, 0)};
 
 boolean pageOrientation = true;
 String[][] formats = { 

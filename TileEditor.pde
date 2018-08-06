@@ -41,6 +41,7 @@ class TileEditor extends PApplet {
   int fontsize = 100;
   int lockColor = 130;
   int unlockColor = 255;
+  int prevTypeColor = -1;
 
   float offsetx, offsety, tmpx, tmpy;
   float scalex = 1f;
@@ -52,7 +53,6 @@ class TileEditor extends PApplet {
 
   String fontname = "Monospaced";
   char lastchar = 'P';
-  color[] typecolor = {color(0, 0, 0)};
 
   ArrayList<PShape> shapelist;
 
@@ -528,6 +528,14 @@ class TileEditor extends PApplet {
 
         popMatrix();
       }
+      
+      if (type_copi != null && type_copi.isOpen()) {
+        if(typecolor[0] != prevTypeColor) {
+          typecolorBang.setColorForeground(typecolor[0]);
+          createLetter();
+          prevTypeColor = typecolor[0];
+        }
+      }
     }
 
     // ---------------------------------------------------
@@ -752,7 +760,7 @@ class TileEditor extends PApplet {
     shapeMode(CORNER); //draws letters on correct y-baseline
     typeShape = typefont.getShape(lastchar, 0);
     typeShape.beginShape();
-    typeShape.fill(0);
+    typeShape.fill(typecolor[0]);
     typeShape.translate(-typeShape.width/2, typeypos); //x-center, because of shapeMode CORNER
     //s.translate(0, ((float)fontsize / 100f) * baseline); //wäre hier besser, aber muss dann jedesmal neu created werden
     typeShape.draw(g);
