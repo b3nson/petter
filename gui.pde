@@ -42,7 +42,7 @@ int w = 180;
 int imgMapHeight = 0;
 int tickMarks = 11;
 int helpwidth = 330;
-int helpheight = 630;
+int helpheight = ceil(68 * 9.6); //68 lines in help.txt
 int infoheight = 22;
 int scrollOffset = 0;
 float mapwidth = 0;
@@ -1505,9 +1505,9 @@ void changeSliderRange(boolean increase) {
           tmp.setMax(tmp.getMax()*0.5f);
           tmp.setMin(tmp.getMin()*0.5f);
         }
-      }
+      }      
     } catch(IndexOutOfBoundsException e) {}
-  }
+  }  
 }
 
 void updatextilenumSlider() {
@@ -1785,12 +1785,23 @@ void loadSettings(String filename, boolean close) {
 
 void saveSettings(String timestamp) {    
    gui.saveProperties(settingspath +timestamp +".json");
-   //gui.getProperties().print();
 }
 
 void loadDefaultSettings() {
-  gui.loadProperties();
-  undo.setUndoStep();
+  if(gui.isMouseOver()) {   //reset single controller
+    try {
+      ControllerInterface c = gui.getMouseOverList().get(0);
+      if(c instanceof Slider || c instanceof ScrollableList) {
+        c.setValue(  ((Controller)c).getDefaultValue() );
+        println("Resetting " +c.getName());
+      }
+    } catch(IndexOutOfBoundsException e) {}
+  }  
+  else {                   //reset all controllers
+    gui.loadProperties();
+    println("Resetting all controllers ");
+  }
+  undo.setUndoStep();  
 }
 
 void findSettingFiles() {
