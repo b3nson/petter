@@ -13,77 +13,59 @@
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.Frame;
-import java.awt.BorderLayout;
 
 public class ColorPicker extends PApplet {
 
-  //final Frame win;
   PApplet parent;
-
   private ControlP5 cp5;
 
-  int w, h;
+  private int w = 380;
+  private int h = 285;
 
-  float hue = 0;
-  float sat = 0;
-  float bri = 0;
+  private float hue = 0;
+  private float sat = 0;
+  private float bri = 0;
 
-  color startCol;  
-  color curCol;
-  color[] srccol;
+  private color startCol;  
+  private color curCol;
+  private color[] srccol;
 
-  boolean opened = true;
-  boolean preview = true;
+  private String name;
+  
+  private boolean opened = true;
+  private boolean preview = true;
 
-  ColorSlider2DView satpick;
-  ColorSlider1DView huepick;
+  private ColorSlider2DView satpick;
+  private ColorSlider1DView huepick;
+  private Slider2D s2D;
+  private Slider s1D;
+  private Textlabel rgbValueLabel, hsbValueLabel, hexValueLabel;
+  private Button okButton, cancelButton;
+  private Toggle previewToggle;
 
-  String name;
-  Textlabel rgbValueLabel, hsbValueLabel, hexValueLabel;
-  Slider2D s2D;
-  Slider s1D;
-  Button okButton, cancelButton;
-  Toggle previewToggle;
 
-  //using a color-array here, to set color-value of mainapp directly (like pass-by-reference in C/C++)
   public ColorPicker(PApplet theParent, String theName, int theWidth, int theHeight, color[] col) {
     parent = theParent;
-    w = theWidth;
-    h = theHeight;
+    //w = theWidth;
+    //h = theHeight;
     startCol = col[0];
     curCol = col[0];
     srccol = col;
     name = theName;
-    //win = new Frame(theName);
-    //win.add(this);
-    //this.init();
-    //win.setTitle(theName);
-    //win.setSize(this.w, this.h);
-    //win.setLocationRelativeTo(null);    
-    ////win.setLocation(frame.getLocation().x, frame.getLocation().y);
-    ////win.setUndecorated(true);
-    //win.setResizable(true);
-    //win.setVisible(true);
   }  
+  //using a color-array here, to set color-value of mainapp directly (like pass-by-reference in C/C++)
 
-  public void settings() {
-    //surface.setSize(380, 285);
-    size(380, 285, JAVA2D);
+
+  // ---------------------------------------------------------------------------
+  //  SETUP
+  // ---------------------------------------------------------------------------
+
+  void settings() {
+    size(w, h, JAVA2D);
   }
 
   void setup() {    
-    //win.addWindowListener(new WindowAdapter() {
-    //  @Override
-    //    public void windowClosing(WindowEvent windowEvent) { 
-    //    //curCol=startCol;
-    //    hide();
-    //  }
-    //}
-    //);    
-
+    surface.setTitle(name);
     colorMode(HSB);
     frameRate(25);
 
@@ -94,7 +76,6 @@ public class ColorPicker extends PApplet {
     s2D = cp5.addSlider2D("s2D")
       .setPosition(10, 10)
       .setSize(255, 255)
-      //.setArrayValue(new float[] {80, 50})
       .setColorBackground(0) 
       .setMaxX(255)
       .setMaxY(0)
@@ -104,7 +85,6 @@ public class ColorPicker extends PApplet {
       .setView(satpick)
       //.disableCrosshair()
       ;
-    //s2D.plugTo(parent, "satbri");
     s2D.getCaptionLabel().hide();
     s2D.getValueLabel().hide();
 
@@ -119,7 +99,6 @@ public class ColorPicker extends PApplet {
       .setScrollSensitivity(0.0392) 
       .setView(huepick)
       ;
-    //s1D.plugTo(parent, "hue");
     s1D.getCaptionLabel().hide();
     s1D.getValueLabel().hide();
 
@@ -169,19 +148,20 @@ public class ColorPicker extends PApplet {
     prop.remove(s1D);
     prop.remove(s2D);
 
-    //initSliders(startCol);
     show();
     smooth();
   } //end setup
 
 
+  // ---------------------------------------------------------------------------
+  //  DRAW
+  // ---------------------------------------------------------------------------
+  
   void draw() {
-    //pushStyle();
-    noStroke();
-
     colorMode(HSB);
     background(50);
-
+    noStroke();
+    
     fill(curCol);
     rect(300, 10, 60, 40);
 
@@ -208,13 +188,21 @@ public class ColorPicker extends PApplet {
       }
     }
     colorMode(RGB);
-    //popStyle();
+  }
+
+
+  // ---------------------------------------------------------------------------
+  //  GUI FUNCTIONS
+  // ---------------------------------------------------------------------------
+
+  public boolean isOpen() {
+    return opened;
   }
 
   public void hide() {
     this.noLoop();
+    surface.setVisible(false);
     opened = false;
-    surface.setVisible(false); //win.hide();
   }
 
   public void show() {
@@ -223,15 +211,32 @@ public class ColorPicker extends PApplet {
     updateColor();
     initSliders(startCol);
     updatePreviewColor();
-    surface.setVisible(true); //win.show();
+    surface.setVisible(true);
+  }
+
+  public void exit() { //on native window-close
+   closeAndCancel();
   }
   
-  void updateColor() {
+  private void closeAndApply() {
+    startCol=curCol;
+    srccol[0] = curCol;
+    hide();
+    undo.setUndoStep();
+  }
+
+  private void closeAndCancel() {
+    curCol=startCol;
+    srccol[0] = startCol;
+    hide();
+  }
+  
+  private void updateColor() {
     startCol = srccol[0];
     curCol = srccol[0];
   }
-  
-  void updatePreviewColor() {
+
+  private void updatePreviewColor() {
     colorMode(HSB);
     curCol =  color(hue, sat, bri);
     if (preview) {
@@ -245,8 +250,7 @@ public class ColorPicker extends PApplet {
     colorMode(RGB);
   }
 
-
-  void initSliders(color c) {
+  private void initSliders(color c) {
     hue = hue(c);
     sat = saturation(c);
     bri = brightness(c)-255; 
@@ -254,56 +258,46 @@ public class ColorPicker extends PApplet {
     s2D.setArrayValue(new float[] {sat, bri});
   }  
 
-  boolean isOpen() {
-    return opened;
-  }
+
+  // ---------------------------------------------------------------------------
+  //  GUI LISTENER
+  // ---------------------------------------------------------------------------
 
   public void controlEvent(ControlEvent theEvent) {
     switch(theEvent.getId()) {
       case(0): //sat-bri
-        sat = (theEvent.getController().getArrayValue())[0];
-        bri = (theEvent.getController().getArrayValue())[1];
-        updatePreviewColor();
+      sat = (theEvent.getController().getArrayValue())[0];
+      bri = (theEvent.getController().getArrayValue())[1];
+      updatePreviewColor();
       break;
       case(1): //hue
-        hue = (theEvent.getController().getValue());
-        updatePreviewColor();
+      hue = (theEvent.getController().getValue());
+      updatePreviewColor();
       break;
       case(2): //OK
-        closeAndApply();
+      closeAndApply();
       break;
       case(3): //X
-        closeAndCancel();
+      closeAndCancel();
       break;
       case(4): //PREVIEW
-        preview = boolean((int)theEvent.getController().getValue());
-        updatePreviewColor();
+      preview = boolean((int)theEvent.getController().getValue());
+      updatePreviewColor();
       break;
     }
   }
 
-  private void closeAndApply() {
-    startCol=curCol;
-    srccol[0] = curCol;
-    hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
-    undo.setUndoStep();
-  }
 
-  private void closeAndCancel() {
-    curCol=startCol;
-    srccol[0] = startCol;
-    hide(); //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
-  }
-
+  // ---------------------------------------------------------------------------
+  //  INPUT LISTENER
+  // ---------------------------------------------------------------------------
 
   void keyPressed() {
     if (key == RETURN || key == ENTER) {
-      //okButton.trigger();
       closeAndApply();
     } else if (key == ESC || keyCode==ESC) {
       key=0;
       keyCode=0;
-      //cancelButton.trigger();
       closeAndCancel();
     }
   }
@@ -323,9 +317,10 @@ public class ColorPicker extends PApplet {
 
 
 
-//==========================================================================
-//== Custom SliderView to prevent drawing of controller-background =========
-//==========================================================================
+// ---------------------------------------------------------------------------
+//  CUSTOM SLIDER-VIEWS (to prevent drawing of controller-background)
+// ---------------------------------------------------------------------------
+  
 
 class ColorSlider2DView implements ControllerView<Slider2D> {
   PApplet theApplet;
@@ -335,17 +330,10 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
   }
 
   public void display(PGraphics g, Slider2D theController) {
-
     theApplet.noStroke();
-    theApplet.noFill();
-
-    //                        if (theController.isInside()) {
-    //                                theApplet.fill(theController.getColor().getForeground());
-    //                        } else {
-    //                                theApplet.fill(theController.getColor().getBackground());
-    //                        }
-
+    //draw no background
     //theApplet.fill(theController.getColor().getBackground());
+    theApplet.noFill();
     theApplet.rect(0, 0, width, height);
 
     if (theController.isCrosshairs) {
@@ -368,79 +356,18 @@ class ColorSlider2DView implements ControllerView<Slider2D> {
 
 
 class ColorSlider1DView implements ControllerView<Slider> {
-
   PApplet theApplet;
 
   public ColorSlider1DView(PApplet a) {
     theApplet = a;
   }
 
-  //                Slider1DViewColor() {
-  //                        //_myCaptionLabel.align(LEFT, BOTTOM_OUTSIDE).setPadding(0, Label.paddingY);
-  //                        //_myValueLabel.set("" + adjustValue(getValue())).align(RIGHT_OUTSIDE, TOP);
-  //                }
-  //
-  //                void setSnapValue() {
-  //                        float n = PApplet.round(PApplet.map(_myValuePosition, 0, getHeight(), 0, _myTickMarks.size() - 1));
-  //                        _myValue = PApplet.map(n, 0, _myTickMarks.size() - 1, _myMin, _myMax);
-  //                }
-  //
-  //                void updateUnit() {
-  //                        _myUnit = (_myMax - _myMin) / (height - _myHandleSize);
-  //                }
-  //
-  //                void update() {
-  //                        float f = _myMin + (-(_myControlWindow.mouseY - (_myParent.getAbsolutePosition().y + position.y) - height)) * _myUnit;
-  //                        setValue(PApplet.map(f, 0, 1, _myMinReal, _myMaxReal));
-  //                }
-  //
-  //                void updateInternalEvents(PApplet theApplet) {
-  //                        float f = _myMin + (-(_myControlWindow.mouseY - (_myParent.getAbsolutePosition().y + position.y) - height)) * _myUnit;
-  //                        setValue(PApplet.map(f, 0, 1, _myMinReal, _myMaxReal));
-  //                }
-
-
   public void display(PGraphics g, Slider theController) {
-    // theApplet.fill(theController.getColor().getBackground());
+    //draw no background
+    //theApplet.fill(theController.getColor().getBackground());
     theApplet.noStroke();
-    //if ((theController.getColor().getBackground() >> 24 & 0xff) > 0) {
-    //theApplet.rect(0, 0, theController.getWidth(), theController.getHeight());
-    //}
-
+    //drawHandle
     theApplet.fill(theController.isInside() ? theController.getColor().getActive() : theController.getColor().getForeground());
     theApplet.rect(0, theController.getHeight() - theController.getValuePosition() - theController.getHandleSize(), theController.getWidth(), theController.getHandleSize());
-
-    if (theController.getSliderMode() == controlP5.Slider.FLEXIBLE) {
-      //theApplet.rect(0, theController.getHeight(), theController.getWidth(), -theController.getValuePosition());
-    } else {
-      //if (theController.isShowTickMarks) {
-      //        theApplet.triangle(theController.getWidth(), theController.getHeight() - theController.getValuePosition(), theController.getWidth(), theController.getHeight() - theController.getValuePosition() - theController.getHandleSize(), 0, theController.getHeight() - theController.getValuePosition()
-      //                       - theController.getHandleSize() / 2);
-      //} else {
-      //theApplet.rect(0, theController.getHeight() - theController.getValuePosition() - theController.getHandleSize(), theController.getWidth(), theController.getHandleSize());
-      //}
-    }
-
-    if (theController.isLabelVisible()) {
-      theController.getCaptionLabel().draw(g, 0, 0, theController);
-      theApplet.pushMatrix();
-      //theApplet.translate(0, (int) PApplet.map(_myValue, _myMax, _myMin, 0, getHeight() - _myValueLabel.getHeight()));
-      theController.getValueLabel().draw(g, 0, 0, theController);
-      theApplet.popMatrix();
-    }
-
-    //                        if (isShowTickMarks) {
-    //                                theApplet.pushMatrix();
-    //                                theApplet.pushStyle();
-    //                                theApplet.translate(-4, (getSliderMode() == FIX) ? 0 : getHandleSize() / 2);
-    //                                theApplet.fill(_myColorTickMark);
-    //                                float x = (getHeight() - ((getSliderMode() == FIX) ? 0 : getHandleSize())) / (getTickMarks().size() - 1);
-    //                                for (TickMark tm : getTickMarks()) {
-    //                                        tm.draw(theApplet, getDirection());
-    //                                        theApplet.translate(0, x);
-    //                                }
-    //                                theApplet.popStyle();
-    //                                theApplet.popMatrix();
-    //                        }
   }
 }

@@ -1201,22 +1201,18 @@ void controlEvent(ControlEvent theEvent) {
   else if (theEvent.isFrom("rotType")) {
     rotType = (int)theEvent.getController().getValue();
     penner_rot.setColorBackground(color(100));
-    //penner_rot.getItem(rotType).setColorBackground(c1);
   }   
   else if (theEvent.isFrom("scaType")) {
     scaType = (int)theEvent.getController().getValue();
     penner_sca.setColorBackground(color(100));
-    //penner_sca.getItem(scaType).setColorBackground(c1);
   }
   else if (theEvent.isFrom("traType")) {
     traType = (int)theEvent.getController().getValue();
     penner_tra.setColorBackground(color(100));
-    //penner_tra.getItem(traType).setColorBackground(c1);
   }    
   else if (theEvent.isFrom("animType")) {
     animType = (int)theEvent.getController().getValue();
     penner_anim.setColorBackground(color(100));
-    //penner_anim.getItem(traType).setColorBackground(c1);
   } 
   else if(theEvent.isFrom("style")) {
     if(customStyle) {
@@ -1450,7 +1446,7 @@ void toggleRandom() {
 
 void changebgcolor(float i) {
   if(bg_copi == null) {
-    bg_copi = new ColorPicker(this, "colorpicker1", 380, 300, bgcolor);
+    bg_copi = new ColorPicker(this, "backgroundcolor", 380, 300, bgcolor);
     String[] args = {"colorpicker1"};
     PApplet.runSketch(args, bg_copi);
   } else {
@@ -1459,7 +1455,7 @@ void changebgcolor(float i) {
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
-    stroke_copi = new ColorPicker(this, "colorpicker2", 380, 300, strokecolor);
+    stroke_copi = new ColorPicker(this, "strokecolor", 380, 300, strokecolor);
     String[] args = {"colorpicker2"};
     PApplet.runSketch(args, stroke_copi);
   } else {
@@ -1468,7 +1464,7 @@ void changestrokecolor(float i) {
 }
 void changeshapecolor(float i) {
   if(shape_copi == null) {
-    shape_copi = new ColorPicker(this, "colorpicker3", 380, 300, shapecolor);
+    shape_copi = new ColorPicker(this, "fillcolor", 380, 300, shapecolor);
     String[] args = {"colorpicker3"};
     PApplet.runSketch(args, shape_copi);
   } else {
@@ -1477,7 +1473,7 @@ void changeshapecolor(float i) {
 }
 void changetypecolor(float i) {
   if(type_copi == null) {
-    type_copi = new ColorPicker(this, "colorpicker4", 380, 300, typecolor);
+    type_copi = new ColorPicker(this, "typecolor", 380, 300, typecolor);
     String[] args = {"colorpicker4"};
     PApplet.runSketch(args, type_copi);
   } else {

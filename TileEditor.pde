@@ -881,7 +881,6 @@ class TileEditor extends PApplet {
     this.noLoop();
     opened = false;
     surface.setVisible(false); 
-    //win.hide();
   }
 
   public void show() {
@@ -893,7 +892,10 @@ class TileEditor extends PApplet {
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setCountLabel();
-    //win.show();
+  }
+
+  public void exit() { //on native window-close
+    hide();
   }
 
   private void openTypeTileEditor() {
