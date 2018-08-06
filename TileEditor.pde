@@ -344,7 +344,7 @@ class TileEditor extends PApplet {
     fontlist = new ScrollableListPlus(cp5, "updating...");
     fontlist
       .setPosition(10, 10)
-      .setSize(200, h-40)
+      .setSize(176, h-40)
       .setItemHeight(20)
       .setBarHeight(20)
       .setBackgroundColor(color(190))
@@ -355,7 +355,7 @@ class TileEditor extends PApplet {
     ; 
 
     fontsizeBox = cp5.addNumberbox("fontsizeBox")
-      .setPosition(220, 10)
+      .setPosition(196, 10)
       .setSize(40, 20)
       .setLabel("fontsize")
       .setRange(1, 2000)
@@ -366,7 +366,7 @@ class TileEditor extends PApplet {
       ;
 
     baselineBox = cp5.addNumberbox("baseline")
-      .setPosition(270, 10)
+      .setPosition(246, 10)
       .setSize(40, 20)
       .setLabel("baseline")
       .setRange(-200, 200)
@@ -379,7 +379,7 @@ class TileEditor extends PApplet {
 
     typecolorBang = cp5.addBang("changetypecolor")
       .setLabel("C")
-      .setPosition(320, 10)
+      .setPosition(296, 10)
       .setSize(20, 20)
       .setGroup(typeGroup)
       ;
@@ -406,15 +406,17 @@ class TileEditor extends PApplet {
 
     fontsizeBox.addCallback(new CallbackListener() {
       public void controlEvent(CallbackEvent theEvent) {
-        if (theEvent.getAction() == ControlP5.ACTION_RELEASED || 
-          theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
-          fontsize = (int) fontsizeBox.getValue();
-          createFont();
-          createLetter();
-        }
+        fontsizeBoxCallback(theEvent);    
       }
-    }
-    );
+    });
+    
+    fontlist.addCallback(new CallbackListener() {
+      public void controlEvent(CallbackEvent theEvent) {
+       fontlistHoverCallback(theEvent);
+      }
+    });
+    
+    
   }//end setupTypeTileEditor
 
 
@@ -872,15 +874,43 @@ class TileEditor extends PApplet {
     }
   }
 
-  //CallbackListener for sizeBox above in setupTypeTileEditor()
-  //if(theEvent.getAction() == ControlP5.ACTION_RELEASED || 
-  //   theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
-  //    fontsize = (int) fontsizeBox.getValue();
-  //    createFont();
-  //    createLetter();
-  //}
+  void fontsizeBoxCallback(CallbackEvent theEvent) {
+    if(theEvent.getAction() == ControlP5.ACTION_RELEASED || 
+       theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
+       fontsize = (int) fontsizeBox.getValue();
+       createFont();
+       createLetter();
+    }
+  }
 
-
+  String hoverfontname = "";
+  String orgfontname = "";
+  
+  void fontlistHoverCallback(CallbackEvent theEvent) {
+    if(systemfonts != null) {  
+      if(theEvent.getAction() == ControlP5.ACTION_MOVE) {
+        int i = fontlist.getItemHover();
+        if(i == -1) {   
+          hoverfontname = orgfontname;
+        } else {
+          hoverfontname = (String)fontlist.getItem(i).get("text");
+        }    
+        if( !hoverfontname.equals(fontname) ) {
+            fontname = hoverfontname;
+            createFont();
+            createLetter();
+         }
+      } else if(theEvent.getAction() == ControlP5.ACTION_ENTER) {
+        orgfontname = fontname;
+        hoverfontname = " ";
+      } else if(theEvent.getAction() == ControlP5.ACTION_LEAVE) {       
+        fontname = (String)fontlist.getItem((int)fontlist.getValue()).get("text");
+        createFont();
+        createLetter();
+      }
+    }
+  }
+ 
 
   // ---------------------------------------------------------------------------
   //  GUI ACTIONS
