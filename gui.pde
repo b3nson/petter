@@ -1471,15 +1471,9 @@ void changeshapecolor(float i) {
     shape_copi.show(); 
   }
 }
-void changetypecolor(float i) {
-  if(type_copi == null) {
-    type_copi = new ColorPicker(this, "typecolor", 380, 300, typecolor);
-    String[] args = {"colorpicker4"};
-    PApplet.runSketch(args, type_copi);
-  } else {
-    type_copi.show(); 
-  }
-}
+
+//void changetypecolor(float i) {} //in TileEditor
+  
 void toggleTileEditor() {
   if(tileEditor == null) {
     tileEditor = new TileEditor(this, 500, 600);
@@ -1494,7 +1488,7 @@ void toggleTileEditor() {
     }
   }
 }
-
+  
 void changeSliderRange(boolean increase) {
   if(gui.isMouseOver()) {
     try {

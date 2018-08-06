@@ -34,6 +34,7 @@ public class ColorPicker extends PApplet {
   
   private boolean opened = true;
   private boolean preview = true;
+  private boolean undoable = true;
 
   private ColorSlider2DView satpick;
   private ColorSlider1DView huepick;
@@ -198,7 +199,11 @@ public class ColorPicker extends PApplet {
   public boolean isOpen() {
     return opened;
   }
-
+  
+  public void setUndoable(boolean able) {
+    undoable = able;
+  }
+  
   public void hide() {
     this.noLoop();
     surface.setVisible(false);
@@ -222,7 +227,9 @@ public class ColorPicker extends PApplet {
     startCol=curCol;
     srccol[0] = curCol;
     hide();
-    undo.setUndoStep();
+    if(undoable) {
+      undo.setUndoStep();
+    }
   }
 
   private void closeAndCancel() {
@@ -321,7 +328,6 @@ public class ColorPicker extends PApplet {
 //  CUSTOM SLIDER-VIEWS (to prevent drawing of controller-background)
 // ---------------------------------------------------------------------------
   
-
 class ColorSlider2DView implements ControllerView<Slider2D> {
   PApplet theApplet;
 

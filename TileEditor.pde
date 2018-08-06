@@ -377,7 +377,7 @@ class TileEditor extends PApplet {
       .setGroup(typeGroup)
       ;  
 
-    typecolorBang = gui.addBang("changetypecolor")
+    typecolorBang = cp5.addBang("changetypecolor")
       .setLabel("C")
       .setPosition(320, 10)
       .setSize(20, 20)
@@ -645,8 +645,17 @@ class TileEditor extends PApplet {
       println(e);
     }
   }
+
+  private void setAsNFO() {
+    try {
+      Tile copy = (Tile) ( (Tile)shapelist.get(svgindex) ).clone();
+      nfo = (PShape)copy;
+    } catch(Exception e) {
+      println(e);
+    }
+  }
   
-  private void prevTile() {
+ private void prevTile() {
     if (svglength > 1) {
       svgindex = (svgindex-1)%svglength;
       if (svgindex == -1) svgindex = svglength-1;
@@ -927,7 +936,17 @@ class TileEditor extends PApplet {
 
   private void closeAndApply() {
     hide(); 
-    //win.dispatchEvent(new WindowEvent(win, WindowEvent.WINDOW_CLOSING));
+  }
+
+  void changetypecolor(float i) {
+    if(type_copi == null) {
+      type_copi = new ColorPicker(this, "typecolor", 380, 300, typecolor);
+      type_copi.setUndoable(false);
+      String[] args = {"colorpicker4"};
+      PApplet.runSketch(args, type_copi);
+    } else {
+      type_copi.show(); 
+    }
   }
 
   private void scaleGUI(boolean bigger) {
@@ -1067,6 +1086,12 @@ class TileEditor extends PApplet {
           closeAndApply();
         } else if (key == 't') {
           hide();
+        } else if (key == 'n') {
+          setAsNFO();
+          if(!showNfo) {
+            showNfo = true;
+            showNfoToggle.setState(showNfo); 
+          }
         } else if (keyCode == 93 || keyCode == 107) { //PLUS
           this.scaleGUI(true);
         } else if (keyCode == 47 || keyCode == 109) { //MINUS
