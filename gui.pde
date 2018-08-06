@@ -981,6 +981,8 @@ void setupGUI() {
     showMENU = false;
     toggleMenu();
   }
+  
+  gui.saveProperties(); //save default properties
 } //setupGUI
 
 
@@ -1309,13 +1311,8 @@ void controlEvent(ControlEvent theEvent) {
     lastImgMapFrame();
   } 
   else if (theEvent.isFrom(bgcolorSaveLabel)) {
-    if( int(bgcolorSaveLabel.getValue()) == 0 ) {
-      randomSeed(frameCount);
-      int c = color(random(255), random(255), random(255));
-      bgcolorSaveLabel.setValue(c);
-    }
-      bgcolor[0] = int(bgcolorSaveLabel.getValue());
-      bgcolorBang.setColorForeground(bgcolor[0]);
+    bgcolor[0] = int(bgcolorSaveLabel.getValue());
+    bgcolorBang.setColorForeground(bgcolor[0]);
   }
   else if (theEvent.isFrom(strokecolorSaveLabel)) {
     strokecolor[0] = int(strokecolorSaveLabel.getValue());
@@ -1792,7 +1789,7 @@ void saveSettings(String timestamp) {
 }
 
 void loadDefaultSettings() {
-  gui.loadProperties("i/settings/0000_Default.json");
+  gui.loadProperties();
   undo.setUndoStep();
 }
 

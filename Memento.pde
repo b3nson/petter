@@ -44,7 +44,7 @@ public class Memento {
   }
 
   public void setUndoStep() {
-    //when not on head of undo-list, remove head-elements on new undo-step
+    //when not on head of undo-list, remove head-elements first
     if(index != 0) {
        for(int i = 0; i<index ; i++) {
         deque.pollFirst();
