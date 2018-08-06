@@ -620,19 +620,21 @@ class TileEditor extends PApplet {
   }
 
   private void deleteTile(int index) {
-    shapelist.remove(index);
-    svglength = shapelist.size();
-    if (svgindex > svglength-1) {
-      svgindex--;
-    } 
-    svg = shapelist.get(svgindex);
-    updateLocalValuesfromTile();
-
-    setCountLabel();
-    setDeleteButtonStatus();
-    setMoveButtonStatus();
-    setExplodeButtonStatus();
-    setValueLabels();
+    if(svglength > 1) { 
+      shapelist.remove(index);
+      svglength = shapelist.size();
+      if (svgindex > svglength-1) {
+        svgindex--;
+      } 
+      svg = shapelist.get(svgindex);
+      updateLocalValuesfromTile();
+  
+      setCountLabel();
+      setDeleteButtonStatus();
+      setMoveButtonStatus();
+      setExplodeButtonStatus();
+      setValueLabels();
+    }
   }
 
   private void duplicateTile(int index) {
@@ -1126,6 +1128,8 @@ class TileEditor extends PApplet {
           this.scaleGUI(true);
         } else if (keyCode == 47 || keyCode == 109) { //MINUS
           this.scaleGUI(false);
+        } else if (key == BACKSPACE || key == DELETE) { //DELETE
+          deleteTile(svgindex);
         } else { //forward to pettermain
           parent.key = key;
           parent.keyCode = keyCode;
