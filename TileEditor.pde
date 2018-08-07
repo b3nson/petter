@@ -619,7 +619,7 @@ class TileEditor extends PApplet {
     setValueLabels();
   }
 
-  private void deleteTile(int index) {
+  private void deleteTile(int index) {    
     if(svglength > 1) { 
       shapelist.remove(index);
       svglength = shapelist.size();
@@ -672,6 +672,7 @@ class TileEditor extends PApplet {
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
+      setDeleteButtonStatus();
       setValueLabels();
     }
   }
@@ -688,6 +689,7 @@ class TileEditor extends PApplet {
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
+      setDeleteButtonStatus();
       setValueLabels();
     }
   }
@@ -709,7 +711,14 @@ class TileEditor extends PApplet {
         explodeTile(t, recursive);
       }
     }
+    svglength = shapelist.size();
+    setCountLabel();
+    updateLocalValuesfromTile();
+    setMoveButtonStatus();
     setExplodeButtonStatus();
+    setDeleteButtonStatus();
+    setValueLabels();
+      
     if (customStyle) {
       enableCustomStyle();
     } else {
@@ -754,6 +763,7 @@ class TileEditor extends PApplet {
           }
         }
       }
+      svglength = shapelist.size();
     }
   }
 
