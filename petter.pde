@@ -94,6 +94,7 @@ boolean mapRot = false;
 boolean mapTra = false;
 boolean invertMap = false;
 boolean strokeMode = true;
+boolean customStyle = false;
 boolean customStroke = true;
 boolean customFill = true;
 boolean random = false;
@@ -106,13 +107,13 @@ boolean exportFormat = true; //true=PDF|false=SVG
 boolean guiExport = false;
 boolean guiExportNow = false;
 boolean sequencing = false;
+boolean shift = false;
 int seed = 0;
 int fps = 0;
 float mapValue = 0f;
 
 int abscount = 0;
 boolean loopDirection = false; //false = X before Y | true = Y before X
-boolean shift = false;
 int rotType = 0;
 int scaType = 0;
 int traType = 0;
@@ -123,8 +124,6 @@ boolean exportOnNextLoop = false;
 String timestamp = "";
 String filename = "";
 String formatName = "";
-
-boolean customStyle = false;
 
 color[] bgcolor = {color(random(255), random(255), random(255))};
 color[] strokecolor = {color(0, 0, 0)};
@@ -236,10 +235,10 @@ void draw() {
     animate();
   }
 
-  if (keyPressed && key == CODED && keyCode == SHIFT && !shiftPressed) {
+  if (shift && key == CODED && keyCode == SHIFT && !shiftPressed) {
     shiftPressed = true;
     enterShiftMode();
-  } else if (!keyPressed && shiftPressed) {
+  } else if (!shift && shiftPressed) {
     shiftPressed = false;  
     leaveShiftMode();
     last = null;
@@ -697,6 +696,9 @@ void keyPressed() {
 }
 
 void keyReleased() {
+  if (keysDown[SHIFT]) {
+    shift = false;
+  }  
   processKey(keyCode, false);
 }
 

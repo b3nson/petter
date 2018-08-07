@@ -1164,9 +1164,15 @@ void controlEvent(ControlEvent theEvent) {
    Slider tmp =  (Slider)theEvent.getController();
    
    if(tmp != xTileNumSlider && tmp != yTileNumSlider) {
-      last = tmp;
       if(shiftPressed && !shiftProcessed) {
+        last = tmp;  
         enterShiftMode();
+      } else if(shiftPressed && shiftProcessed) { //slider changed while shift-pressed
+        if(last != null && !last.equals(tmp)) { 
+          leaveShiftMode();
+          last = tmp;
+          enterShiftMode();
+        }
       }
     }
   }
@@ -1518,17 +1524,17 @@ void updateytilenumSlider() {
 }
 
 void enterShiftMode() {
-  if(last != null && !shiftProcessed) {
+  if(last != null && !shiftProcessed && last.isVisible()) { //omit invisible offset-sliders
     last.showTickMarks(true);
     last.snapToTickMarks(true);
     shiftProcessed = true;
   } 
 }
 void leaveShiftMode() {
-  if(last != null && shiftProcessed) {
+  if(last != null && shiftProcessed && last.isVisible()) {
     last.showTickMarks(false);
     last.snapToTickMarks(false); 
-   shiftProcessed = false; 
+    shiftProcessed = false; 
   }
 }
 
