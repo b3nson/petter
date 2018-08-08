@@ -46,6 +46,7 @@ PGraphics pdf;
 String version = "0.4";
 String settingspath = "i/settings/";
 String outputpath = "o/";
+String tmppath = "tmp/";
 String subfolder = "";
 String[] names;
 String[] helptext;
@@ -59,7 +60,6 @@ PShape ref;
 PShape nfo;
 PShape s;
 
-//PImage map;
 int mapIndex = 0;
 int absPageOffset = 25;
 int pageOffset = 25;
@@ -94,7 +94,7 @@ boolean mapRot = false;
 boolean mapTra = false;
 boolean invertMap = false;
 boolean strokeMode = true;
-boolean customStyle = false;
+boolean globalStyle = false;
 boolean customStroke = true;
 boolean customFill = true;
 boolean random = false;
@@ -124,6 +124,7 @@ boolean exportOnNextLoop = false;
 String timestamp = "";
 String filename = "";
 String formatName = "";
+String sketchPath;
 
 color[] bgcolor = {color(random(255), random(255), random(255))};
 color[] strokecolor = {color(0, 0, 0)};
@@ -158,7 +159,8 @@ void setup() {
   surface.setResizable(true);
   surface.setSize(905, 842);
   surface.setTitle("petter " +version);
-
+  sketchPath = sketchPath();
+  
   PImage pettericon = loadImage("i/icon.png");
   surface.setIcon(pettericon);
 
@@ -244,20 +246,6 @@ void draw() {
     last = null;
   }
 
-  if (customStyle) {
-    if (customStroke) {
-      stroke(strokecolor[0]);
-      strokeWeight(customStrokeWeight);
-    } else {
-      noStroke();
-    }
-    if (customFill) {
-      fill(shapecolor[0]);
-    } else {
-      noFill();
-    }
-  } 
-  
   if(exportOnNextLoop) {
     exportCurrentFrame = true;
     exportOnNextLoop = false;
@@ -292,19 +280,6 @@ void draw() {
     beginRecord(pdf); 
     pdf.shapeMode(CENTER);   
     pdf.pushStyle();
-    if (customStyle) {
-      if (customStroke) {
-        pdf.stroke(strokecolor[0]);
-        pdf.strokeWeight(customStrokeWeight);
-      } else {
-        pdf.noStroke();
-      }
-      if (customFill) {
-        pdf.fill(shapecolor[0]);
-      } else {
-        pdf.noFill();
-      }
-    }
 
     if (guiExportNow) { //reset scale to 1 for guiexport
       tmpzoom = zoom;
@@ -321,7 +296,7 @@ void draw() {
     bgcolorBang.setColorForeground(bgcolor[0]);
     bgcolorSaveLabel.setValue((bgcolor[0]));
   }
-  if (customStyle) {
+  if (globalStyle) {
     if (stroke_copi != null && stroke_copi.isOpen()) {
       strokecolorBang.setColorForeground(strokecolor[0]);
       strokecolorSaveLabel.setValue((strokecolor[0]));
@@ -355,7 +330,6 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-
 
   abscount = 0;
   if (!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
@@ -462,24 +436,7 @@ void draw() {
       } else {
         s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
       }
-      
-      //setRelativeStrokeWeight
-      if (customStyle && customStroke && !strokeMode) {
-        float sw = ((relsca)*(absScale)*(tilescale)*((Tile)s).getScaleX());
-        if (sw != 0f) {
-          sw = abs(customStrokeWeight*(1/sw));
-        } else {
-          sw = 0f;
-        }
-
-        stroke(strokecolor[0]);
-        strokeWeight(sw);
-        if (exportCurrentFrame) {
-          pdf.stroke(strokecolor[0]);
-          pdf.strokeWeight(sw);
-        }
-      }
-
+        
       if (s != null) {
         shape(s);
       }

@@ -16,7 +16,8 @@
 
 public interface Tile {  
   public void draw(PGraphics g);
-  public void reset();
+  public void resetTransform();
+  public Tile getOrigin();
   public void setOffsetX(float ox);
   public void setOffsetY(float oy);
   public void setScaleX(float sx);
@@ -29,8 +30,11 @@ public interface Tile {
   public float getRotation();
   public float getWidth();
   public float getHeight();
-  public Tile getOrigin();
-  public Object clone() throws CloneNotSupportedException;
+  public float[] getTransformParams();
+  public void setTransformParams(float[] params);
+  public void enableGlobalStyle();
+  public void disableGlobalStyle();
+  public void useGlobalStyle(boolean use);
 }
 
 
@@ -38,7 +42,7 @@ public interface Tile {
 //  TileSVG
 // ---------------------------------------------------------------------------
 
-public class TileSVG extends PShapeSVG implements Tile, Cloneable {
+public class TileSVG extends PShapeSVG implements Tile {
 
   float scalex = 1f;
   float scaley = 1f;
@@ -46,16 +50,17 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
   float offsety = 0f;
   float rotation = 0f;
 
-  String filepath = null;
+  boolean useGlobalStyle = true;
   Tile origin = null;
-
+  String filepath = null;
 
   public TileSVG(String path) {
     super(loadXML(path));
     filepath = path;
     handleLFKN_VDB();
+    if(globalStyle) enableGlobalStyle();
   }
-
+  
   public void draw(PGraphics g) {
     g.pushMatrix();
     g.translate(offsetx, offsety);    
@@ -63,13 +68,35 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
     g.scale(scalex, scaley);
     g.rotate(rotation);
     g.translate(-width/2, -height/2);
-    
+    g.pushStyle();
+    setDrawStyle(exportCurrentFrame?pdf:g);
     super.draw(g);
-    
+    g.popStyle();
     g.popMatrix();
   }
 
-  public void reset() {
+  private void setDrawStyle(PGraphics g) {
+    if(globalStyle && useGlobalStyle) {
+      if (customStroke) {
+        g.stroke(strokecolor[0]);
+        g.strokeWeight(customStrokeWeight); //setAbsoluteStrokeWeight
+        if(!strokeMode) {                   //setRelativeStrokeWeight
+          if(tileEditor == null || !tileEditor.getG().equals(g)) { //dirty! if not tileeditor drawing
+            float relsw = ((relsca)*(absScale)*(tilescale)*((Tile)s).getScaleX());
+            if (relsw != 0f) { relsw = abs(customStrokeWeight*(1/relsw)); }
+            g.strokeWeight(relsw);
+          }
+        }
+      } else { g.noStroke(); }
+      if (customFill) {
+        g.fill(shapecolor[0]);
+      } else {
+        g.noFill();
+      }
+    }
+  }
+
+  public void resetTransform() {
     scalex = 1f; 
     scaley = 1f; 
     offsetx = 0f;
@@ -77,6 +104,24 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
     rotation = 0f;
   }
   
+  public void enableGlobalStyle() { 
+    this.disableStyle(); 
+    super.disableStyle();
+  }
+  public void disableGlobalStyle() { 
+    this.enableStyle(); 
+    super.enableStyle();
+  }
+  public void useGlobalStyle(boolean use) { 
+    this.useGlobalStyle = use; 
+    if(use) {
+      enableGlobalStyle();
+    } else {
+      disableGlobalStyle();
+    }
+  }
+  
+  public Tile getOrigin() { return null; }
   public void setOffsetX(float ox) { offsetx = ox; }
   public void setOffsetY(float oy) { offsety = oy; }
   public void setScaleX(float sx) { scalex = sx; }
@@ -87,12 +132,22 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
   public float getRotation() { return rotation; }
-  public Tile getOrigin() { return null; };
   
-  public Object clone() throws CloneNotSupportedException {
-      return super.clone();
+  public float[] getTransformParams() {
+    float[] params = {offsetx, offsety, scalex, scaley, rotation};
+    return params;
   }
-    
+  
+  public void setTransformParams(float[] params) {
+    if(params.length == 5) {
+      offsetx = params[0];
+      offsety = params[1];
+      scalex = params[2];
+      scaley = params[3];
+      rotation = params[4];
+    }
+  }
+
   private void handleLFKN_VDB() {
     if (split(filepath, ".lafkon.net").length > 1) {
       filepath =  split(filepath, ".pdf")[0] +".svg";
@@ -103,7 +158,6 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
     } 
     catch (ArrayIndexOutOfBoundsException e) {}
   }
-
 }
 
 
@@ -111,7 +165,7 @@ public class TileSVG extends PShapeSVG implements Tile, Cloneable {
 //  TileShape
 // ---------------------------------------------------------------------------
 
-public class TileShape extends PShape implements Tile, Cloneable {
+public class TileShape extends PShape implements Tile {
 
   float scalex = 1f;
   float scaley = 1f;
@@ -119,6 +173,7 @@ public class TileShape extends PShape implements Tile, Cloneable {
   float offsety = 0f;
   float rotation = 0f;
 
+  boolean useGlobalStyle = true;
   Tile origin = null;
 
   public TileShape(PShape s, float w, float h) {
@@ -126,6 +181,7 @@ public class TileShape extends PShape implements Tile, Cloneable {
     this.addChild(s);
     this.width = w;
     this.height = h;
+    if(globalStyle) enableGlobalStyle();
   }
 
   public TileShape(PShape s, float w, float h, Tile origin) {
@@ -145,13 +201,36 @@ public class TileShape extends PShape implements Tile, Cloneable {
     g.scale(scalex, scaley);
     g.rotate(rotation);
     g.translate(-width/2, -height/2);
-    
+    g.pushStyle();
+    //setDrawStyle(g);
+    setDrawStyle(exportCurrentFrame?pdf:g);
     super.draw(g);
-    
+    g.popStyle();
     g.popMatrix();
   }
 
-  public void reset() {
+  private void setDrawStyle(PGraphics g) {
+    if(globalStyle && useGlobalStyle) {
+      if (customStroke) {
+        g.stroke(strokecolor[0]);
+        g.strokeWeight(customStrokeWeight); //setAbsoluteStrokeWeight
+        if(!strokeMode) {                   //setRelativeStrokeWeight
+          if(tileEditor == null || !tileEditor.getG().equals(g)) { //dirty! if not tileeditor drawing
+            float relsw = ((relsca)*(absScale)*(tilescale)*((Tile)s).getScaleX());
+            if (relsw != 0f) { relsw = abs(customStrokeWeight*(1/relsw)); }
+            g.strokeWeight(relsw);
+          }
+        }
+      } else { g.noStroke(); }
+      if (customFill) {
+        g.fill(shapecolor[0]);
+      } else {
+        g.noFill();
+      }
+    }
+  }
+
+  public void resetTransform() {
     scalex = 1f; 
     scaley = 1f; 
     offsetx = 0f;
@@ -159,6 +238,24 @@ public class TileShape extends PShape implements Tile, Cloneable {
     rotation = 0f;
   }
   
+  public void enableGlobalStyle() {
+      this.disableStyle();
+      super.disableStyle();
+  }
+  public void disableGlobalStyle() { 
+    this.enableStyle();
+    super.enableStyle();
+  }
+  public void useGlobalStyle(boolean use) { 
+    this.useGlobalStyle = use; 
+    if(use) {
+      enableGlobalStyle();
+    } else {
+      disableGlobalStyle();
+    }
+  }
+  
+  public Tile getOrigin() { return origin; }
   public void setOffsetX(float ox) { offsetx = ox; }
   public void setOffsetY(float oy) { offsety = oy; }
   public void setScaleX(float sx) { scalex = sx; }
@@ -169,11 +266,20 @@ public class TileShape extends PShape implements Tile, Cloneable {
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
   public float getRotation() { return rotation; }
-  public Tile getOrigin() { return origin; };
   
-  public Object clone() throws CloneNotSupportedException {
-    Object copy = super.clone();
-    ((TileShape)copy).origin = null;
-    return copy;
+  public float[] getTransformParams() {
+    float[] params = {offsetx, offsety, scalex, scaley, rotation};
+    return params;
   }
+  
+  public void setTransformParams(float[] params) {
+    if(params.length == 5) {
+      offsetx = params[0];
+      offsety = params[1];
+      scalex = params[2];
+      scaley = params[3];
+      rotation = params[4];
+    }
+  }
+
 }

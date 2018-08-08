@@ -19,11 +19,13 @@ class TileEditor extends PApplet {
   PApplet parent;
 
   private ControlP5 cp5;
-
-  PShape svg;
-  PShape typeShape;
-  Tile explodeOrigin;
+  
   PFont typefont;
+  PGraphics clonetile;
+  
+  PShape svg;
+  TileShape ts;
+  Tile explodeOrigin;
 
   boolean opened = true;
   boolean drag = false;
@@ -54,7 +56,7 @@ class TileEditor extends PApplet {
   String fontname = "Monospaced";
   char lastchar = 'P';
 
-  ArrayList<PShape> shapelist;
+  ArrayList<PShape> tileeditorshapelist;
 
   Group mainGroup, mainTileGroup, mainSortGroup, mainAddGroup, mainInfoGroup, typeGroup;
   Button closeButton, nextTileButton, prevTileButton, resetTileButton;
@@ -415,8 +417,6 @@ class TileEditor extends PApplet {
        fontlistHoverCallback(theEvent);
       }
     });
-    
-    
   }//end setupTypeTileEditor
 
 
@@ -438,6 +438,7 @@ class TileEditor extends PApplet {
     // --------------------------------------------------- draw tileditor
 
     if (!typeEditorOpened) {
+      
       background(50);
       shapeMode(CENTER);
 
@@ -451,15 +452,12 @@ class TileEditor extends PApplet {
         //mastertilesizeBox fill
         fill(200, 20);
         noStroke();
-        float tw = shapelist.get(0).width;
-        float th = shapelist.get(0).height;
+        float tw = tileeditorshapelist.get(0).width;
+        float th = tileeditorshapelist.get(0).height;
         rect(0, 0, tw, th);
-
-        pushStyle();
-        checkAndSetCustomStyle(svg);
+        
         shape(svg);
-        popStyle();
-
+      
         //mastertilesizeBox stroke
         noFill();
         if (svgindex == 0) { 
@@ -467,6 +465,7 @@ class TileEditor extends PApplet {
         } else { 
           stroke(0, 150, 255, 80);
         }
+        strokeWeight(1f/zoom);
         rect(0, 0, tw, th);
         //currenttilesizeBox
         stroke(150, 60);
@@ -509,24 +508,22 @@ class TileEditor extends PApplet {
         translate(w/2, h/2);
         scale(zoom);
         translate(-w/2, -h/2);
-        strokeWeight(1f/zoom);
 
-        if (typeShape != null) {   
-          pushStyle();
-          checkAndSetCustomStyle(typeShape);
+        if (ts != null) {   
+          pushMatrix();
           translate(0, ((float)fontsize / 100f) * baseline);
-          shape(typeShape, ((float)w/2f), (float)h/2);
-          translate(0, -((float)fontsize / 100f) * baseline);
-          popStyle();
+          shape(ts, ((float)w/2f)-50, ((float)h/2)-50) ;
+          popMatrix();
         }
 
         //typetilesizeBox stroke
+        strokeWeight(1f/zoom);
         noFill();
         stroke(150, 80);
         rect(w/2, h/2, 100, 100);
         //mastertilesizeBox stroke
         stroke(0, 150, 255, 80);
-        rect(w/2, h/2, shapelist.get(0).width, shapelist.get(0).height);
+        rect(w/2, h/2, tileeditorshapelist.get(0).width, tileeditorshapelist.get(0).height);
 
         popMatrix();
       }
@@ -539,7 +536,6 @@ class TileEditor extends PApplet {
         }
       }
     }
-
     // ---------------------------------------------------
   }//draw
 
@@ -549,16 +545,16 @@ class TileEditor extends PApplet {
   // ---------------------------------------------------------------------------
 
   public void setTileList(ArrayList<PShape> slist) {
-    shapelist = slist;
+    tileeditorshapelist = slist;
     svgindex = 0;
     svglength = slist.size();
-    svg = shapelist.get(svgindex);
+    svg = tileeditorshapelist.get(svgindex);
     //setCountLabel();
   }
 
   public void updateTileList(ArrayList<PShape> slist, int mode) {
-    shapelist = slist;
-    svglength = shapelist.size();
+    tileeditorshapelist = slist;
+    svglength = tileeditorshapelist.size();
     if (mode == REPLACESVG) {
       svgindex = 0;
       offsetx = 0;
@@ -569,7 +565,7 @@ class TileEditor extends PApplet {
       tmpx = 0;
       tmpy = 0;
     }
-    svg = shapelist.get(svgindex);
+    svg = tileeditorshapelist.get(svgindex);
     setCountLabel();
     setDeleteButtonStatus();
     setMoveButtonStatus();
@@ -577,89 +573,7 @@ class TileEditor extends PApplet {
     setValueLabels();
   }
 
-  private void updateScale() {    
-    ((Tile)( shapelist.get(svgindex) )).setScaleX(scalex);
-    ((Tile)( shapelist.get(svgindex) )).setScaleY(scaley);
-    sLabel.setText("S:  " +nf(scalex, 1, 2));
-  }
-
-  private void updateRotation() {    
-    ((Tile)( shapelist.get(svgindex) )).setRotation(rotation);
-    rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
-  }
-
-  private void updateTranslate() {
-    float xo = ((Tile)( shapelist.get(svgindex) )).getOffsetX();
-    float yo = ((Tile)( shapelist.get(svgindex) )).getOffsetY();
-    ((Tile)( shapelist.get(svgindex) )).setOffsetX( xo - offsetx);
-    ((Tile)( shapelist.get(svgindex) )).setOffsetY( yo - offsety);
-    pLabel.setText("P:  " +nf(xo - offsetx, 1, 0) +" X " +nf(yo - offsety, 1, 0));
-  }
-
-  private void moveTileOrder(int index, boolean direction) {
-    PShape tmp = shapelist.get(svgindex);
-    shapelist.remove(index);
-
-    if (direction) { //move left
-      shapelist.add(svgindex-1, tmp);
-      prevTile();
-    } else {        //move right
-      shapelist.add(svgindex+1, tmp);
-      nextTile();
-    }
-  }
-
-  private void resetTile(int index) {
-    ((Tile)( shapelist.get(index) )).reset();
-    tmpx = 0;
-    tmpy = 0;
-    scalex = 1;
-    scaley = 1;
-    rotation = 0;
-    setValueLabels();
-  }
-
-  private void deleteTile(int index) {    
-    if(svglength > 1) { 
-      shapelist.remove(index);
-      svglength = shapelist.size();
-      if (svgindex > svglength-1) {
-        svgindex--;
-      } 
-      svg = shapelist.get(svgindex);
-      updateLocalValuesfromTile();
-  
-      setCountLabel();
-      setDeleteButtonStatus();
-      setMoveButtonStatus();
-      setExplodeButtonStatus();
-      setValueLabels();
-    }
-  }
-
-  private void duplicateTile(int index) {
-    try {
-      Tile copy = (Tile) ( (Tile)shapelist.get(svgindex) ).clone();
-      shapelist.add(index+1, (PShape)copy);
-      svglength = shapelist.size();
-
-      nextTile();
-    } catch(Exception e) {
-      println("Could not duplicate this tile. Sorry!");
-      println(e);
-    }
-  }
-
-  private void setAsNFO() {
-    try {
-      Tile copy = (Tile) ( (Tile)shapelist.get(svgindex) ).clone();
-      nfo = (PShape)copy;
-    } catch(Exception e) {
-      println(e);
-    }
-  }
-  
- private void prevTile() {
+  private void prevTile() {
     if (svglength > 1) {
       svgindex = (svgindex-1)%svglength;
       if (svgindex == -1) svgindex = svglength-1;
@@ -668,7 +582,7 @@ class TileEditor extends PApplet {
       ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
       ((Tile)( svg )).setOffsetY(tmpy);
 
-      svg = shapelist.get(svgindex);
+      svg = tileeditorshapelist.get(svgindex);
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
@@ -685,7 +599,7 @@ class TileEditor extends PApplet {
       ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
       ((Tile)( svg )).setOffsetY(tmpy);
 
-      svg = shapelist.get(svgindex);
+      svg = tileeditorshapelist.get(svgindex);
       updateLocalValuesfromTile();
       setMoveButtonStatus();
       setExplodeButtonStatus();
@@ -693,7 +607,98 @@ class TileEditor extends PApplet {
       setValueLabels();
     }
   }
+  
+  private void moveTileOrder(int index, boolean direction) {
+    PShape tmp = tileeditorshapelist.get(svgindex);
+    tileeditorshapelist.remove(index);
 
+    if (direction) { //move left
+      tileeditorshapelist.add(svgindex-1, tmp);
+      prevTile();
+    } else {        //move right
+      tileeditorshapelist.add(svgindex+1, tmp);
+      nextTile();
+    }
+  }
+
+  private void resetTile(int index) {
+    ((Tile)( tileeditorshapelist.get(index) )).resetTransform();
+    tmpx = 0;
+    tmpy = 0;
+    scalex = 1;
+    scaley = 1;
+    rotation = 0;
+    setValueLabels();
+  }
+
+  private void deleteTile(int index) {    
+    if(svglength > 1) { 
+      tileeditorshapelist.remove(index);
+      svglength = tileeditorshapelist.size();
+      if (svgindex > svglength-1) {
+        svgindex--;
+      } 
+      svg = tileeditorshapelist.get(svgindex);
+      updateLocalValuesfromTile();
+  
+      setCountLabel();
+      setDeleteButtonStatus();
+      setMoveButtonStatus();
+      setExplodeButtonStatus();
+      setValueLabels();
+    }
+  }
+
+  private void duplicateTile(int index) { 
+    Tile tmp = cloneTile( tileeditorshapelist.get(svgindex) );
+    tileeditorshapelist.add(index+1, (PShape)tmp);
+    svglength = tileeditorshapelist.size();
+    nextTile();
+  }
+
+  private void setTileAsNFO() {
+    Tile tmp = cloneTile( tileeditorshapelist.get(svgindex) );
+    tmp.useGlobalStyle(false);
+    nfo = (PShape)tmp;
+  }
+
+  private void explodeimplode(int svgindex, boolean recursive) {
+    Tile t = (Tile)tileeditorshapelist.get(svgindex);
+    if ( t.getOrigin() != null ) {
+      implodeTile(t);
+    } else {
+      if (t instanceof TileSVG) {
+        explodeTile(t, recursive);
+      }
+    }
+    svglength = tileeditorshapelist.size();
+    setCountLabel();
+    updateLocalValuesfromTile();
+    setMoveButtonStatus();
+    setExplodeButtonStatus();
+    setDeleteButtonStatus();
+    setValueLabels();
+  }
+  
+  private void updateScale() {    
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleX(scalex);
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleY(scaley);
+    sLabel.setText("S:  " +nf(scalex, 1, 2));
+  }
+
+  private void updateRotation() {    
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setRotation(rotation);
+    rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
+  }
+
+  private void updateTranslate() {
+    float xo = ((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetX();
+    float yo = ((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetY();
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetX( xo - offsetx);
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetY( yo - offsety);
+    pLabel.setText("P:  " +nf(xo - offsetx, 1, 0) +" X " +nf(yo - offsety, 1, 0));
+  }
+  
   private void updateLocalValuesfromTile() {
     tmpx = ((Tile)( svg )).getOffsetX();
     tmpy = ((Tile)( svg )).getOffsetY();
@@ -702,92 +707,14 @@ class TileEditor extends PApplet {
     rotation = ((Tile)( svg )).getRotation();
   }
 
-  private void explodeimplode(int svgindex, boolean recursive) {
-    Tile t = (Tile)shapelist.get(svgindex);
-    if ( t.getOrigin() != null ) {
-      implodeTile(t);
-    } else {
-      if (t instanceof TileSVG) {
-        explodeTile(t, recursive);
+  public void updateGlobalStyle() {
+    if(ts != null) {
+      if(globalStyle) {
+        ts.enableGlobalStyle();
+      } else {
+        ts.disableGlobalStyle(); 
       }
     }
-    svglength = shapelist.size();
-    setCountLabel();
-    updateLocalValuesfromTile();
-    setMoveButtonStatus();
-    setExplodeButtonStatus();
-    setDeleteButtonStatus();
-    setValueLabels();
-      
-    if (customStyle) {
-      enableCustomStyle();
-    } else {
-      disableCustomStyle();
-    }
-  }
-
-  private void explodeTile(Tile t, boolean recursive) {
-    explodeOrigin = (Tile)t;
-    getSubShapes((PShape)t, t.getWidth(), t.getHeight());
-    deleteTile(shapelist.indexOf(explodeOrigin));
-    explodeOrigin = null;
-  }
-
-  private void implodeTile(Tile src) {
-    Tile commonOrigin = src.getOrigin();
-    shapelist.add(svgindex, (PShape)commonOrigin);
-    for (int i = 0; i < shapelist.size(); i++) {
-      Tile t = ((Tile)shapelist.get(i));
-      if (t.getOrigin() != null && t.getOrigin().equals(commonOrigin)) {
-        deleteTile(i);
-        i--;
-      }
-    }    
-    svgindex = shapelist.indexOf(commonOrigin); 
-    svg = shapelist.get(svgindex);
-  }
-
-  private void getSubShapes(PShape s, float w, float h) {
-    PShape[] children = s.getChildren();
-
-    for (int i = children.length-1; i >= 0; i--) {
-      int t = children[i].getFamily();
-      if (t == PShape.PATH || t == PShape.PRIMITIVE || t == PShape.GEOMETRY) {
-        shapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
-      } else if (t == PConstants.GROUP) {
-        if (recursive) {
-          getSubShapes(children[i], w, h);
-        } else {
-          if (children[i].getChildCount() != 0) {
-            shapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
-          }
-        }
-      }
-      svglength = shapelist.size();
-    }
-  }
-
-  void createTypeTile() {
-    if (typeShape != null) {
-      TileShape ts = new TileShape(typeShape, 100, 100);
-      checkAndSetCustomStyle(ts);
-      //from shapeMode CORNER to CENTER
-      ts.translate( 50, 50 + ((float)fontsize / 100f) * baseline );
-      shapelist.add(svgindex+1, (PShape) ts );
-      svglength = shapelist.size();
-      nextTile();
-    }
-  }
-
-  void createLetter() {
-    shapeMode(CORNER); //draws letters on correct y-baseline
-    typeShape = typefont.getShape(lastchar, 0);
-    typeShape.beginShape();
-    typeShape.fill(typecolor[0]);
-    typeShape.translate(-typeShape.width/2, typeypos); //x-center, because of shapeMode CORNER
-    //s.translate(0, ((float)fontsize / 100f) * baseline); //wäre hier besser, aber muss dann jedesmal neu created werden
-    typeShape.draw(g);
-    typeShape.endShape(CLOSE);
   }
 
   void createFont() {
@@ -797,37 +724,101 @@ class TileEditor extends PApplet {
     typeypos = ((float)fontsize/2f) -  textDescent() ;
   }
 
-  void checkAndSetCustomStyle(PShape s) {
-    if (customStyle) {
-      s.disableStyle();
-      if (customStroke && strokeMode) {
-        stroke(strokecolor[0]);
-        strokeWeight(customStrokeWeight);
-      } else if (customStroke && !strokeMode) {          
-        stroke(strokecolor[0]);
-        float sw = 1f;
-        try {
-          sw = ((Tile)s).getScaleX();    //typeTiles don't cast to Tile before
-        } 
-        catch(ClassCastException e) {
-        } //they are actually *created* (as Tile)
-        if (sw != 0f) {
-          sw = abs(customStrokeWeight*(1/sw));
-        }
-        strokeWeight(sw);
-      } else {
-        noStroke();
-      }
-      if (customFill) {
-        fill(shapecolor[0]);
-      } else {
-        noFill();
-      }
-    } else {
-      s.enableStyle();
+  void createLetter() {
+    PShape typeShape;
+    shapeMode(CORNER); //draws letters on correct y-baseline
+    typeShape = typefont.getShape(lastchar, 0);
+    typeShape.beginShape();
+    typeShape.fill(typecolor[0]);
+    typeShape.translate(-typeShape.width/2, typeypos); //x-center, because of shapeMode CORNER
+    typeShape.draw(g);
+    typeShape.endShape(CLOSE);
+
+    ts = new TileShape(typeShape, 100, 100);
+    ts.translate(50, 50);
+  }
+  
+  void createTypeTile() {
+    if (ts != null) {
+      ts.translate(0, ((float)fontsize / 100f) * baseline);
+      tileeditorshapelist.add(svgindex+1, (PShape) ts );
+      svglength = tileeditorshapelist.size();
+      createLetter();
+      nextTile();
     }
   }
 
+
+  // ---------------------------------------------------------------------------
+  //  TILE ACTIONS UTIL
+  // ---------------------------------------------------------------------------
+
+  //Cloning via SVG-serialization as long as PShape-copying remains protected in PShape.java
+  //https://github.com/processing/processing/blob/db659cf0fff5d76d535082297d8c0dec6b52386d/core/src/processing/core/PShape.java#L1437
+  private Tile cloneTile(PShape toClone) {
+    String filename = sketchPath +"/" +tmppath +toClone.hashCode() +".svg" ;
+    clonetile = (PGraphicsSVG) createGraphics((int)toClone.getWidth(), (int)toClone.getHeight(), SVG, filename);
+    
+    float[] p = ((Tile)toClone).getTransformParams();
+    ((Tile)toClone).resetTransform();
+    
+    beginRecord(clonetile); 
+    shape(toClone);
+    endRecord();
+    
+    ((Tile)toClone).setTransformParams(p);
+    Tile newTile = new TileSVG(filename);
+    newTile.setTransformParams(p);
+    
+    return newTile;
+  }
+  
+  private void explodeTile(Tile t, boolean recursive) {
+    explodeOrigin = (Tile)t;
+    getSubShapes((PShape)t, t.getWidth(), t.getHeight());
+    deleteTile(tileeditorshapelist.indexOf(explodeOrigin));
+    explodeOrigin = null;
+  }
+
+  private void implodeTile(Tile src) {
+    Tile commonOrigin = src.getOrigin();
+    tileeditorshapelist.add(svgindex, (PShape)commonOrigin);
+    for (int i = 0; i < tileeditorshapelist.size(); i++) {
+      Tile t = ((Tile)tileeditorshapelist.get(i));
+      if (t.getOrigin() != null && t.getOrigin().equals(commonOrigin)) {
+        deleteTile(i);
+        i--;
+      }
+    }    
+    svgindex = tileeditorshapelist.indexOf(commonOrigin); 
+    svg = tileeditorshapelist.get(svgindex);
+  }
+
+  private void getSubShapes(PShape s, float w, float h) {
+    PShape[] children = s.getChildren();
+
+    for (int i = children.length-1; i >= 0; i--) {
+      int t = children[i].getFamily();
+      if (t == PShape.PATH || t == PShape.PRIMITIVE || t == PShape.GEOMETRY) {
+        tileeditorshapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
+      } else if (t == PConstants.GROUP) {
+        if (recursive) {
+          getSubShapes(children[i], w, h);
+        } else {
+          if (children[i].getChildCount() != 0) {
+            tileeditorshapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
+          }
+        }
+      }
+      svglength = tileeditorshapelist.size();
+    }
+  }
+  
+  public PGraphics getG() {
+     return this.g; 
+  }
+
+  
   // ---------------------------------------------------------------------------
   //  GUI EVENTHANDLING
   // ---------------------------------------------------------------------------
@@ -1008,7 +999,7 @@ class TileEditor extends PApplet {
   }
 
   private void setCountLabel() {
-    tileCountLabel.setText("    " +(svgindex+1) +" / " +shapelist.size());
+    tileCountLabel.setText("    " +(svgindex+1) +" / " +tileeditorshapelist.size());
   }
 
   private void setDeleteButtonStatus() {
@@ -1038,7 +1029,7 @@ class TileEditor extends PApplet {
   }
 
   private void setExplodeButtonStatus() {
-    Tile t = (Tile)shapelist.get(svgindex);
+    Tile t = (Tile)tileeditorshapelist.get(svgindex);
     if ( t.getOrigin() != null ) {
       explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
       explodeTileButton.setLabel("IMPLODE");
@@ -1058,7 +1049,7 @@ class TileEditor extends PApplet {
   }
 
   private void setValueLabels() {
-    pLabel.setText("P:  " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetX(), 1, 0) +" X " +nf(((Tile)( shapelist.get(svgindex) )).getOffsetY(), 1, 0));
+    pLabel.setText("P:  " +nf(((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetX(), 1, 0) +" X " +nf(((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetY(), 1, 0));
     rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
     sLabel.setText("S:  " +nf(scalex, 1, 2));
   }
@@ -1129,7 +1120,7 @@ class TileEditor extends PApplet {
         } else if (key == 't') {
           hide();
         } else if (key == 'n') {
-          setAsNFO();
+          setTileAsNFO();
           if(!showNfo) {
             showNfo = true;
             showNfoToggle.setState(showNfo); 

@@ -98,7 +98,6 @@ class DropTargetSVG extends DropListener {
       PShape sh = new TileSVG(path);
 
       if (mode  == ADDSVG || mode  == REPLACESVG) {
-        if (customStyle) sh.disableStyle(); 
         tmpsvg.add(sh);
         tmppath.add(path);
       }
@@ -118,7 +117,8 @@ class DropTargetSVG extends DropListener {
         }
       } else if (mode == NFOSVG) {
         print("NFOSVG: ");
-        nfo = sh; 
+        ((TileSVG)sh).useGlobalStyle(false);
+        nfo = sh;
         showNfoToggle.setState(true);
       }
 

@@ -73,6 +73,7 @@ Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSave
 Slider offsetxSaveLabel, offsetySaveLabel;
 
 
+
 // ---------------------------------------------------------------------------
 //  GUI SETUP
 // ---------------------------------------------------------------------------
@@ -486,7 +487,7 @@ void setupGUI() {
      ;
   styleSaveLabel = gui.addNumberbox("styleSaveLabel" )
      .setPosition(0, 0)
-     .setValue((int(customStyle)))
+     .setValue((int(globalStyle)))
      .setGroup(main)
      .hide()
      ;
@@ -643,7 +644,7 @@ void setupGUI() {
            .setGroup(main)
            .close()
            ;
-  if(customStyle) style.open();
+  if(globalStyle) style.open();
   else style.close();
   
   ypos += gapY;
@@ -1221,12 +1222,12 @@ void controlEvent(ControlEvent theEvent) {
     penner_anim.setColorBackground(color(100));
   } 
   else if(theEvent.isFrom("style")) {
-    if(customStyle) {
-      disableCustomStyle();
+    if(globalStyle) {
+      disableGlobalStyle();
     } else {
-      enableCustomStyle();
+      enableGlobalStyle();
     }
-    styleSaveLabel.setValue((int(customStyle)));
+    styleSaveLabel.setValue((int(globalStyle)));
   } 
   else if(theEvent.isFrom(pageOrientationToggle)) {
     if(pageOrientation) {
@@ -1326,12 +1327,12 @@ void controlEvent(ControlEvent theEvent) {
   else if (theEvent.isFrom(styleSaveLabel)) {
     //float to bool in 2 lines, otherwise won't work in processing 2.2.1
     int val = int(styleSaveLabel.getValue());
-    if( customStyle != boolean(val) ) {
-      if(customStyle) {
-        disableCustomStyle();
+    if( globalStyle != boolean(val) ) {
+      if(globalStyle) {
+        disableGlobalStyle();
         style.close();
       } else {
-        enableCustomStyle();
+        enableGlobalStyle();
         style.open(); 
       }
     }
@@ -1408,19 +1409,21 @@ void closeAnimate() {
   reorderGuiElements();
 }
 
-void disableCustomStyle() {
-  customStyle = false;
+void disableGlobalStyle() {
+  globalStyle = false;
   for (int i = 0; i < svg.size (); i++) {
-    svg.get(i).enableStyle();
+    ((Tile)svg.get(i)).disableGlobalStyle();
   }
+  if(tileEditor != null) tileEditor.updateGlobalStyle();
   reorderGuiElements();
 }
 
-void enableCustomStyle() {
-  customStyle = true;
+void enableGlobalStyle() {
+  globalStyle = true;
   for (int i = 0; i < svg.size (); i++) {
-    svg.get(i).disableStyle();
+    ((Tile)svg.get(i)).enableGlobalStyle();
   }
+  if(tileEditor != null) tileEditor.updateGlobalStyle();
   reorderGuiElements();
 }
 
