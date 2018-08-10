@@ -376,12 +376,10 @@ void draw() {
           //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
           mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
           //mapValue = ( brightness(col) /255);
-        } 
-        catch(Exception e) { //ArrayIndexOutOfBoundsException | NullPointerException
+        } catch(Exception e) { //ArrayIndexOutOfBoundsException | NullPointerException
           mapValue = 1f;
         }
       }
-
 
       float xx = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
       float yy = absTransY*(map(i, 0f, (float)ytilenum, 0, (float)ytilenum ));
@@ -393,9 +391,7 @@ void draw() {
           float tvy = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransY*10); 
           totaltranslatex += tvx;
           totaltranslatey += tvy;
-        } 
-        catch (ArrayIndexOutOfBoundsException e) {
-        }
+        } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totaltranslatex += ease(TRA, abscount, -relTransX, relTransX, tilecount);
         totaltranslatey += ease(TRA, abscount, relTransY, -relTransY, tilecount);
@@ -408,9 +404,7 @@ void draw() {
         try {
           float rv = mapValue * (relRot); 
           totalrotate += rv;
-        } 
-        catch (ArrayIndexOutOfBoundsException e) {
-        }
+        } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
       }
@@ -422,9 +416,7 @@ void draw() {
         try {
           relsca = mapValue * (relScale);
           totalscale *= invertMap ? (1-relsca) : relsca;
-        } 
-        catch (ArrayIndexOutOfBoundsException e) {
-        }
+        } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
         relsca = ease(SCA, abscount, 1.0, relScale, tilecount);
         totalscale *= relsca;

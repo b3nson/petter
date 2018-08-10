@@ -63,7 +63,7 @@ class TileEditor extends PApplet {
   Button deleteTileButton, moveTileBackButton, moveTileForeButton, explodeTileButton;
   Bang typecolorBang;
   Button addTextButton, duplicateTileButton;
-  Toggle recursiveToggle;
+  Toggle recursiveToggle, disableGlobalStyleToggle;
   Textfield tileCountLabel;
   Textlabel tezoomLabel, sLabel, rLabel, pLabel;
 
@@ -150,7 +150,7 @@ class TileEditor extends PApplet {
     mainTileGroup = cp5.addGroup("mainTileGroup")
       .setLabel("TILE")
       .setPosition(100, this.h-56)
-      .setWidth(199)
+      .setWidth(259)
       .hideArrow()
       .disableCollapse()
       .open()
@@ -201,11 +201,22 @@ class TileEditor extends PApplet {
       .setId(10)
       .setGroup(mainTileGroup)
       ;
-
     controlP5.Label lr = recursiveToggle.getCaptionLabel();
     lr.setHeight(10);
     lr.getStyle().setPadding(2, 2, 2, 2);
     lr.getStyle().setMargin(-15, 0, 0, 3);
+
+    disableGlobalStyleToggle = cp5.addToggle("DISABLEGLOBALSTYLE")
+      .setLabel("   DISABLE \nGLOBALSTYLE")
+      .setPosition(203, 4)
+      .setSize(56, 26)
+      .setId(13)
+      .setGroup(mainTileGroup)
+      ;
+    controlP5.Label lg = disableGlobalStyleToggle.getCaptionLabel();
+    lg.setHeight(10);
+    lg.getStyle().setPadding(2, 2, 2, 2);
+    lg.getStyle().setMargin(-28, 0, 0, 1);
 
     // ---------------------------------------------------
 
@@ -243,7 +254,7 @@ class TileEditor extends PApplet {
 
     mainAddGroup = cp5.addGroup("mainAddGroup")
       .setLabel("ADD")
-      .setPosition(325, this.h-56)
+      .setPosition(375, this.h-56)
       .setWidth(30)
       .hideArrow()
       .disableCollapse()
@@ -316,6 +327,7 @@ class TileEditor extends PApplet {
     prop.remove(deleteTileButton);
     prop.remove(explodeTileButton);
     prop.remove(duplicateTileButton);
+    prop.remove(disableGlobalStyleToggle);
     prop.remove(moveTileBackButton);
     prop.remove(moveTileForeButton);
     prop.remove(tezoomLabel);
@@ -570,6 +582,7 @@ class TileEditor extends PApplet {
     setDeleteButtonStatus();
     setMoveButtonStatus();
     setExplodeButtonStatus();
+    setGlobalStyleButtonStatus();
     setValueLabels();
   }
 
@@ -587,6 +600,7 @@ class TileEditor extends PApplet {
       setMoveButtonStatus();
       setExplodeButtonStatus();
       setDeleteButtonStatus();
+      setGlobalStyleButtonStatus();
       setValueLabels();
     }
   }
@@ -604,6 +618,7 @@ class TileEditor extends PApplet {
       setMoveButtonStatus();
       setExplodeButtonStatus();
       setDeleteButtonStatus();
+      setGlobalStyleButtonStatus();
       setValueLabels();
     }
   }
@@ -643,6 +658,7 @@ class TileEditor extends PApplet {
   
       setCountLabel();
       setDeleteButtonStatus();
+      setGlobalStyleButtonStatus();
       setMoveButtonStatus();
       setExplodeButtonStatus();
       setValueLabels();
@@ -662,14 +678,16 @@ class TileEditor extends PApplet {
     nfo = (PShape)tmp;
   }
 
+  private void toggleGlobalStyle(int svgindex) {
+    ((Tile)tileeditorshapelist.get(svgindex)).toggleUseGlobalStyle();
+  }
+  
   private void explodeimplode(int svgindex, boolean recursive) {
     Tile t = (Tile)tileeditorshapelist.get(svgindex);
     if ( t.getOrigin() != null ) {
       implodeTile(t);
     } else {
-      if (t instanceof TileSVG) {
-        explodeTile(t, recursive);
-      }
+      explodeTile(t, recursive);
     }
     svglength = tileeditorshapelist.size();
     setCountLabel();
@@ -677,6 +695,7 @@ class TileEditor extends PApplet {
     setMoveButtonStatus();
     setExplodeButtonStatus();
     setDeleteButtonStatus();
+    setGlobalStyleButtonStatus();
     setValueLabels();
   }
   
@@ -736,6 +755,7 @@ class TileEditor extends PApplet {
 
     ts = new TileShape(typeShape, 100, 100);
     ts.translate(50, 50);
+    ts.setExplodable(false);
   }
   
   void createTypeTile() {
@@ -769,6 +789,7 @@ class TileEditor extends PApplet {
     ((Tile)toClone).setTransformParams(p);
     Tile newTile = new TileSVG(filename);
     newTile.setTransformParams(p);
+    newTile.setExplodable(((Tile)toClone).isExplodable());
     
     return newTile;
   }
@@ -858,6 +879,9 @@ class TileEditor extends PApplet {
       break;
       case(12): //DUPLICATE
       duplicateTile(svgindex);
+      break;
+      case(13): //DISABLEGLOBALSTYLE      
+      toggleGlobalStyle(svgindex);
       break;
       case(11): //TYPETILEDITOR
       if (!typeEditorOpened) {
@@ -1009,7 +1033,18 @@ class TileEditor extends PApplet {
       deleteTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
     }
   }
-
+  
+  private void setGlobalStyleButtonStatus() {
+    Tile t = (Tile)tileeditorshapelist.get(svgindex);
+    if(t.getUseGlobalStyle()) {
+      //set the value of the controller without sending the broadcast event
+      disableGlobalStyleToggle.changeValue(0f);
+    } else {
+      //set the value of the controller without sending the broadcast event
+      disableGlobalStyleToggle.changeValue(1f);
+    }
+  }
+  
   private void setMoveButtonStatus() {
     if (svglength == 1) {
       moveTileForeButton.setBroadcast(false).setColorLabel(lockColor).setColorActive(bg).setColorForeground(bg);
@@ -1030,16 +1065,18 @@ class TileEditor extends PApplet {
 
   private void setExplodeButtonStatus() {
     Tile t = (Tile)tileeditorshapelist.get(svgindex);
-    if ( t.getOrigin() != null ) {
-      explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
-      explodeTileButton.setLabel("IMPLODE");
-      explodeTileButton.setHeight(26);
-      recursiveToggle.hide();
-    } else if (t instanceof TileSVG) {
-      explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
-      explodeTileButton.setLabel("EXPLODE");
-      explodeTileButton.setHeight(16);
-      recursiveToggle.show();
+    if(t.isExplodable()) {
+      if ( t.getOrigin() != null ) {
+        explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
+        explodeTileButton.setLabel("IMPLODE");
+        explodeTileButton.setHeight(26);
+        recursiveToggle.hide();
+      } else { /*if (t instanceof TileSVG) {*/
+        explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
+        explodeTileButton.setLabel("EXPLODE");
+        explodeTileButton.setHeight(16);
+        recursiveToggle.show();
+      } 
     } else {
       explodeTileButton.setLabel("EXPLODE");
       explodeTileButton.setHeight(26);

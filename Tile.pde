@@ -35,6 +35,10 @@ public interface Tile {
   public void enableGlobalStyle();
   public void disableGlobalStyle();
   public void useGlobalStyle(boolean use);
+  public void toggleUseGlobalStyle();
+  public boolean getUseGlobalStyle();
+  public void setExplodable(boolean flag);
+  public boolean isExplodable();
 }
 
 
@@ -51,6 +55,7 @@ public class TileSVG extends PShapeSVG implements Tile {
   float rotation = 0f;
 
   boolean useGlobalStyle = true;
+  boolean explodable = true;
   Tile origin = null;
   String filepath = null;
 
@@ -62,17 +67,21 @@ public class TileSVG extends PShapeSVG implements Tile {
   }
   
   public void draw(PGraphics g) {
-    g.pushMatrix();
-    g.translate(offsetx, offsety);    
-    g.translate(width/2, height/2);
-    g.scale(scalex, scaley);
-    g.rotate(rotation);
-    g.translate(-width/2, -height/2);
-    g.pushStyle();
-    setDrawStyle(exportCurrentFrame?pdf:g);
-    super.draw(g);
-    g.popStyle();
-    g.popMatrix();
+    try {
+      g.pushMatrix();
+      g.translate(offsetx, offsety);    
+      g.translate(width/2, height/2);
+      g.scale(scalex, scaley);
+      g.rotate(rotation);
+      g.translate(-width/2, -height/2);
+      g.pushStyle();
+      setDrawStyle(exportCurrentFrame?pdf:g);
+      super.draw(g);
+      g.popStyle();
+      g.popMatrix();
+    } catch(Exception e) { 
+      //e.printStackTrace(); 
+    }
   }
 
   private void setDrawStyle(PGraphics g) {
@@ -105,20 +114,36 @@ public class TileSVG extends PShapeSVG implements Tile {
   }
   
   public void enableGlobalStyle() { 
-    this.disableStyle(); 
-    super.disableStyle();
+    if(useGlobalStyle) {
+      this.disableStyle(); 
+      super.disableStyle();
+    }
   }
+  
   public void disableGlobalStyle() { 
-    this.enableStyle(); 
-    super.enableStyle();
+    if(useGlobalStyle) {
+      this.enableStyle(); 
+      super.enableStyle();
+    }
   }
+  
   public void useGlobalStyle(boolean use) { 
     this.useGlobalStyle = use; 
     if(use) {
-      enableGlobalStyle();
+      if(globalStyle) {
+        this.disableStyle(); 
+        super.disableStyle();
+      }
     } else {
-      disableGlobalStyle();
+      if(globalStyle) {
+        this.enableStyle(); 
+       super.enableStyle();
+      }
     }
+  }
+  
+  public void toggleUseGlobalStyle() { 
+    useGlobalStyle(!useGlobalStyle); 
   }
   
   public Tile getOrigin() { return null; }
@@ -132,6 +157,9 @@ public class TileSVG extends PShapeSVG implements Tile {
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
   public float getRotation() { return rotation; }
+  public boolean getUseGlobalStyle() { return useGlobalStyle; }
+  public void setExplodable(boolean flag) { explodable = flag; }
+  public boolean isExplodable() { return explodable; }
   
   public float[] getTransformParams() {
     float[] params = {offsetx, offsety, scalex, scaley, rotation};
@@ -174,6 +202,7 @@ public class TileShape extends PShape implements Tile {
   float rotation = 0f;
 
   boolean useGlobalStyle = true;
+  boolean explodable = true;
   Tile origin = null;
 
   public TileShape(PShape s, float w, float h) {
@@ -195,18 +224,21 @@ public class TileShape extends PShape implements Tile {
   }
 
   public void draw(PGraphics g) {
-    g.pushMatrix();
-    g.translate(offsetx, offsety);    
-    g.translate(width/2, height/2);
-    g.scale(scalex, scaley);
-    g.rotate(rotation);
-    g.translate(-width/2, -height/2);
-    g.pushStyle();
-    //setDrawStyle(g);
-    setDrawStyle(exportCurrentFrame?pdf:g);
-    super.draw(g);
-    g.popStyle();
-    g.popMatrix();
+    try {
+      g.pushMatrix();
+      g.translate(offsetx, offsety);    
+      g.translate(width/2, height/2);
+      g.scale(scalex, scaley);
+      g.rotate(rotation);
+      g.translate(-width/2, -height/2);
+      g.pushStyle();
+      setDrawStyle(exportCurrentFrame?pdf:g);
+      super.draw(g);
+      g.popStyle();
+      g.popMatrix();
+    } catch(Exception e) { 
+      //e.printStackTrace(); 
+    }
   }
 
   private void setDrawStyle(PGraphics g) {
@@ -238,21 +270,37 @@ public class TileShape extends PShape implements Tile {
     rotation = 0f;
   }
   
-  public void enableGlobalStyle() {
-      this.disableStyle();
+  public void enableGlobalStyle() { 
+    if(useGlobalStyle) {
+      this.disableStyle(); 
       super.disableStyle();
+    }
   }
+  
   public void disableGlobalStyle() { 
-    this.enableStyle();
-    super.enableStyle();
+    if(useGlobalStyle) {
+      this.enableStyle(); 
+      super.enableStyle();
+    }
   }
+  
   public void useGlobalStyle(boolean use) { 
     this.useGlobalStyle = use; 
     if(use) {
-      enableGlobalStyle();
+      if(globalStyle) {
+        this.disableStyle(); 
+        super.disableStyle();
+      }
     } else {
-      disableGlobalStyle();
+      if(globalStyle) {
+        this.enableStyle(); 
+       super.enableStyle();
+      }
     }
+  }
+  
+  public void toggleUseGlobalStyle() { 
+    useGlobalStyle(!useGlobalStyle); 
   }
   
   public Tile getOrigin() { return origin; }
@@ -266,6 +314,9 @@ public class TileShape extends PShape implements Tile {
   public float getScaleX() { return scalex; }
   public float getScaleY() { return scaley; }
   public float getRotation() { return rotation; }
+  public boolean getUseGlobalStyle() { return useGlobalStyle; }
+  public void setExplodable(boolean flag) { explodable = flag; }
+  public boolean isExplodable() { return explodable; }
   
   public float[] getTransformParams() {
     float[] params = {offsetx, offsety, scalex, scaley, rotation};
