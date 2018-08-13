@@ -106,6 +106,7 @@ boolean nfoOnTop = true;
 boolean exportFormat = true; //true=PDF|false=SVG
 boolean guiExport = false;
 boolean guiExportNow = false;
+boolean showExportLabel = false;
 boolean sequencing = false;
 boolean shift = false;
 int seed = 0;
@@ -475,6 +476,13 @@ void draw() {
     if (batchmode && batchnow) {
       exit();
     }
+    
+    if(!guiExport) {
+      showExportLabel(true);
+    } else if(guiExportNow) {
+      showExportLabel(true);
+    }
+    
     if (guiExport && !guiExportNow) {
       guiExportNow = true;
     } else if (guiExport && guiExportNow) {
@@ -482,6 +490,12 @@ void draw() {
       exportCurrentFrame = false;
     } else if (!guiExport) {
       exportCurrentFrame = false;
+    }
+  }
+
+  if(showExportLabel) {
+    if(millis() - showExportLabelTimer >= 4000) {
+      showExportLabel(false);
     }
   }
 
@@ -591,6 +605,7 @@ void keyPressed() {
     exportOnNextLoop = true;
     generateName();
     generateTimestamp();
+    if(showExportLabel) showExportLabel(false);
   } else if (keysDown['M']) {
     toggleMenu();
   } else if (keysDown['0']) {

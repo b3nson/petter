@@ -47,6 +47,7 @@ int infoheight = 22;
 int scrollOffset = 0;
 float mapwidth = 0;
 float mapheight = 0;
+float showExportLabelTimer = 0;
   
 color c1 = color(16, 181, 198);    // blue
 color c2 = color(60, 105, 97, 180);// green
@@ -58,7 +59,7 @@ ArrayList settingFiles;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
-Group main, style, animate, help, helptextbox, info;
+Group main, style, animate, help, helptextbox, info, exportinfo;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
@@ -66,7 +67,7 @@ Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLast
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
-Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem;
+Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
 Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
@@ -461,7 +462,6 @@ void setupGUI() {
   ypos += sep;
 
 
-
 // ---------------------------------------------------------------------------
 //  GUI SETUP - SAVELABELS - Workaround to save additional values in cp5-properties 
 // ---------------------------------------------------------------------------
@@ -850,6 +850,23 @@ void setupGUI() {
      .setText("ZOOM: 1.0")
      .setGroup(info)
      ;
+
+  exportinfo = gui.addGroup("exportinfo")
+    .setSize(fwidth, infoheight)
+    .setPosition(0, fheight-infoheight)
+    .setBackgroundHeight(infoheight+2)
+    .setBackgroundColor(230)
+    .hideBar()
+    .open()
+    .hide()
+    ;
+    
+  exportConfirmationLabel = gui.addTextlabel("exportlabel" )
+    .setPosition(10, 7)
+    .setText("")
+    .setColor(0)
+    .setGroup(exportinfo)
+    ; 
    
 // ---------------------------------------------------------------------------
 //  GUI SETUP - HELP MENU
@@ -951,6 +968,8 @@ void setupGUI() {
   cprop.remove(dragOffset);
   cprop.remove(zoomLabel);
   cprop.remove(fpsLabel);
+  cprop.remove(exportinfo);
+  cprop.remove(exportConfirmationLabel);
   
   //cprop.remove(pageOrientationToggle);
   //cprop.remove(invertMapToggle);
@@ -1448,6 +1467,20 @@ void reorderGuiElements() {
   }  
 }
 
+void showExportLabel(boolean state) {
+  if(state) {
+    exportConfirmationLabel.setText("EXPORTED:     " +filename);
+    exportinfo.show();
+    showExportLabel = true;
+    showExportLabelTimer = millis();
+  } else {
+    exportConfirmationLabel.setText("");
+    exportinfo.hide();
+    showExportLabel = false;
+    showExportLabelTimer = 0;
+  }
+}
+
 void toggleRandom() {
   random = !random;
   seed = mouseX;
@@ -1859,7 +1892,7 @@ void checkArgs() {
 }
 
 void generateName() {
-    randomSeed(mouseX*mouseY*frameCount);
+    randomSeed(mouseX+mouseY+frameCount);
     if(batchmode) {
       name = "petterbatch";
     } else if(names != null) {
