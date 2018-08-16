@@ -157,7 +157,7 @@ int manualNFOY = fheight/6*5;
 void setup() {  
   frameRate(100);
   size(905, 842, JAVA2D);
-  surface.setResizable(true);
+  //surface.setResizable(true);
   surface.setSize(905, 842);
   surface.setTitle("petter " +version);
   sketchPath = sketchPath();
