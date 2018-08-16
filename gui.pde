@@ -1711,6 +1711,9 @@ void resizeFrame(int newW, int newH) {
   dropSVGnfo.updateTargetRect(fwidth, fheight);
   dropIMG.updateTargetRect(fwidth, fheight);
   
+  exportinfo.setSize(fwidth, infoheight);
+  exportinfo.setPosition(0, fheight-infoheight);
+  
   reorderGuiElements();
   
   gui.setGraphics(this, 0, 0);
@@ -1837,6 +1840,7 @@ void loadDefaultSettings() {
   }  
   else {                   //reset all controllers
     gui.loadProperties();
+    nfoscale = 1f;
     println("Resetting all controllers ");
   }
   undo.setUndoStep();  
