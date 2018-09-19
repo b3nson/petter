@@ -11,3 +11,5 @@
 * **All instances of 'int(myBool)' changed to 'myBool == true ? 1 : 0'.**  int() is only available in the Processing IDE.
 
 * **Introduce an explicit PApplet launch to start Petter.** In the Processing IDE, there is a behind-the-scenes, or implicit, call to a static method belonging to the PApplet class to setup and run the user's PApplet instance. When using the Processing library in Java, this needs to be done manually with a call PApplet.main() (located in Petter.java).
+
+* **Add Public or Private access modifiers.** Add the relevant access modifiers to both variables and methods in all classes.
