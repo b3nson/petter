@@ -1,121 +1,15 @@
-Petter
-======
-a vector-graphic-based pattern generator.
+## petter-java Refactoring Decisions:
 
-### Description:
-Petter is a experimental [Processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
-Use [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)-Files as input to generate, influence and export graphic patterns as PDF.    
-JPEG/PNG/GIF (also animated ones) can be used as a "ImageMap" to alter the pattern.    
-Drag and Drop SVG and Image-Files into the GUI to set input-files, use gui-controls to alter the pattern,    
-press 's' to export as PDF. Press 'h' for further help.    
+* **Extensive use of static import** Processing may support multiple tabs but these do not behave like Java classes: every class in every tab is a member of the same higher-level class behind the scenes. As a result, all variables share the same scope and a tab that declares a given object or method needn't be referenced when another tab is attempting to reference the belonging declarations. Converting the project to Java (introducing distinct classes), there becomes a requirement to reference methods and variables between classes. Using static imports (rather than Class.field or Class.method()) minimises changes to references in the rest of the code. For example, rather than needing to prefix every reference to *bgcolor* with *Petter.* (the declaring class), we include *static import bgcolor;* once, at the top of the class that needs to reference *bgcolor*, which preserves each reference to *bgcolor*, without needing to refactor each reference to *Petter.bgcolor*. In opting for static imports, it is hoped that converting future revisions of petter (either pde->java or java->pde) will require less refactoring of references than otherwise.
 
-See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
+* **Introduce a static reference to the main PApplet instance.** Similar to the above. As code within the Processing IDE behaves as a single class, each tab can reference the live PApplet implicitly and call functions such as ellipse() because the IDE knows to call these methods on the user's PApplet instance. In Java mode, this is not implicit. The PApplet instance must be explicitly referenced by other classes if they wish to call non-static methods like ellipse() and so on. In the refactor, Petter.java exposes a static reference to the non-static PApplet instance. The PApplet assigns itself (*petter = this;*) to the static reference during *setup()*, so when other classes reference the static reference, they be pointed the running Petter PApplet instance. The alternative is passing the PApplet to other classes in constructors or otherwise but this causes larger disparity between the .pde and .java code bases, hence the static reference approach.
 
-![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
-![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
-Animated PDF-sequences with (bottom) and without (top) animated-gif as ImageMap.
+* **All 'color' primitives changed to 'int'.** In the Processing IDE, one can declare color datatypes whose value takes a return value from *color()*, a non-static PApplet method that returns ints. As Java mode does not recognise Processing's color primitive, all color primitives have been changed to int datatypes.
 
-### Keyboard Shortcuts:
-```
-SHORTCUTS
-========================================================================
+* **All instances of 'boolean(myInt)' changed to 'myInt == 1 ? true : false'.** boolean() is only available in the Processing IDE.
 
-------------------------------------------------------------------------
-GENERAL 
-------------------------------------------------------------------------
+* **All instances of 'int(myBool)' changed to 'myBool == true ? 1 : 0'.**  int() is only available in the Processing IDE.
 
-M		-	Show/Hide MAIN-MENU
-H		- 	Show/Hide this HELP
-T		- 	Show/Hide TileEditor
-+ / - 		- 	ZOOM IN / OUT
-Z / Y 		- 	UNDO / REDO
-D 		-	RESET TO DEFAULT
+* **Introduce an explicit PApplet launch to start Petter.** In the Processing IDE, there is a behind-the-scenes, or implicit, call to a static method belonging to the PApplet class to setup and run the user's PApplet instance. When using the Processing library in Java, this needs to be done manually with a call PApplet.main() (located in Petter.java).
 
-SHIFT on Sliders	-	bigger steps
-SCROLL on Sliders	-	finer steps
-. / ; on Sliders	-	in/decrease sliderrange
-D on Sliders		-	reset slider to default
-
-0 (ZERO)	-	Load previous Settings
-S		-	Save PDF
-
-------------------------------------------------------------------------
-CREATE
-------------------------------------------------------------------------
-
-DRAG'N'DROP SVG-FILES (on canvas)	
-		- one or multiple SVGS to add/replace tiles
-		- (bottom-area) to add/replace nfo-graphic
-DRAG'N'DROP IMG-FILE (on menu)
-		- set image as transformation-map
-
-LEFTCLICK-DRAG THE CANVAS	- repos artwork
-RIGHTCLICK-DRAG THE CANVAS	- repos nfo-graphic
-CTRL-SCROLL			- scale nfo-graphic
-
-CURSOR LEFT/RIGHT	- add/remove tiles in x-space (+SHIFT: 10)
-CURSOR UP/DOWN		- add/remove tiles in y-space (+SHIFT: 10)
-
-R	- randomize tile-order (when multiple different tiles are used)
-X	- change cycle-order (L>R>T>B to T>B>L>R)
-L	- change rel-transformations from tile-by-tile to line-by-line
-N	- show/hide NFO-Graphic
-B	- show/hide REF-Graphic
-
-C	- show prev frame of animated-gif-imagemap
-V	- show next frame of animated-gif-imagemap
-
-------------------------------------------------------------------------
-ANIM
-------------------------------------------------------------------------
-
-A 	- show Anim menu
-I	- set/overwrite start-values
-O	- set/overwrite end-values
-J	- view start-values
-K	- view end-values
-P	- view/testrun animation
-
-========================================================================
-```
-
-### Installation:
-- Grab a copy of [Processing](http://www.processing.org/) for your OS, install it.
-- Download/clone Petter to your Processing Sketch-Directory.
-- Download and install external libraries (see below).
-- For **Processing 3**.x choose `master`-branch: [master](https://github.com/b3nson/petter/tree/master)
-- For **Processing 2**.x choose `processing-2.x`-branch: [processing-2.x](https://github.com/b3nson/petter/tree/processing-2.x)
-
-
-### Use of contributed Libraries:
-- `penner.easing` - http://github.com/jesusgollonet/processing-penner-easing
-- `controlP5` - http://github.com/sojamo/controlp5 (> v2.2.3)
-- `sojamo.drop` - http://www.sojamo.de/libraries/drop/
-- `gifAnimation` - http://extrapixel.github.io/gif-animation/ (>= [3.0](https://github.com/extrapixel/gif-animation/tree/3.0))
-
-### Command-Line-Options:
-soon...
-
-
-### Known Issues:    
-DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
-Use e.g. `Nautilus` instead.    
-"The root error is pcmanfm sends a null-terminated-string for file list"    
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
-
-
-### License: 
-```
-Petter - vector-graphic-based pattern generator.
-http://www.lafkon.net/petter/
-Copyright (C) 2015 LAFKON/Benjamin Stephan
- 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation; either version 2 of the License, or (at your option) any later
-version.
- 
-This program is distributed in the hope that it will be useful, but WITHOUT
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-```
+* **Add Public or Private access modifiers.** Add the relevant access modifiers to both variables and methods in all classes.
