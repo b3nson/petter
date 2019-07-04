@@ -1004,6 +1004,7 @@ class TileEditor extends PApplet {
     } else {
       type_copi.show(); 
     }
+    colorpicking = true;
   }
 
   private void scaleGUI(boolean bigger) {

@@ -109,6 +109,7 @@ boolean guiExportNow = false;
 boolean showExportLabel = false;
 boolean sequencing = false;
 boolean shift = false;
+boolean colorpicking = false;
 int seed = 0;
 int fps = 0;
 float mapValue = 0f;
@@ -518,6 +519,28 @@ void draw() {
     }
   }
 
+
+  if(colorpicking) {
+    if ((mouseX <= fwidth) && (mouseY <= fheight)) {
+      if( (bg_copi != null && bg_copi.isOpen()) ||
+          (stroke_copi != null && stroke_copi.isOpen()) ||
+          (shape_copi != null && shape_copi.isOpen()) ||
+          (type_copi != null && type_copi.isOpen())
+         ) { 
+        color c = get(mouseX, mouseY);
+        noFill();
+        stroke(255);
+        rect(mouseX+13, mouseY+13, 22, 22);
+        fill(c);
+        stroke(0);
+        rect(mouseX+14, mouseY+14, 20, 20);
+       } else {
+         colorpicking = false; 
+       }
+    }
+  }
+
+
   shapeMode(CENTER);
   noStroke();
 
@@ -555,6 +578,19 @@ void mousePressed() {
     dragAllowed = true;
     pmouseX = mouseX;
     pmouseY = mouseY;
+
+    if(colorpicking) {
+      ColorPicker tmpcp = null;
+      if      (bg_copi != null && bg_copi.isOpen()) { tmpcp = bg_copi;}
+      else if (stroke_copi != null && stroke_copi.isOpen()) {tmpcp = stroke_copi;}
+      else if (shape_copi != null && shape_copi.isOpen()) {tmpcp = shape_copi;}
+      else if (type_copi != null && type_copi.isOpen()) {tmpcp = type_copi;}
+
+      if(tmpcp != null) {
+        color c = get(mouseX, mouseY);
+        tmpcp.setExtColor(c);
+      }
+    }
   }
 }
 

@@ -1494,6 +1494,8 @@ void changebgcolor(float i) {
   } else {
     bg_copi.show(); 
   }
+  colorpicking = true;
+
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
@@ -1501,8 +1503,10 @@ void changestrokecolor(float i) {
     String[] args = {"colorpicker2"};
     PApplet.runSketch(args, stroke_copi);
   } else {
-    stroke_copi.show(); 
+    stroke_copi.show();
   }
+  colorpicking = true;
+
 }
 void changeshapecolor(float i) {
   if(shape_copi == null) {
@@ -1512,6 +1516,7 @@ void changeshapecolor(float i) {
   } else {
     shape_copi.show(); 
   }
+  colorpicking = true;
 }
 
 //void changetypecolor(float i) {} //in TileEditor

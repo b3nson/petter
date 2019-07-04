@@ -2,12 +2,12 @@
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
  * Copyright (C) 2015 LAFKON/Benjamin Stephan
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -26,12 +26,12 @@ public class ColorPicker extends PApplet {
   private float sat = 0;
   private float bri = 0;
 
-  private color startCol;  
+  private color startCol;
   private color curCol;
   private color[] srccol;
 
   private String name;
-  
+
   private boolean opened = true;
   private boolean preview = true;
   private boolean undoable = true;
@@ -53,7 +53,7 @@ public class ColorPicker extends PApplet {
     curCol = col[0];
     srccol = col;
     name = theName;
-  }  
+  }
   //using a color-array here, to set color-value of mainapp directly (like pass-by-reference in C/C++)
 
 
@@ -65,7 +65,7 @@ public class ColorPicker extends PApplet {
     size(w, h, JAVA2D);
   }
 
-  void setup() {    
+  void setup() {
     surface.setTitle(name);
     colorMode(HSB);
     frameRate(25);
@@ -77,7 +77,7 @@ public class ColorPicker extends PApplet {
     s2D = cp5.addSlider2D("s2D")
       .setPosition(10, 10)
       .setSize(255, 255)
-      .setColorBackground(0) 
+      .setColorBackground(0)
       .setMaxX(255)
       .setMaxY(0)
       .setMinX(0)
@@ -95,9 +95,9 @@ public class ColorPicker extends PApplet {
       .setRange(255, 0)
       .setValue(128)
       .setSliderMode(Slider.FLEXIBLE)
-      .setHandleSize(1) 
+      .setHandleSize(1)
       .setId(1)
-      .setScrollSensitivity(0.0392) 
+      .setScrollSensitivity(0.0392)
       .setView(huepick)
       ;
     s1D.getCaptionLabel().hide();
@@ -107,17 +107,17 @@ public class ColorPicker extends PApplet {
     rgbValueLabel = cp5.addTextlabel("RGB" )
       .setPosition(300, 104)
       .setText("RGB")
-      ;   
+      ;
 
     hsbValueLabel = cp5.addTextlabel("HSB" )
       .setPosition(300, 140)
       .setText("HSB")
-      ;   
+      ;
 
     hexValueLabel = cp5.addTextlabel("HEX" )
       .setPosition(300, 176)
       .setText("HEX")
-      ;       
+      ;
 
     previewToggle = cp5.addToggle("preview")
       .setLabel("preview")
@@ -157,12 +157,12 @@ public class ColorPicker extends PApplet {
   // ---------------------------------------------------------------------------
   //  DRAW
   // ---------------------------------------------------------------------------
-  
+
   void draw() {
     colorMode(HSB);
     background(50);
     noStroke();
-    
+
     fill(curCol);
     rect(300, 10, 60, 40);
 
@@ -174,7 +174,7 @@ public class ColorPicker extends PApplet {
 
     loadPixels();
     for ( int j = 0; j < 255; j++ ) {
-      for ( int i = 0; i < 20; i++ ) {   
+      for ( int i = 0; i < 20; i++ ) {
         set(  i+xpos, j+ypos, color( j, 255, 255 ) );
       }
     }
@@ -183,7 +183,7 @@ public class ColorPicker extends PApplet {
     ypos = (int)s2D.getPosition()[1];
 
     loadPixels();
-    for ( int j = 0; j < 255; j++ ) { 
+    for ( int j = 0; j < 255; j++ ) {
       for ( int i = 0; i < 255; i++ ) {
         set(  j+xpos, i+ypos, color( hue, j, 255 - i ) );
       }
@@ -199,11 +199,11 @@ public class ColorPicker extends PApplet {
   public boolean isOpen() {
     return opened;
   }
-  
+
   public void setUndoable(boolean able) {
     undoable = able;
   }
-  
+
   public void hide() {
     this.noLoop();
     surface.setVisible(false);
@@ -212,15 +212,26 @@ public class ColorPicker extends PApplet {
 
   public void show() {
     this.loop();
-    opened = true;
     updateColor();
     initSliders(startCol);
     updatePreviewColor();
     surface.setVisible(true);
+    opened = true;
   }
 
   public void exit() { //on native window-close
    closeAndCancel();
+  }
+
+  public void setExtColor(color ec) {
+    if(s1D != null) {
+      curCol = ec;
+      hue = hue(ec);
+      sat = saturation(ec);
+      bri = brightness(ec);
+      updatePreviewColor();
+      initSliders(ec);
+    }
   }
   
   private void closeAndApply() {
@@ -237,7 +248,7 @@ public class ColorPicker extends PApplet {
     srccol[0] = startCol;
     hide();
   }
-  
+
   private void updateColor() {
     startCol = srccol[0];
     curCol = srccol[0];
@@ -260,10 +271,10 @@ public class ColorPicker extends PApplet {
   private void initSliders(color c) {
     hue = hue(c);
     sat = saturation(c);
-    bri = brightness(c)-255; 
+    bri = brightness(c)-255;
     s1D.setValue(hue);
     s2D.setArrayValue(new float[] {sat, bri});
-  }  
+  }
 
 
   // ---------------------------------------------------------------------------
@@ -298,6 +309,12 @@ public class ColorPicker extends PApplet {
   // ---------------------------------------------------------------------------
   //  INPUT LISTENER
   // ---------------------------------------------------------------------------
+  public void mouseClicked(MouseEvent evt) {
+    if (evt.getCount() == 2) {
+      println("doubleclick");
+      //doubleClicked();
+    }
+  }
 
   void keyPressed() {
     if (key == RETURN || key == ENTER) {
@@ -310,8 +327,8 @@ public class ColorPicker extends PApplet {
   }
 
   void keyTyped() {
-    if (keyCode==ESC || key == ESC) { 
-      key = 0; 
+    if (keyCode==ESC || key == ESC) {
+      key = 0;
       keyCode = 0;
     }
   }
@@ -327,7 +344,7 @@ public class ColorPicker extends PApplet {
 // ---------------------------------------------------------------------------
 //  CUSTOM SLIDER-VIEWS (to prevent drawing of controller-background)
 // ---------------------------------------------------------------------------
-  
+
 class ColorSlider2DView implements ControllerView<Slider2D> {
   PApplet theApplet;
 
