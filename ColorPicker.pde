@@ -169,25 +169,25 @@ public class ColorPicker extends PApplet {
     fill(startCol);
     rect(300, 50, 60, 40);
 
+    loadPixels();
+    
     int xpos = (int)s1D.getPosition()[0];
     int ypos = (int)s1D.getPosition()[1];
-
-    loadPixels();
     for ( int j = 0; j < 255; j++ ) {
       for ( int i = 0; i < 20; i++ ) {
-        set(  i+xpos, j+ypos, color( j, 255, 255 ) );
+        pixels[(j+ypos)*width+(i+xpos)] = color( j, 255, 255 );
       }
     }
-
+    
     xpos = (int)s2D.getPosition()[0];
     ypos = (int)s2D.getPosition()[1];
-
-    loadPixels();
     for ( int j = 0; j < 255; j++ ) {
       for ( int i = 0; i < 255; i++ ) {
-        set(  j+xpos, i+ypos, color( hue, j, 255 - i ) );
+        pixels[(i+ypos)*width+(j+xpos)] = color( hue, j, 255 - i );
       }
     }
+
+    updatePixels();
     colorMode(RGB);
   }
 
