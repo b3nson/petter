@@ -1505,7 +1505,7 @@ void toggleRandom() {
 
 void changebgcolor(float i) {
   if(bg_copi == null) {
-    bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, false);
+    bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, false, recentcolors);
     String[] args = {"colorpicker1"};
     PApplet.runSketch(args, bg_copi);
   } else {
@@ -1516,7 +1516,7 @@ void changebgcolor(float i) {
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
-    stroke_copi = new ColorPicker(this, "strokecolor", strokecolor);
+    stroke_copi = new ColorPicker(this, "strokecolor", strokecolor, recentcolors);
     String[] args = {"colorpicker2"};
     PApplet.runSketch(args, stroke_copi);
   } else {
@@ -1527,7 +1527,7 @@ void changestrokecolor(float i) {
 }
 void changeshapecolor(float i) {
   if(shape_copi == null) {
-    shape_copi = new ColorPicker(this, "fillcolor", shapecolor);
+    shape_copi = new ColorPicker(this, "fillcolor", shapecolor, recentcolors);
     String[] args = {"colorpicker3"};
     PApplet.runSketch(args, shape_copi);
   } else {

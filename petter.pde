@@ -132,6 +132,7 @@ color[] bgcolor = {color(random(255), random(255), random(255))};
 color[] strokecolor = {color(0, 0, 0, 255)};
 color[] shapecolor = {color(255, 255, 255, 255)};
 color[] typecolor = {color(0, 0, 0, 255)};
+color[] recentcolors = {bgcolor[0], strokecolor[0], shapecolor[0], typecolor[0]};
 
 boolean pageOrientation = true;
 String[][] formats = { 
@@ -159,11 +160,6 @@ void setup() {
   frameRate(100);
   size(905, 842, JAVA2D);
   colorMode(RGB, 255);
-  
- bgcolor[0] = color(random(255), random(255), random(255));
-strokecolor[0] = color(0, 0, 0, 255);
-shapecolor[0] = color(255, 255, 255, 255);
-typecolor[0] = color(0, 0, 0, 255);
 
   //surface.setResizable(true);
   surface.setSize(905, 842);

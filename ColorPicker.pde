@@ -30,6 +30,7 @@ public class ColorPicker extends PApplet {
   private color startCol;
   private color curCol;
   private color[] srccol;
+  private color[] recents = {0,0,0,0};
 
   private String name;
 
@@ -42,19 +43,29 @@ public class ColorPicker extends PApplet {
   private Slider s1Dh, s1Da;
   private Textlabel rgbValueLabel, hsbValueLabel, hexValueLabel;
   private Button okButton, cancelButton;
+  private Button recentColor1Button, recentColor2Button, recentColor3Button, recentColor4Button;
   private Toggle previewToggle;
   private Group infoui;
 
   private PImage alphaChecker, curColChecker, startColChecker;
   private PImage hueBuffer, satbriBuffer, alphaBuffer;
 
-
+  public ColorPicker(PApplet theParent, String theName, color[] col, boolean showAlphaSlider, color[] recents) {
+    this(theParent, theName, col, showAlphaSlider);
+    this.recents = recents;
+  }
+  
   public ColorPicker(PApplet theParent, String theName, color[] col, boolean showAlphaSlider) {
     this(theParent, theName, col);
     showalpha = showAlphaSlider;
     w -= 25;
   }
 
+  public ColorPicker(PApplet theParent, String theName, color[] col, color[] recents) {
+    this(theParent, theName, col);
+    this.recents = recents;
+  }
+  
   public ColorPicker(PApplet theParent, String theName, color[] col) {
     parent = theParent;
     startCol = col[0];
@@ -129,33 +140,66 @@ public class ColorPicker extends PApplet {
     if(showalpha) {
       infoui.setPosition(320, 0);
     }
-           
+    
+    recentColor1Button = cp5.addButton("rc1")
+     .setLabel("A")
+     .setPosition(0, 91)
+     .setSize(15, 10)
+     .setColor(new CColor(recents[0], recents[0], recents[0], recents[0], recents[0]))
+     .setGroup(infoui)
+     ;
+     
+    recentColor2Button = cp5.addButton("rc2")
+     .setLabel("A")
+     .setPosition(15, 91)
+     .setSize(15, 10)
+     .setColor(new CColor(recents[1], recents[1], recents[1], recents[1], recents[1]))
+     .setGroup(infoui)
+     ;
+     
+    recentColor3Button = cp5.addButton("rc3")
+     .setLabel("A")
+     .setPosition(30, 91)
+     .setSize(15, 10)
+     .setColor(new CColor(recents[2], recents[2], recents[2], recents[2], recents[2]))
+     .setGroup(infoui)
+     ;
+     
+    recentColor4Button = cp5.addButton("rc4")
+     .setLabel("A")
+     .setPosition(45, 91)
+     .setSize(15, 10)
+     .setColor(new CColor(recents[3], recents[3], recents[3], recents[3], recents[3]))
+     .setGroup(infoui)
+     ;
+          
     rgbValueLabel = cp5.addTextlabel("RGB" )
-      .setPosition(-2, 98)
+      .setPosition(-2, 114)
       .setText("RGBA")
       .setGroup(infoui)
       ;
 
     hsbValueLabel = cp5.addTextlabel("HSB" )
-      .setPosition(-2, 142)
+      .setPosition(-2, 158)
       .setText("HSB")
       .setGroup(infoui)
       ;
 
     hexValueLabel = cp5.addTextlabel("HEX" )
-      .setPosition(-2, 176)
+      .setPosition(-2, 192)
       .setText("HEX")
       .setGroup(infoui)
       ;
 
     previewToggle = cp5.addToggle("preview")
       .setLabel("preview")
-      .setPosition(2, 196)
+      .setPosition(0, 218)
       .setSize(10, 10)
       .setValue(true)
       .setId(4)
       .setGroup(infoui)
       ;
+      previewToggle.getCaptionLabel().setPadding(14, -10);
 
     okButton = cp5.addButton("OK")
       .setPosition(0, 236)
@@ -243,6 +287,7 @@ public class ColorPicker extends PApplet {
     updateColor();
     initSliders(startCol);
     updatePreviewColor();
+    updateRecentColorLabels();
     surface.setVisible(true);
     opened = true;
   }
@@ -264,8 +309,9 @@ public class ColorPicker extends PApplet {
   }
   
   private void closeAndApply() {
-    startCol=curCol;
+    startCol = curCol;
     srccol[0] = curCol;
+    setNewRecentColor(curCol);
     hide();
     if(undoable) {
       undo.setUndoStep();
@@ -284,6 +330,14 @@ public class ColorPicker extends PApplet {
     curCol = srccol[0];
   }
 
+  private void updateRecentColorLabels() {
+    colorMode(RGB, 255);
+    recentColor1Button.setColor(new CColor(recents[0], recents[0], recents[0], recents[0], recents[0]));
+    recentColor2Button.setColor(new CColor(recents[1], recents[1], recents[1], recents[1], recents[1]));
+    recentColor3Button.setColor(new CColor(recents[2], recents[2], recents[2], recents[2], recents[2]));
+    recentColor4Button.setColor(new CColor(recents[3], recents[3], recents[3], recents[3], recents[3]));
+  }
+  
   private void updatePreviewColor() {
     colorMode(HSB, 255, 255, 255, 255);
     color tmp = color(hue, sat, bri, alp);
@@ -321,6 +375,21 @@ public class ColorPicker extends PApplet {
     updateSatBriBuffer();
   }
 
+  private void setNewRecentColor(color c) {
+    boolean duplicate = false;
+    for(int i = 0; i<recents.length; i++) {
+      if(recents[i] == c) {
+         duplicate = true;
+         break;
+      }
+    }
+    if(!duplicate) {
+      recents[3] = recents[2];
+      recents[2] = recents[1];
+      recents[1] = recents[0];
+      recents[0] = curCol;
+    }
+  }
 
   // ---------------------------------------------------------------------------
   //  DRAW IMGBUFFERS
@@ -433,11 +502,17 @@ PImage createCheckerboard(int ww, int hh) {
   // ---------------------------------------------------------------------------
   //  INPUT LISTENER
   // ---------------------------------------------------------------------------
+  
   public void mouseClicked(MouseEvent evt) {
-    if (evt.getCount() == 2) {
-      println("doubleclick");
-      //doubleClicked();
-    }
+     if(cp5.isMouseOver(cp5.getController("rc1"))) {
+       setExtColor(recentColor1Button.getColor().getBackground());
+     } else if (cp5.isMouseOver(cp5.getController("rc2"))) {
+       setExtColor(recentColor2Button.getColor().getBackground());
+     } else if (cp5.isMouseOver(cp5.getController("rc3"))) {
+       setExtColor(recentColor3Button.getColor().getBackground());
+     } else if (cp5.isMouseOver(cp5.getController("rc4"))) {
+       setExtColor(recentColor4Button.getColor().getBackground());
+     }
   }
 
   void keyPressed() {

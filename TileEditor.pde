@@ -997,7 +997,7 @@ class TileEditor extends PApplet {
 
   void changetypecolor(float i) {
     if(type_copi == null) {
-      type_copi = new ColorPicker(this, "typecolor", typecolor);
+      type_copi = new ColorPicker(this, "typecolor", typecolor, recentcolors);
       type_copi.setUndoable(false);
       String[] args = {"colorpicker4"};
       PApplet.runSketch(args, type_copi);
