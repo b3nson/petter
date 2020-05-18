@@ -129,9 +129,9 @@ String formatName = "";
 String sketchPath;
 
 color[] bgcolor = {color(random(255), random(255), random(255))};
-color[] strokecolor = {color(0, 0, 0)};
-color[] shapecolor = {color(255, 255, 255)};
-color[] typecolor = {color(0, 0, 0)};
+color[] strokecolor = {color(0, 0, 0, 255)};
+color[] shapecolor = {color(255, 255, 255, 255)};
+color[] typecolor = {color(0, 0, 0, 255)};
 
 boolean pageOrientation = true;
 String[][] formats = { 
@@ -158,6 +158,13 @@ int manualNFOY = fheight/6*5;
 void setup() {  
   frameRate(100);
   size(905, 842, JAVA2D);
+  colorMode(RGB, 255);
+  
+ bgcolor[0] = color(random(255), random(255), random(255));
+strokecolor[0] = color(0, 0, 0, 255);
+shapecolor[0] = color(255, 255, 255, 255);
+typecolor[0] = color(0, 0, 0, 255);
+
   //surface.setResizable(true);
   surface.setSize(905, 842);
   surface.setTitle("petter " +version);
@@ -301,11 +308,13 @@ void draw() {
   if (globalStyle) {
     if (stroke_copi != null && stroke_copi.isOpen()) {
       strokecolorBang.setColorForeground(strokecolor[0]);
-      strokecolorSaveLabel.setValue((strokecolor[0]));
+      strokecolorSaveLabel.setValue( color(red(strokecolor[0]), green(strokecolor[0]), blue(strokecolor[0]) ));
+      strokecolorAlphaSaveLabel.setValue(alpha(strokecolor[0]));   
     }
     if (shape_copi != null && shape_copi.isOpen()) {
       shapecolorBang.setColorForeground(shapecolor[0]);
-      shapecolorSaveLabel.setValue((shapecolor[0]));
+      shapecolorSaveLabel.setValue( color(red(shapecolor[0]), green(shapecolor[0]), blue(shapecolor[0]) ));
+      shapecolorAlphaSaveLabel.setValue(alpha(shapecolor[0]));   
     }
   }
 
@@ -432,6 +441,7 @@ void draw() {
       }
         
       if (s != null) {
+        //colorMode(RGB, 255);
         shape(s);
       }
 

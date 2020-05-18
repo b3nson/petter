@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.awt.Insets;
 
 CallbackListener cbAllUndo, cbDropdownHover;
+CallbackListener cbColorChange;
 GuiImage imgMap;
 Insets insets;
 
@@ -70,7 +71,7 @@ Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientat
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
-Numberbox bgcolorSaveLabel, strokecolorSaveLabel, shapecolorSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
+Numberbox bgcolorSaveLabel, strokecolorSaveLabel, strokecolorAlphaSaveLabel, shapecolorSaveLabel, shapecolorAlphaSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
 Slider offsetxSaveLabel, offsetySaveLabel;
 
 
@@ -473,18 +474,35 @@ void setupGUI() {
      .setGroup(main)
      .hide()
      ;
+     
   strokecolorSaveLabel  = gui.addNumberbox("strokecolorSaveLabel" )
      .setPosition(0, 0)
-     .setValue(strokecolor[0])
+     .setValue( color(red(strokecolor[0]), green(strokecolor[0]), blue(strokecolor[0]) ))
      .setGroup(main)
      .hide()
      ;
+
+  strokecolorAlphaSaveLabel  = gui.addNumberbox("strokecolorAlphaSaveLabel" )
+     .setPosition(0, 0)
+     .setValue(alpha(strokecolor[0]))
+     .setGroup(main)
+     .hide()
+     ;
+
   shapecolorSaveLabel  = gui.addNumberbox("shapecolorSaveLabel" )
      .setPosition(0, 0)
-     .setValue(shapecolor[0])
+     .setValue( color(red(shapecolor[0]), green(shapecolor[0]), blue(shapecolor[0]) ))
      .setGroup(main)
      .hide()
      ;
+     
+  shapecolorAlphaSaveLabel  = gui.addNumberbox("shapecolorAlphaSaveLabel" )
+     .setPosition(0, 0)
+     .setValue(alpha(shapecolor[0]))
+     .setGroup(main)
+     .hide()
+     ;
+
   styleSaveLabel = gui.addNumberbox("styleSaveLabel" )
      .setPosition(0, 0)
      .setValue((int(globalStyle)))
@@ -933,7 +951,6 @@ void setupGUI() {
   //settingsFilelist not created yet. Created on userinput (Key 0)
   //settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
 
-  
   formatDropdown.bringToFront();
   penner_sca.bringToFront();
   penner_rot.bringToFront();
@@ -1332,15 +1349,15 @@ void controlEvent(ControlEvent theEvent) {
     lastImgMapFrame();
   } 
   else if (theEvent.isFrom(bgcolorSaveLabel)) {
-    bgcolor[0] = int(bgcolorSaveLabel.getValue());
+    if(focused) {bgcolor[0] = int(bgcolorSaveLabel.getValue());} //set color on undo/redo/loadsettings
     bgcolorBang.setColorForeground(bgcolor[0]);
   }
-  else if (theEvent.isFrom(strokecolorSaveLabel)) {
-    strokecolor[0] = int(strokecolorSaveLabel.getValue());
+  else if (theEvent.isFrom(strokecolorSaveLabel) || theEvent.isFrom(strokecolorAlphaSaveLabel)) {
+    if(focused) {strokecolor[0] = color(int(strokecolorSaveLabel.getValue()), int(strokecolorAlphaSaveLabel.getValue()));} //""
     strokecolorBang.setColorForeground(strokecolor[0]);
   }
-  else if (theEvent.isFrom(shapecolorSaveLabel)) {
-    shapecolor[0] = int(shapecolorSaveLabel.getValue());
+  else if (theEvent.isFrom(shapecolorSaveLabel) || theEvent.isFrom(shapecolorAlphaSaveLabel)) {
+    if(focused) {shapecolor[0] = color(int(shapecolorSaveLabel.getValue()), int(shapecolorAlphaSaveLabel.getValue()));} //""
     shapecolorBang.setColorForeground(shapecolor[0]);
   }
   else if (theEvent.isFrom(styleSaveLabel)) {
@@ -1488,7 +1505,7 @@ void toggleRandom() {
 
 void changebgcolor(float i) {
   if(bg_copi == null) {
-    bg_copi = new ColorPicker(this, "backgroundcolor", 380, 300, bgcolor);
+    bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, false);
     String[] args = {"colorpicker1"};
     PApplet.runSketch(args, bg_copi);
   } else {
@@ -1499,7 +1516,7 @@ void changebgcolor(float i) {
 }
 void changestrokecolor(float i) {
   if(stroke_copi == null) {
-    stroke_copi = new ColorPicker(this, "strokecolor", 380, 300, strokecolor);
+    stroke_copi = new ColorPicker(this, "strokecolor", strokecolor);
     String[] args = {"colorpicker2"};
     PApplet.runSketch(args, stroke_copi);
   } else {
@@ -1510,7 +1527,7 @@ void changestrokecolor(float i) {
 }
 void changeshapecolor(float i) {
   if(shape_copi == null) {
-    shape_copi = new ColorPicker(this, "fillcolor", 380, 300, shapecolor);
+    shape_copi = new ColorPicker(this, "fillcolor", shapecolor);
     String[] args = {"colorpicker3"};
     PApplet.runSketch(args, shape_copi);
   } else {
