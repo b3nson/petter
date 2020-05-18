@@ -19,12 +19,13 @@ public class ColorPicker extends PApplet {
   PApplet parent;
   private ControlP5 cp5;
 
-  private int w = 380;
-  private int h = 285;
+  private int w = 390;//380
+  private int h = 275;//300
 
   private float hue = 0;
   private float sat = 0;
   private float bri = 0;
+  private float alp = 255;
 
   private color startCol;
   private color curCol;
@@ -35,20 +36,27 @@ public class ColorPicker extends PApplet {
   private boolean opened = true;
   private boolean preview = true;
   private boolean undoable = true;
+  private boolean showalpha = true;
 
-  private ColorSlider2DView satpick;
-  private ColorSlider1DView huepick;
   private Slider2D s2D;
-  private Slider s1D;
+  private Slider s1Dh, s1Da;
   private Textlabel rgbValueLabel, hsbValueLabel, hexValueLabel;
   private Button okButton, cancelButton;
   private Toggle previewToggle;
+  private Group infoui;
+
+  private PImage alphaChecker, curColChecker, startColChecker;
+  private PImage hueBuffer, satbriBuffer, alphaBuffer;
 
 
-  public ColorPicker(PApplet theParent, String theName, int theWidth, int theHeight, color[] col) {
+  public ColorPicker(PApplet theParent, String theName, color[] col, boolean showAlphaSlider) {
+    this(theParent, theName, col);
+    showalpha = showAlphaSlider;
+    w -= 25;
+  }
+
+  public ColorPicker(PApplet theParent, String theName, color[] col) {
     parent = theParent;
-    //w = theWidth;
-    //h = theHeight;
     startCol = col[0];
     curCol = col[0];
     srccol = col;
@@ -67,29 +75,24 @@ public class ColorPicker extends PApplet {
 
   void setup() {
     surface.setTitle(name);
-    colorMode(HSB);
     frameRate(25);
 
     cp5 = new ControlP5(this);
-    satpick = new ColorSlider2DView(this);
-    huepick = new ColorSlider1DView(this);
 
     s2D = cp5.addSlider2D("s2D")
       .setPosition(10, 10)
       .setSize(255, 255)
-      .setColorBackground(0)
       .setMaxX(255)
       .setMaxY(0)
       .setMinX(0)
       .setMinY(255)
       .setId(0)
-      .setView(satpick)
-      //.disableCrosshair()
+      .setColorBackground(color(255, 1))//0 for alpha does not work
       ;
     s2D.getCaptionLabel().hide();
     s2D.getValueLabel().hide();
 
-    s1D = cp5.addSlider("s1D")
+    s1Dh = cp5.addSlider("s1D")
       .setPosition(270, 10)
       .setSize(20, 255)
       .setRange(255, 0)
@@ -98,45 +101,75 @@ public class ColorPicker extends PApplet {
       .setHandleSize(1)
       .setId(1)
       .setScrollSensitivity(0.0392)
-      .setView(huepick)
+      .setColorBackground(color(255, 1))
       ;
-    s1D.getCaptionLabel().hide();
-    s1D.getValueLabel().hide();
+    s1Dh.getCaptionLabel().hide();
+    s1Dh.getValueLabel().hide();
 
+    if(showalpha) {
+      s1Da = cp5.addSlider("s1Da")
+        .setPosition(295, 10)
+        .setSize(20, 255)
+        .setRange(255, 0)
+        .setValue(128)
+        .setSliderMode(Slider.FLEXIBLE)
+        .setHandleSize(1)
+        .setId(5)
+        .setScrollSensitivity(0.0392)
+        .setColorBackground(color(255, 1))
+        ;
+      s1Da.getCaptionLabel().hide();
+      s1Da.getValueLabel().hide();
+    }
 
+    infoui = cp5.addGroup("infoui")
+           .setPosition(295, 0)
+           .hideBar()
+           ;
+    if(showalpha) {
+      infoui.setPosition(320, 0);
+    }
+           
     rgbValueLabel = cp5.addTextlabel("RGB" )
-      .setPosition(300, 104)
-      .setText("RGB")
+      .setPosition(-2, 98)
+      .setText("RGBA")
+      .setGroup(infoui)
       ;
 
     hsbValueLabel = cp5.addTextlabel("HSB" )
-      .setPosition(300, 140)
+      .setPosition(-2, 142)
       .setText("HSB")
+      .setGroup(infoui)
       ;
 
     hexValueLabel = cp5.addTextlabel("HEX" )
-      .setPosition(300, 176)
+      .setPosition(-2, 176)
       .setText("HEX")
+      .setGroup(infoui)
       ;
 
     previewToggle = cp5.addToggle("preview")
       .setLabel("preview")
-      .setPosition(302, 196)
+      .setPosition(2, 196)
       .setSize(10, 10)
       .setValue(true)
       .setId(4)
+      .setGroup(infoui)
       ;
 
     okButton = cp5.addButton("OK")
-      .setPosition(300, 236)
+      .setPosition(0, 236)
       .setSize(40, 30)
       .setId(2)
+      .setGroup(infoui)
       ;
+      
     cancelButton = cp5.addButton("CANCEL")
       .setLabel("X")
-      .setPosition(342, 236)
+      .setPosition(42, 236)
       .setSize(18, 30)
       .setId(3)
+      .setGroup(infoui)
       ;
 
     ControllerProperties prop = cp5.getProperties();
@@ -146,9 +179,19 @@ public class ColorPicker extends PApplet {
     prop.remove(hexValueLabel);
     prop.remove(hsbValueLabel);
     prop.remove(rgbValueLabel);
-    prop.remove(s1D);
+    prop.remove(s1Dh);
+    prop.remove(s1Da);
     prop.remove(s2D);
 
+    if(showalpha) {
+      alphaChecker = createCheckerboard(20, 255);
+      curColChecker = createCheckerboard(60, 40);
+      startColChecker = createCheckerboard(60, 40);
+    }
+    updateHueBuffer();
+    
+    colorMode(RGB, 255);
+    
     show();
     smooth();
   } //end setup
@@ -159,36 +202,21 @@ public class ColorPicker extends PApplet {
   // ---------------------------------------------------------------------------
 
   void draw() {
-    colorMode(HSB);
+
     background(50);
     noStroke();
 
+    if(showalpha) image(curColChecker, 320, 10);
     fill(curCol);
-    rect(300, 10, 60, 40);
-
+    rect(showalpha?320:295, 10, 60, 40);
+    if(showalpha) image(startColChecker, 320, 50);
     fill(startCol);
-    rect(300, 50, 60, 40);
+    rect(showalpha?320:295, 50, 60, 40);
 
-    loadPixels();
-    
-    int xpos = (int)s1D.getPosition()[0];
-    int ypos = (int)s1D.getPosition()[1];
-    for ( int j = 0; j < 255; j++ ) {
-      for ( int i = 0; i < 20; i++ ) {
-        pixels[(j+ypos)*width+(i+xpos)] = color( j, 255, 255 );
-      }
-    }
-    
-    xpos = (int)s2D.getPosition()[0];
-    ypos = (int)s2D.getPosition()[1];
-    for ( int j = 0; j < 255; j++ ) {
-      for ( int i = 0; i < 255; i++ ) {
-        pixels[(i+ypos)*width+(j+xpos)] = color( hue, j, 255 - i );
-      }
-    }
-
-    updatePixels();
-    colorMode(RGB);
+    image(satbriBuffer, s2D.getPosition()[0], s2D.getPosition()[1]);
+    image(hueBuffer, s1Dh.getPosition()[0], s1Dh.getPosition()[1]);
+    if(showalpha) image(alphaChecker, s1Da.getPosition()[0], s1Da.getPosition()[1]);
+    if(showalpha) image(alphaBuffer, s1Da.getPosition()[0], s1Da.getPosition()[1]);
   }
 
 
@@ -224,11 +252,12 @@ public class ColorPicker extends PApplet {
   }
 
   public void setExtColor(color ec) {
-    if(s1D != null) {
+    if(s1Dh != null) {
       curCol = ec;
       hue = hue(ec);
       sat = saturation(ec);
       bri = brightness(ec);
+      alp = alpha(ec);
       updatePreviewColor();
       initSliders(ec);
     }
@@ -250,31 +279,119 @@ public class ColorPicker extends PApplet {
   }
 
   private void updateColor() {
+    colorMode(RGB, 255);
     startCol = srccol[0];
     curCol = srccol[0];
   }
 
   private void updatePreviewColor() {
-    colorMode(HSB);
-    curCol =  color(hue, sat, bri);
+    colorMode(HSB, 255, 255, 255, 255);
+    color tmp = color(hue, sat, bri, alp);
+    colorMode(RGB, 255);
+    
+    curCol =  tmp;
+    
     if (preview) {
       srccol[0] = curCol;
     } else {
       srccol[0] = startCol;
     }
-    rgbValueLabel.setText("R " +(int)red(curCol) +"\nG " +(int)green(curCol) +"\nB " +(int)blue(curCol));
+    
+    String rgb = "R " +(int)red(curCol) +"\nG " +(int)green(curCol) +"\nB " +(int)blue(curCol);
+    if(showalpha) {
+      rgb += "\nA " +(int)alpha(curCol);
+    }
+    rgbValueLabel.setText(rgb);
     hsbValueLabel.setText("H " +(int)hue(curCol) +"\nS " +(int)saturation(curCol) +"\nB " +(int)brightness(curCol));
     hexValueLabel.setText(hex(curCol, 6));
-    colorMode(RGB);
   }
 
   private void initSliders(color c) {
+    colorMode(RGB, 255);
     hue = hue(c);
     sat = saturation(c);
     bri = brightness(c)-255;
-    s1D.setValue(hue);
+    alp = alpha(c);
+    s1Dh.setValue(hue);
     s2D.setArrayValue(new float[] {sat, bri});
+    if(showalpha) {
+      s1Da.setValue(alp);
+      updateAlphaBuffer();
+    }
+    updateSatBriBuffer();
   }
+
+
+  // ---------------------------------------------------------------------------
+  //  DRAW IMGBUFFERS
+  // ---------------------------------------------------------------------------
+  
+  private void updateAlphaBuffer() {
+    if(alphaBuffer == null) { alphaBuffer = createImage(20, 255, ARGB); }
+    alphaBuffer.loadPixels();
+    for ( int j = 0; j < 255; j++ ) {
+      for ( int i = 0; i < 20; i++ ) {
+        alphaBuffer.pixels[j*20+i] = color( red(curCol), green(curCol), blue(curCol), j );
+      }
+    }
+    alphaBuffer.updatePixels();
+  }
+
+  private void updateSatBriBuffer() {
+    colorMode(HSB, 255);
+    if(satbriBuffer == null) { satbriBuffer = createImage(255, 255, RGB); }
+    satbriBuffer.loadPixels();
+    for ( int j = 0; j < 255; j++ ) {
+      for ( int i = 0; i < 255; i++ ) {
+        satbriBuffer.pixels[i*255+j] = color( hue, j, 255 - i );
+      }
+    }
+    satbriBuffer.updatePixels();
+    colorMode(RGB, 255);
+  }
+
+  private void updateHueBuffer() {
+    colorMode(HSB, 255);
+    if(hueBuffer == null) { hueBuffer = createImage(20, 255, RGB); }
+    hueBuffer.loadPixels();
+    for ( int j = 0; j < 255; j++ ) {
+      for ( int i = 0; i < 20; i++ ) {
+        hueBuffer.pixels[j*20+i] = color( j, 255, 255 );
+      }
+    }
+    hueBuffer.updatePixels();
+    colorMode(RGB, 255);
+  }
+  
+
+PImage createCheckerboard(int ww, int hh) { 
+  int sw = ww;
+  int sh = hh;
+  int col;
+  int[] checkercolors = {64, 192};
+  boolean swap = false;
+  PImage checkerboard = createImage(sw, sh, RGB);
+  checkerboard.loadPixels();
+
+  for ( int j = 0; j < sh; j++ ) {
+    if(j%10 < 5) {
+      swap = true;
+    } else {
+      swap = false;
+    }
+    for ( int i = 0; i < sw; i++ ) {
+      int px = (j*sw)+i;
+      if(px%10 < 5) {
+        col = checkercolors[swap?0:1];
+      } else {
+        col = checkercolors[swap?1:0];
+      }
+      checkerboard.pixels[px] = color(col);
+    }
+  }  
+  checkerboard.updatePixels();
+  return checkerboard;
+}
 
 
   // ---------------------------------------------------------------------------
@@ -287,9 +404,16 @@ public class ColorPicker extends PApplet {
       sat = (theEvent.getController().getArrayValue())[0];
       bri = (theEvent.getController().getArrayValue())[1];
       updatePreviewColor();
+      if(showalpha) updateAlphaBuffer();
       break;
       case(1): //hue
       hue = (theEvent.getController().getValue());
+      updatePreviewColor();
+      if(showalpha) updateAlphaBuffer();
+      updateSatBriBuffer();
+      break;
+      case(5): //alpha
+      alp = (theEvent.getController().getValue());
       updatePreviewColor();
       break;
       case(2): //OK
@@ -336,61 +460,5 @@ public class ColorPicker extends PApplet {
   void mouseWheel(MouseEvent event) {
     float e = event.getAmount();
     cp5.setMouseWheelRotation((int)e);
-  }
-}
-
-
-
-// ---------------------------------------------------------------------------
-//  CUSTOM SLIDER-VIEWS (to prevent drawing of controller-background)
-// ---------------------------------------------------------------------------
-
-class ColorSlider2DView implements ControllerView<Slider2D> {
-  PApplet theApplet;
-
-  public ColorSlider2DView(PApplet a) {
-    theApplet = a;
-  }
-
-  public void display(PGraphics g, Slider2D theController) {
-    theApplet.noStroke();
-    //draw no background
-    //theApplet.fill(theController.getColor().getBackground());
-    theApplet.noFill();
-    theApplet.rect(0, 0, width, height);
-
-    if (theController.isCrosshairs) {
-      if (theController.isInside()) {
-        theApplet.fill(theController.getColor().getBackground());
-      } else {
-        theApplet.fill(theController.getColor().getForeground());
-      }
-      theApplet.rect(0, (int) (theController.getCursorY() + theController.getCursorHeight() / 2), (int) theController.getWidth(), 1);
-      theApplet.rect((int) (theController.getCursorX() + theController.getCursorWidth() / 2), 0, 1, (int) theController.getHeight());
-    }
-
-    theApplet.fill(theController.getColor().getActive());
-    theApplet.rect((int) theController.getCursorX(), (int) theController.getCursorY(), (int) theController.getCursorWidth(), (int) theController.getCursorHeight());
-
-    theController.getCaptionLabel().draw(g, 0, 0, theController);
-    theController.getValueLabel().draw(g, 0, 0, theController);
-  }
-}
-
-
-class ColorSlider1DView implements ControllerView<Slider> {
-  PApplet theApplet;
-
-  public ColorSlider1DView(PApplet a) {
-    theApplet = a;
-  }
-
-  public void display(PGraphics g, Slider theController) {
-    //draw no background
-    //theApplet.fill(theController.getColor().getBackground());
-    theApplet.noStroke();
-    //drawHandle
-    theApplet.fill(theController.isInside() ? theController.getColor().getActive() : theController.getColor().getForeground());
-    theApplet.rect(0, theController.getHeight() - theController.getValuePosition() - theController.getHandleSize(), theController.getWidth(), theController.getHandleSize());
   }
 }
