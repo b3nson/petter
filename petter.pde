@@ -362,32 +362,29 @@ void draw() {
     for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
       pushMatrix();
       
-      //Distribute Tiles
-      translate( (tilewidth/2)+(tilewidth*(loopDirection?i:j)), (tileheight/2)+(tileheight*(loopDirection?j:i)) ); //swap i/j for xalign/yaligndraw
+      //Standard tile distribution
+      float tilex = (tilewidth/2)+(tilewidth*(loopDirection?i:j));
+      float tiley = (tileheight/2)+(tileheight*(loopDirection?j:i));
+      translate(tilex, tiley);
 
       if ((mapScale || mapRot || mapTra) && (map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) ) {
         int cropX = (int)map((imgMap.a - imgMap.x), 0, imgMap.ww, 0, map.get(mapIndex).width);
         int cropY = (int)map((imgMap.b - imgMap.y), 0, imgMap.hh, 0, map.get(mapIndex).height);
         int cropW = (int)map(imgMap.e, 0, imgMap.ww, 0, map.get(mapIndex).width ) + cropX;
         int cropH = (int)map(imgMap.f, 0, imgMap.hh, 0, map.get(mapIndex).height) + cropY;
-
-        absScreenX = screenX(0, 0);
-        absScreenY = screenY(0, 0);
-        absScreenX = map(absScreenX, pageOffset, viewwidth-pageOffset, cropX, cropW ) ;
-        absScreenY = map(absScreenY, pageOffset, ((float(viewwidth-(2*pageOffset)) / viewwidth) * viewheight)+pageOffset, cropY, cropH );
-
+        absScreenX = map(tilex, 0, pagewidth, cropX, cropW ) ;
+        absScreenY = map(tiley, 0, pageheight, cropY, cropH );
         try {
           color col = map.get(mapIndex).pixels[(int)constrain(absScreenY, 0, map.get(mapIndex).height)*(int)map.get(mapIndex).width+(int)constrain(absScreenX, 0, map.get(mapIndex).width)];
-          if (col == color(0, 255, 0)) {
+          if (col == color(0, 255, 0)) { //green doesn't get mapped
             popMatrix();
             abscount++;
             continue;
           }
           //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
           mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
-          //mapValue = ( brightness(col) /255);
         } catch(Exception e) { //ArrayIndexOutOfBoundsException | NullPointerException
-          mapValue = 1f;
+          //mapValue = 0f;
         }
       }
 
