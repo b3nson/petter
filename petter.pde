@@ -359,7 +359,8 @@ void draw() {
   for (int i=0; i< (loopDirection?xtilenum:ytilenum); i++) {
     for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
       pushMatrix();
-
+      
+      //Distribute Tiles
       translate( (tilewidth/2)+(tilewidth*(loopDirection?i:j)), (tileheight/2)+(tileheight*(loopDirection?j:i)) ); //swap i/j for xalign/yaligndraw
 
       if ((mapScale || mapRot || mapTra) && (map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) ) {
@@ -388,10 +389,9 @@ void draw() {
         }
       }
 
-      float xx = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
-      float yy = absTransY*(map(i, 0f, (float)ytilenum, 0, (float)ytilenum ));
-      totaltranslatex = xx;
-      totaltranslatey = yy;
+      //TRANSLATE-------------------------------------
+      totaltranslatex = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
+      totaltranslatey = absTransY*(map(i, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
       if (mapTra && map != null) {
         try {
           float tvx = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransX*10); 
@@ -400,12 +400,12 @@ void draw() {
           totaltranslatey += tvy;
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
-        totaltranslatex += ease(TRA, abscount, -relTransX, relTransX, tilecount);
-        totaltranslatey += ease(TRA, abscount, relTransY, -relTransY, tilecount);
+        totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
+        totaltranslatey += (ease(TRA, abscount, 0, -relTransY, tilecount)+(relTransY/2));
       }
       translate(totaltranslatex, totaltranslatey);
 
-
+      //ROTATE-------------------------------------
       totalrotate = absRot;
       if (mapRot && map != null) {
         try {
@@ -417,7 +417,7 @@ void draw() {
       }
       rotate(radians(totalrotate));
 
-
+      //SCALE-------------------------------------
       totalscale = absScale;
       if (mapScale && map != null) {
         try {
@@ -425,10 +425,10 @@ void draw() {
           totalscale *= invertMap ? (1-relsca) : relsca;
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
-        relsca = ease(SCA, abscount, 1.0, relScale, tilecount);
-        totalscale *= relsca;
+        totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);;
       }
       scale(totalscale*tilescale);
+
 
       if (random) {
         s = svg.get(int(random(svg.size())));
@@ -437,7 +437,6 @@ void draw() {
       }
         
       if (s != null) {
-        //colorMode(RGB, 255);
         shape(s);
       }
 
@@ -450,7 +449,6 @@ void draw() {
       abscount++;
     }
   } //for i
-
   popMatrix();
 
   // ---------------------------------------------------
