@@ -143,14 +143,14 @@ String[][] formats = {
   { "Q1", "800", "800" }, 
   { "FullHD", "1920", "1080" }
 };
-int fwidth = 595;
-int fheight = 842;
-int pdfwidth = 595;
-int pdfheight = 842;
+int viewwidth = 595;
+int viewheight = 842;
+int pagewidth = 595;
+int pageheight = 842;
 int guiwidth = 310;
 
-int manualNFOX = fwidth/2;
-int manualNFOY = fheight/6*5;
+int manualNFOX = viewwidth/2;
+int manualNFOY = viewheight/6*5;
 
 // ---------------------------------------------------------------------------
 //  SETUP
@@ -257,7 +257,7 @@ void draw() {
   }
   if (exportCurrentFrame) {
     if (!guiExportNow) {
-      formatName = pdfwidth +"x" +pdfheight;
+      formatName = pagewidth +"x" +pageheight;
       if (!sequencing && !batchmode) {
         saveSettings(timestamp +"_" +name);
       }
@@ -266,19 +266,19 @@ void draw() {
       filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname;
       if (exportFormat) {
         filename += ".pdf";
-        pdf = (PGraphicsPDF) createGraphics(pdfwidth, pdfheight, PDF, filename);
+        pdf = (PGraphicsPDF) createGraphics(pagewidth, pageheight, PDF, filename);
       } else {
         filename += ".svg";
-        pdf = (PGraphicsSVG) createGraphics(pdfwidth, pdfheight, SVG, filename);
+        pdf = (PGraphicsSVG) createGraphics(pagewidth, pageheight, SVG, filename);
       }
     } else {
       filename = outputpath +subfolder +timestamp +"_" +formatName +"_" +name +seqname +"+GUI";
       if (exportFormat) {
         filename += ".pdf";
-        pdf = (PGraphicsPDF) createGraphics(pdfwidth+guiwidth, pdfheight, PDF, filename);
+        pdf = (PGraphicsPDF) createGraphics(pagewidth+guiwidth, pageheight, PDF, filename);
       } else {
         filename += ".svg";
-        pdf = (PGraphicsSVG) createGraphics(pdfwidth+guiwidth, pdfheight, SVG, filename);
+        pdf = (PGraphicsSVG) createGraphics(pagewidth+guiwidth, pageheight, SVG, filename);
       }
     }
 
@@ -317,14 +317,14 @@ void draw() {
   pushStyle();
   fill(bgcolor[0]);
   noStroke();
-  rect(0, 0, fwidth, fheight);
+  rect(0, 0, viewwidth, viewheight);
   popStyle();
 
   if (!exportCurrentFrame || (exportCurrentFrame && guiExportNow)) {
     pushStyle();
     fill(50);
     noStroke();
-    rect(fwidth, 0, guiwidth, fheight);
+    rect(viewwidth, 0, guiwidth, viewheight);
     popStyle();
   }
 
@@ -341,16 +341,18 @@ void draw() {
   abscount = 0;
   if (!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
   else { tilecount = ytilenum-1; }
-  pageOffset = int(absPageOffset * zoom);
-  tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
+  pageOffset = int(absPageOffset);
+  tilewidth  = (float(pagewidth) / xtilenum);
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
 
   randomSeed(seed);
 
   pushMatrix();
-  translate(pageOffset, pageOffset);
-  translate(manualOffsetX, manualOffsetY);
+  scale(zoom);
+  translate(pageOffset + manualOffsetX, pageOffset + manualOffsetY);
+  scale(((float)(pagewidth-(2*pageOffset)) / (float)pagewidth)); //scale for offset
+  
 
   // ---------------------------------------------------
   // MAIN LOOP
@@ -371,8 +373,8 @@ void draw() {
 
         absScreenX = screenX(0, 0);
         absScreenY = screenY(0, 0);
-        absScreenX = map(absScreenX, pageOffset, fwidth-pageOffset, cropX, cropW ) ;
-        absScreenY = map(absScreenY, pageOffset, ((float(fwidth-(2*pageOffset)) / fwidth) * fheight)+pageOffset, cropY, cropH );
+        absScreenX = map(absScreenX, pageOffset, viewwidth-pageOffset, cropX, cropW ) ;
+        absScreenY = map(absScreenY, pageOffset, ((float(viewwidth-(2*pageOffset)) / viewwidth) * viewheight)+pageOffset, cropY, cropH );
 
         try {
           color col = map.get(mapIndex).pixels[(int)constrain(absScreenY, 0, map.get(mapIndex).height)*(int)map.get(mapIndex).width+(int)constrain(absScreenX, 0, map.get(mapIndex).width)];
@@ -466,7 +468,7 @@ void draw() {
   if (exportCurrentFrame && guiExportNow) { 
     if (ref != null && showRef) {
       shapeMode(CORNER);
-      shape(ref, 0, 0, fwidth, fheight);
+      shape(ref, 0, 0, viewwidth, viewheight);
     }
     gui.getWindow().draw(pdf);
     scaleGUI(tmpzoom); //recreate prev zoom
@@ -507,7 +509,7 @@ void draw() {
   if (!exportCurrentFrame) {
     if (ref != null && showRef) {
       shapeMode(CORNER);
-      shape(ref, 0, 0, fwidth, fheight);
+      shape(ref, 0, 0, viewwidth, viewheight);
     }  
     gui.draw();
   }
@@ -525,7 +527,7 @@ void draw() {
 
 
   if(colorpicking) {
-    if ((mouseX <= fwidth) && (mouseY <= fheight)) {
+    if ((mouseX <= viewwidth) && (mouseY <= viewheight)) {
       if( (bg_copi != null && bg_copi.isOpen()) ||
           (stroke_copi != null && stroke_copi.isOpen()) ||
           (shape_copi != null && shape_copi.isOpen()) ||
@@ -578,7 +580,7 @@ void mouseMoved() {
 }
 
 void mousePressed() {
-  if ((mouseX <= fwidth) && (mouseY <= fheight)) {
+  if ((mouseX <= viewwidth) && (mouseY <= viewheight)) {
     dragAllowed = true;
     pmouseX = mouseX;
     pmouseY = mouseY;

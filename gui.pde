@@ -96,7 +96,7 @@ void setupGUI() {
 // ---------------------------------------------------------------------------
 
   main = gui.addGroup("main")
-           .setPosition(fwidth+12, 0)
+           .setPosition(viewwidth+12, 0)
            .hideBar()
            //.setBackgroundHeight(height-38)
            //.setWidth(guiwidth-24)
@@ -129,7 +129,7 @@ void setupGUI() {
      .setRange(20,2000)
      .setDecimalPrecision(0) 
      //.setMultiplier(0.1) // set the sensitifity of the numberbox
-     .setValue(pdfwidth)
+     .setValue(pagewidth)
      .setLock(true)
      .setLabelVisible(false)
      .setGroup(main)
@@ -142,7 +142,7 @@ void setupGUI() {
      .setRange(20,2000)
      .setDecimalPrecision(0) 
      //.setMultiplier(0.1) // set the sensitifity of the numberbox
-     .setValue(pdfheight)
+     .setValue(pageheight)
      .setLock(true)
      .setGroup(main)
      ;
@@ -850,7 +850,7 @@ void setupGUI() {
    
   info = gui.addGroup("info")
     .setSize(guiwidth, infoheight)
-    .setPosition(fwidth, fheight-infoheight)
+    .setPosition(viewwidth, viewheight-infoheight)
     .setBackgroundHeight(infoheight+2)
     .setBackgroundColor(color(45))
     .hideBar()
@@ -870,8 +870,8 @@ void setupGUI() {
      ;
 
   exportinfo = gui.addGroup("exportinfo")
-    .setSize(fwidth, infoheight)
-    .setPosition(0, fheight-infoheight)
+    .setSize(viewwidth, infoheight)
+    .setPosition(0, viewheight-infoheight)
     .setBackgroundHeight(infoheight+2)
     .setBackgroundColor(230)
     .hideBar()
@@ -891,16 +891,16 @@ void setupGUI() {
 // ---------------------------------------------------------------------------   
   
   help = gui.addGroup("help")
-    .setSize(fwidth, fheight+1)
+    .setSize(viewwidth, viewheight+1)
     .setPosition(0, 0)
-    .setBackgroundHeight(fheight+1)
+    .setBackgroundHeight(viewheight+1)
     .setBackgroundColor(color(0, 170))
     .hideBar()
     .close();
 
   helptextbox = gui.addGroup("helptextbox")
     .setSize(helpwidth, helpheight)
-    .setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2)
+    .setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2)
     .setBackgroundHeight(helpheight)
     .setBackgroundColor(color(255))
     .hideBar()
@@ -1234,7 +1234,7 @@ void controlEvent(ControlEvent theEvent) {
       int ww = int(formats[num-1][pageOrientation?1:2]);
       int hh = int(formats[num-1][pageOrientation?2:1]);
    
-      if(ww != fwidth || hh != fheight) {
+      if(ww != viewwidth || hh != viewheight) {
         wBox.setValue(ww);
         hBox.setValue(hh);
         canvasResize();  
@@ -1267,11 +1267,11 @@ void controlEvent(ControlEvent theEvent) {
   } 
   else if(theEvent.isFrom(pageOrientationToggle)) {
     if(pageOrientation) {
-      if((fwidth > fheight)) {
+      if((viewwidth > viewheight)) {
         togglePageOrientation();
       }
     } else {
-      if((fwidth < fheight)) {
+      if((viewwidth < viewheight)) {
         togglePageOrientation();
       }      
     }
@@ -1405,12 +1405,12 @@ void toggleMenu() {
   showMENU = !(gui.getGroup("main").isOpen());
   insets = frame.getInsets();
   if (showMENU) {
-    surface.setSize(fwidth+guiwidth, fheight+insets.top);
+    surface.setSize(viewwidth+guiwidth, viewheight+insets.top);
     //frame.setSize(fwidth+guiwidth, fheight+insets.top);
     style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.getGroup("main").open();
   } else {
-    surface.setSize(fwidth, fheight+insets.top);    
+    surface.setSize(viewwidth, viewheight+insets.top);    
     //frame.setSize(fwidth, fheight+insets.top);
     gui.getGroup("main").close();
   }
@@ -1419,7 +1419,7 @@ void toggleMenu() {
 void toggleHelp() {  
   showHELP = !(gui.getGroup("help").isOpen());
   if (showHELP) {
-    helptextbox.setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2);
+    helptextbox.setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
     help.open();
   } else {
     help.close();
@@ -1473,11 +1473,11 @@ void reorderGuiElements() {
   
   int scrollpos = (int)main.getPosition()[1];
   if(scrollpos < 0) {
-    if( (lastguielem.getPosition()[1] < (fheight-infoheight))) { 
+    if( (lastguielem.getPosition()[1] < (viewheight-infoheight))) { 
       main.setPosition(main.getPosition()[0], 0);
     } else {
-      if(scrollpos < -1*((int)lastguielem.getPosition()[1] - (fheight-infoheight))) {
-        int newy = (int)lastguielem.getPosition()[1] - (fheight-infoheight);
+      if(scrollpos < -1*((int)lastguielem.getPosition()[1] - (viewheight-infoheight))) {
+        int newy = (int)lastguielem.getPosition()[1] - (viewheight-infoheight);
         main.setPosition(main.getPosition()[0], -newy);
       }
     }
@@ -1608,11 +1608,11 @@ void togglePageOrientation() {
   xtilenum = ytilenum;
   ytilenum = tmp;
   
-  tilewidth  = (float(fwidth -  (2*pageOffset)) / xtilenum);
+  tilewidth  = (float(viewwidth -  (2*pageOffset)) / xtilenum);
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
   
-  while((tileheight * ytilenum) > fheight) {
+  while((tileheight * ytilenum) > viewheight) {
      ytilenum--; 
   }
   
@@ -1703,38 +1703,37 @@ void updateImgMap() {
 // ---------------------------------------------------------------------------
 
 void canvasResize() {
-  pdfwidth = (int) wBox.getValue();
-  pdfheight = (int) hBox.getValue();
-  resizeFrame(pdfwidth, pdfheight);
+  pagewidth = (int) wBox.getValue();
+  pageheight = (int) hBox.getValue();
+  resizeFrame(pagewidth, pageheight);
 }
 
 void resizeFrame(int newW, int newH) {
-  fwidth = int(newW*zoom);
-  fheight = int(newH*zoom); 
+  viewwidth = int(newW*zoom);
+  viewheight = int(newH*zoom); 
 
   insets = frame.getInsets();
   
   if (showMENU) {
-    newW = fwidth+guiwidth;
-    newH = fheight+insets.top;
+    newW = viewwidth+guiwidth;
+    newH = viewheight+insets.top;
   } else {
-    newW = fwidth;
-    newH = fheight+insets.top;
+    newW = viewwidth;
+    newH = viewheight+insets.top;
   }
   surface.setSize(newW, newH);
-  //frame.setSize(newW, newH);
-  gui.getGroup("main").setPosition(fwidth+12, main.getPosition()[1]);
-  gui.getGroup("help").setSize(fwidth, fheight+1);
-  gui.getGroup("helptextbox").setPosition((fwidth-helpwidth)/2, (fheight-helpheight)/2);
-  gui.getGroup("info").setPosition(fwidth, fheight-infoheight);
+  gui.getGroup("main").setPosition(viewwidth+12, main.getPosition()[1]);
+  gui.getGroup("help").setSize(viewwidth, viewheight+1);
+  gui.getGroup("helptextbox").setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
+  gui.getGroup("info").setPosition(viewwidth, viewheight-infoheight);
   
-  dropSVGadd.updateTargetRect(fwidth, fheight);
-  dropSVGrep.updateTargetRect(fwidth, fheight);
-  dropSVGnfo.updateTargetRect(fwidth, fheight);
-  dropIMG.updateTargetRect(fwidth, fheight);
+  dropSVGadd.updateTargetRect(viewwidth, viewheight);
+  dropSVGrep.updateTargetRect(viewwidth, viewheight);
+  dropSVGnfo.updateTargetRect(viewwidth, viewheight);
+  dropIMG.updateTargetRect(viewwidth, viewheight);
   
-  exportinfo.setSize(fwidth, infoheight);
-  exportinfo.setPosition(0, fheight-infoheight);
+  exportinfo.setSize(viewwidth, infoheight);
+  exportinfo.setPosition(0, viewheight-infoheight);
   
   reorderGuiElements();
   
@@ -1745,7 +1744,7 @@ void resizeFrame(int newW, int newH) {
 void scaleGUI(float newzoom) {
   zoom = newzoom;
   zoomLabel.setText("ZOOM: " +nf(zoom, 1, 1));
-  resizeFrame(pdfwidth, pdfheight);
+  resizeFrame(pagewidth, pageheight);
 }
 
 void scaleGUI(boolean bigger) {
@@ -1757,22 +1756,22 @@ void scaleGUI(boolean bigger) {
     }
   }
   zoomLabel.setText("ZOOM: " +nf(zoom, 1, 1));
-  resizeFrame(pdfwidth, pdfheight);
+  resizeFrame(pagewidth, pageheight);
 }
 
 //somewhat confusing and dirty
 void menuScroll(int amount) {
   amount *= 2;
-  if(!gui.isMouseOver() && mouseX > fwidth) {
+  if(!gui.isMouseOver() && mouseX > viewwidth) {
     int scrollpos = (int)main.getPosition()[1];
-    if( (lastguielem.getPosition()[1]-scrollpos > (fheight-infoheight))) {
+    if( (lastguielem.getPosition()[1]-scrollpos > (viewheight-infoheight))) {
       if(amount < 0) {
           if(scrollpos < 0) {
             scrollpos = (scrollpos-amount) > 0 ? 0 : scrollpos-amount;
             main.setPosition(main.getPosition()[0], scrollpos); 
           }
       } else {
-        if((lastguielem.getPosition()[1]+scrollpos) > (fheight-infoheight)) { //scroll upwards when longer
+        if((lastguielem.getPosition()[1]+scrollpos) > (viewheight-infoheight)) { //scroll upwards when longer
           main.setPosition(main.getPosition()[0], scrollpos-amount); 
         }
       }

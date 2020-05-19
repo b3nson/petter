@@ -38,7 +38,7 @@ class DropTargetSVG extends DropListener {
   DropTargetSVG(PApplet app, int mode) {
     this.app = app;
     this.mode = mode;
-    setTargetRect(fwidth, fheight, mode);
+    setTargetRect(viewwidth, viewheight, mode);
   }
 
   void draw() {
@@ -150,8 +150,8 @@ class DropTargetIMG extends DropListener {
 
   DropTargetIMG(PApplet app) {
     this.app = app;
-    cw = fwidth;
-    ch = fheight;
+    cw = viewwidth;
+    ch = viewheight;
     setTargetRect(cw+10, 10, guiwidth-20, height-20);
   }
 
@@ -280,14 +280,14 @@ class GuiImage extends Canvas {
 
           if (map.get(mapIndex).height > map.get(mapIndex).width) {
             e = ww;
-            f = (int) ((float)ww * ((float)fheight) / (float)fwidth);
+            f = (int) ((float)ww * ((float)viewheight) / (float)viewwidth);
             if (f > hh) {
               f = hh;
-              e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
+              e = (int) ((float)hh * ((float)viewwidth) / (float)viewheight);
             }
           } else {
             f = hh;
-            e = (int) ((float)hh * ((float)fwidth) / (float)fheight);
+            e = (int) ((float)hh * ((float)viewwidth) / (float)viewheight);
           }
         }
 
@@ -357,7 +357,7 @@ class GuiImage extends Canvas {
               e = mx-a+(offsetx);
               if (shiftPressed) {
                 stroke(colCornerOver);
-                f = (int) ((float)e * ((float)fheight) / (float)fwidth);
+                f = (int) ((float)e * ((float)viewheight) / (float)viewwidth);
               } else {
                 f = my-b+(offsety);
               }
