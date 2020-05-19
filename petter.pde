@@ -393,10 +393,8 @@ void draw() {
       totaltranslatey = absTransY*(map(i, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
       if (mapTra && map != null) {
         try {
-          float tvx = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransX*10); 
-          float tvy = (invertMap?(1.0-mapValue):mapValue) * ((float)relTransY*10); 
-          totaltranslatex += tvx;
-          totaltranslatey += tvy;
+          totaltranslatex += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransX));
+          totaltranslatey += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransY));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
@@ -408,8 +406,7 @@ void draw() {
       totalrotate = absRot;
       if (mapRot && map != null) {
         try {
-          float rv = mapValue * (relRot); 
-          totalrotate += rv;
+          totalrotate += ((invertMap?(1.0-mapValue):mapValue) * (relRot));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
@@ -420,8 +417,7 @@ void draw() {
       totalscale = absScale;
       if (mapScale && map != null) {
         try {
-          relsca = mapValue * (relScale);
-          totalscale *= invertMap ? (1-relsca) : relsca;
+          totalscale *= ((invertMap?(1.0-mapValue):mapValue) * (relScale));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
         totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);;
