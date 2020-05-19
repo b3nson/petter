@@ -467,7 +467,12 @@ void draw() {
     scaleGUI(tmpzoom); //recreate prev zoom
     tmpzoom = 0f;
   }
-
+  
+  if(showScrollbar && !guiExportNow) {
+    fill(c1);
+    rect(viewwidth+guiwidth - 2, scrollbarY, 2, scrollbarHeight);
+  }
+  
   if (exportCurrentFrame) {
     pdf.popMatrix(); 
     pdf.popStyle();

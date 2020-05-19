@@ -27,6 +27,7 @@ boolean showANIMATE = false;
 boolean showHELP = false;
 boolean batchmode = false;
 boolean batchnow = false;
+boolean showScrollbar = false;
 int batchwait = 1;
 
 int c = 0;
@@ -46,6 +47,10 @@ int helpwidth = 330;
 int helpheight = ceil(68 * 9.6); //68 lines in help.txt
 int infoheight = 22;
 int scrollOffset = 0;
+float scrollbarWidth = 2;
+float scrollbarHeight = 0;
+float scrollbarY = 0;
+
 float mapwidth = 0;
 float mapheight = 0;
 float showExportLabelTimer = 0;
@@ -1475,13 +1480,25 @@ void reorderGuiElements() {
   if(scrollpos < 0) {
     if( (lastguielem.getPosition()[1] < (viewheight-infoheight))) { 
       main.setPosition(main.getPosition()[0], 0);
+      showScrollbar = false;
     } else {
       if(scrollpos < -1*((int)lastguielem.getPosition()[1] - (viewheight-infoheight))) {
         int newy = (int)lastguielem.getPosition()[1] - (viewheight-infoheight);
         main.setPosition(main.getPosition()[0], -newy);
+        showScrollbar = true;
       }
     }
-  }  
+  } else {
+     if((lastguielem.getPosition()[1] >= (viewheight-infoheight))) {
+       showScrollbar = true; 
+     } else {
+       showScrollbar = false; 
+     }
+  }
+  if(showScrollbar) {
+    scrollbarHeight = ( (viewheight-infoheight) / lastguielem.getPosition()[1] ) * (viewheight-infoheight);
+    scrollbarY = (-main.getPosition()[1] / lastguielem.getPosition()[1]) * (viewheight-infoheight);
+  }
 }
 
 void showExportLabel(boolean state) {
@@ -1780,6 +1797,7 @@ void menuScroll(int amount) {
           main.setPosition(main.getPosition()[0], 0);
       }
     }
+    scrollbarY = (-main.getPosition()[1] / lastguielem.getPosition()[1]) * (viewheight-infoheight);
   }
 }
 
