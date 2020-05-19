@@ -1,7 +1,7 @@
 /**
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
- * Copyright (C) 2015 LAFKON/Benjamin Stephan
+ * Copyright (C) 2020 LAFKON/Benjamin Stephan
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ TileEditor tileEditor;
 Memento undo;
 PGraphics pdf; 
 
-String version = "0.4";
+String version = "0.5";
 String settingspath = "i/settings/";
 String outputpath = "o/";
 String tmppath = "tmp/";
