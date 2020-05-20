@@ -681,25 +681,24 @@ void setupGUI() {
      .setGroup(style)
      ;
      strokeToggle.getCaptionLabel().setPadding(8,-14);
-     
-  strokeModeToggle = gui.addToggle("strokeMode")
-     .setLabel("")
-     .setValue(strokeMode)
-     .setPosition(indentX+h+h/2,indentY)
-     .setSize(h,h)
-     .setMode(ControlP5.SWITCH)
-     .setGroup(style)
-     ;
-     
+
    strokecolorBang = gui.addBang("changestrokecolor")
      .setLabel("C")
-     .setPosition(indentX+3*h,indentY)
+     .setPosition(indentX+h+h/2,indentY)
      .setSize(h, h)
      .setGroup(style)
      ;
      strokecolorBang.getCaptionLabel().setPadding(8,-14);
      strokecolorBang.setColorForeground(strokecolor[0]);
-
+     
+  strokeModeToggle = gui.addToggle("strokeMode")
+     .setLabel("")
+     .setValue(strokeMode)
+     .setPosition(indentX+3*h,indentY)
+     .setSize(h,h)
+     .setMode(ControlP5.SWITCH)
+     .setGroup(style)
+     ;
   
   strokeWeightSlider = gui.addSlider("customStrokeWeight")
      .setLabel("strokeWeight")
