@@ -83,7 +83,6 @@ float absRot = 0;
 float relRot = 90;
 float absScale = 1.0;
 float relScale = 0.0;
-float relsca = 0.0;
 float totaltranslatex = 0.0;
 float totaltranslatey = 0.0;
 float totalscale = 0.0;
@@ -420,10 +419,9 @@ void draw() {
           totalscale *= ((invertMap?(1.0-mapValue):mapValue) * (relScale));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
-        totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);;
+        totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);
       }
       scale(totalscale*tilescale);
-
 
       if (random) {
         s = svg.get(int(random(svg.size())));
