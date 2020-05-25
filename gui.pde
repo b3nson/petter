@@ -65,12 +65,13 @@ ArrayList settingFiles;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
-Group main, style, animate, help, helptextbox, info, exportinfo;
+Group main, style, styleLineGroup, animate, help, helptextbox, info, exportinfo;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
 Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
+RadioButton linecapRadioButton, linejoinRadioButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
 Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
@@ -133,7 +134,7 @@ void setupGUI() {
      .setLabel("")
      .setRange(20,2000)
      .setDecimalPrecision(0) 
-     //.setMultiplier(0.1) // set the sensitifity of the numberbox
+     //.setMultiplier(0.1)
      .setValue(pagewidth)
      .setLock(true)
      .setLabelVisible(false)
@@ -146,7 +147,7 @@ void setupGUI() {
      .setLabel("")
      .setRange(20,2000)
      .setDecimalPrecision(0) 
-     //.setMultiplier(0.1) // set the sensitifity of the numberbox
+     //.setMultiplier(0.1)
      .setValue(pageheight)
      .setLock(true)
      .setGroup(main)
@@ -715,7 +716,7 @@ void setupGUI() {
      .setGroup(style)
      ;   
      styleLabel(strokeWeightSlider, "strokeoptions");     
-     
+  
   fillToggle = gui.addToggle("customFill")
      .setLabel("X")
      .setValue(customFill)
@@ -735,7 +736,54 @@ void setupGUI() {
      styleLabel(shapecolorBang, "filloptions");
      shapecolorBang.setColorForeground(shapecolor[0]);
 
-   
+   styleLineGroup = gui.addGroup("linejoin/linecap")
+     .setPosition(10, 100)
+     .setPosition(indentX,indentY+sep+sep)
+     .setBackgroundHeight(100)
+     .setSize(0,0)
+     .disableCollapse()
+     .open()
+     .setGroup(style)
+     ;
+     controlP5.Label l = styleLineGroup.getCaptionLabel();
+     l.setHeight(20);
+     l.getStyle().setPadding(4, 4, 4, 4);
+     l.getStyle().setMargin(8, 0, 0, 190);
+     l.setColorBackground(c2);
+  
+   linejoinRadioButton = gui.addRadioButton("linejoinmode")
+     .setPosition(0,0)
+     .setSize(28,12)
+     .setItemsPerRow(3)
+     .setSpacingColumn(1)
+     .addItem("RND", ROUND)
+     .addItem("MTR", MITER)
+     .addItem("BVL", BEVEL)
+     .setGroup(styleLineGroup)
+     .activate(0)
+     ;
+     for(Toggle t:linejoinRadioButton.getItems()) {
+       t.getCaptionLabel().getStyle().moveMargin(-1,0,0,-33);
+       t.getCaptionLabel().getStyle().movePadding(0,0,0,8);
+     }
+  
+   linecapRadioButton = gui.addRadioButton("linecapmode")
+     .setPosition(94,0)
+     .setSize(28,12)
+     .setItemsPerRow(3)
+     .setSpacingColumn(1)
+     .addItem("SQR", SQUARE)
+     .addItem("PRJ", PROJECT)
+     .addItem("rnd", ROUND)
+     .setGroup(styleLineGroup)
+     .activate(0)
+     ;
+     for(Toggle t:linecapRadioButton.getItems()) {
+       t.getCaptionLabel().getStyle().moveMargin(-1,0,0,-33);
+       t.getCaptionLabel().getStyle().movePadding(0,0,0,8);
+     }
+     
+     
 // ---------------------------------------------------------------------------
 //  GUI SETUP - ANIMATE MENU
 // ---------------------------------------------------------------------------   
@@ -968,6 +1016,8 @@ void setupGUI() {
   cprop.remove(bgcolorBang);
   cprop.remove(strokecolorBang);
   cprop.remove(shapecolorBang);
+  cprop.remove(linecapRadioButton);
+  cprop.remove(linejoinRadioButton);
   cprop.remove(animate);
   cprop.remove(animSetInButton);
   cprop.remove(animSetOutButton);
@@ -1467,9 +1517,39 @@ void enableGlobalStyle() {
   reorderGuiElements();
 }
 
+void linejoinmode(int m) {
+  if(m == -1) {
+    List<Toggle> items = linejoinRadioButton.getItems();
+    int i = 0;
+    for(Toggle item : items){
+      if(int(item.internalValue()) == joinmode ) {
+        linejoinRadioButton.activate(i);
+        items = null;
+        break;
+      }
+      i++;
+    }
+  } else { joinmode = m; }
+}
+
+void linecapmode(int m) {
+  if(m == -1) {
+    List<Toggle> items = linecapRadioButton.getItems();
+    int i = 0;
+    for(Toggle item : items){
+      if(int(item.internalValue()) == capmode ) {
+        linecapRadioButton.activate(i);
+        items = null;
+        break;
+      }
+      i++;
+    }
+  } else { capmode = m; }
+}
+
 void reorderGuiElements() {
   int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+10;
-  int styleheight = style.isOpen() ? 70 : 4;
+  int styleheight = style.isOpen() ? 90 : 4;
   int animateheight = animate.isOpen() ? 70 : 4;
   style.setPosition(indentX, imgMap.y+imgmapheight+h);
   animate.setPosition(indentX, style.getPosition()[1]+gapY+styleheight);

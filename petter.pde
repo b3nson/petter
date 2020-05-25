@@ -119,6 +119,8 @@ int rotType = 0;
 int scaType = 0;
 int traType = 0;
 int animType = 0;
+int joinmode = ROUND;
+int capmode = SQUARE;
 
 boolean exportCurrentFrame = false;
 boolean exportOnNextLoop = false;
