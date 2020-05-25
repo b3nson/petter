@@ -261,6 +261,8 @@ public class TileShape extends PShape implements Tile {
       } else {
         g.noFill();
       }
+      g.strokeJoin(joinmode);
+      g.strokeCap(capmode);
     }
   }
 
