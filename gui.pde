@@ -1347,7 +1347,12 @@ void controlEvent(ControlEvent theEvent) {
     mapScale = false;
     mapRot = false;
     mapTra = false;
+    mapTraToggle.setValue(0);
+    mapScaleToggle.setValue(0);
+    mapRotToggle.setValue(0);
+    invertMapToggle.setValue(0);
     map.clear();
+    mapIndex = 0;
     //map = null;
     updateImgMap();
   } 

@@ -213,6 +213,7 @@ class DropTargetIMG extends DropListener {
           //map.add(theDropEvent.loadImage()); //fails in Processing 3.x
           map.add(requestImage(path));
         }
+        mapIndex = 0;
         imgMap.setup(app);
         updateImgMap();
       } else {
@@ -293,9 +294,7 @@ class GuiImage extends Canvas {
 
         try {
           g.image(map.get(mapIndex), x, y, ww, hh); //problem during svg-export
-        } 
-        catch(NullPointerException e) {
-        }
+        } catch(NullPointerException e) {}
 
         wtmp = map.get(mapIndex).width;
 
