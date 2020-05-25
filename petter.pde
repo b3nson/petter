@@ -384,6 +384,8 @@ void draw() {
           }
           //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
           mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
+          //histogram/contrast
+          mapValue = constrain(map(mapValue, constrain(imgmapHistogramRange.getLowValue(), 0, 0.9999), constrain(imgmapHistogramRange.getHighValue(), 0.0001,1f) , 0f , 1f), 0.0, 1.0);
         } catch(Exception e) { //ArrayIndexOutOfBoundsException | NullPointerException
           //mapValue = 0f;
         }

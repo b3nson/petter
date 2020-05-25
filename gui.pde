@@ -67,6 +67,7 @@ Boolean shiftProcessed = false;
 
 Group main, style, styleLineGroup, animate, help, helptextbox, info, exportinfo;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
+Range imgmapHistogramRange;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
 Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
@@ -653,6 +654,19 @@ void setupGUI() {
      ;
   mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
 
+
+  imgmapHistogramRange = gui.addRange("contrast")
+             .setBroadcast(false) 
+             .setPosition(indentX, ypos)
+             .setSize(180,14)
+             .setHandleSize(10)
+             .setRange(0f,1f)
+             .setRangeValues(0f,1f)
+             .setBroadcast(true)
+             .setGroup("main")
+             .hide()
+             ;
+  styleLabel(imgmapHistogramRange, "contrast");
 
   //ypos += gapY+imgMapHeight;
 
@@ -1551,7 +1565,8 @@ void reorderGuiElements() {
   int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+10;
   int styleheight = style.isOpen() ? 90 : 4;
   int animateheight = animate.isOpen() ? 70 : 4;
-  style.setPosition(indentX, imgMap.y+imgmapheight+h);
+  imgmapHistogramRange.setPosition(indentX, imgMap.y+imgmapheight-7);
+  style.setPosition(indentX, imgMap.y+imgmapheight+h+h);
   animate.setPosition(indentX, style.getPosition()[1]+gapY+styleheight);
   lastguielem.setPosition(indentX, animate.getPosition()[1]+h/2+animateheight);
   
@@ -1727,6 +1742,7 @@ void updateImgMap() {
     mapScaleToggle.show();
     mapTraToggle.show();
     invertMapToggle.show();
+    imgmapHistogramRange.show();
     penner_sca.setVisible(!mapScale);
     penner_rot.setVisible(!mapRot);
     penner_tra.setVisible(!mapTra);
@@ -1753,6 +1769,7 @@ void updateImgMap() {
       mapScaleToggle.hide();
       mapTraToggle.hide();
       invertMapToggle.hide();
+      imgmapHistogramRange.hide();
       mapFramePrevButton.hide();
       mapFrameNextButton.hide();
       mapFrameFirstButton.hide();
