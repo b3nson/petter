@@ -299,8 +299,8 @@ class GuiImage extends Canvas {
 
         wtmp = map.get(mapIndex).width;
 
-        mx = mouseX-(int)main.getPosition()[0]-1;
-        my = mouseY-(int)main.getPosition()[1]-3;
+        mx = mouseX- (int)imgmapGroup.getAbsolutePosition()[0] -1;
+        my = mouseY- (int)imgmapGroup.getAbsolutePosition()[1] -3;
 
         stroke(c1);
         strokeWeight(1f);

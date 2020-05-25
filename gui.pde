@@ -65,7 +65,7 @@ ArrayList settingFiles;
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
-Group main, style, styleLineGroup, animate, help, helptextbox, info, exportinfo;
+Group main, imgmapGroup, style, animate, help, helptextbox, info, exportinfo, styleLineGroup;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 Range imgmapHistogramRange;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
@@ -80,7 +80,7 @@ Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
 Numberbox bgcolorSaveLabel, strokecolorSaveLabel, strokecolorAlphaSaveLabel, shapecolorSaveLabel, shapecolorAlphaSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
 Slider offsetxSaveLabel, offsetySaveLabel;
-
+Label tmp;
 
 
 // ---------------------------------------------------------------------------
@@ -91,8 +91,6 @@ void setupGUI() {
   gui.setColorActive(c1);
   gui.setColorBackground(bg);
   gui.setColorForeground(color(30));
-  //gui.setColorLabel(color(0, 255, 0));
-  //gui.setColorValue(color(255, 0, 0));
   gui.setColorCaptionLabel(color(255, 255, 255));
   gui.setColorValueLabel(color(255, 255, 255));
 
@@ -105,10 +103,6 @@ void setupGUI() {
   main = gui.addGroup("main")
            .setPosition(viewwidth+12, 0)
            .hideBar()
-           //.setBackgroundHeight(height-38)
-           //.setWidth(guiwidth-24)
-           //.setBackgroundWidth(guiwidth-12)
-           //.setBackgroundColor(color(255,50))
            .close()
            ;
    
@@ -546,78 +540,84 @@ void setupGUI() {
    .setGroup(main)
    .hide()
    ;
-
+  
+  ypos += gapY;
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP - IMGMAP MENU
 // ---------------------------------------------------------------------------
   
-  ypos += gapY;
-  imgMap = new GuiImage(indentX, ypos);
+  imgmapGroup = gui.addGroup("imgmap")
+           .setPosition(0, ypos)
+           .setBackgroundHeight(0)
+           .activateEvent(true)
+           .setGroup(main)
+           .open()
+           .setSize(0,0)
+           .disableCollapse()
+           .hide()
+           ;
+           
+  tmp = imgmapGroup.getCaptionLabel();
+  tmp.setHeight(20);
+  tmp.getStyle().setPadding(4, 4, 4, 4);
+  tmp.getStyle().setMargin(8, 0, 0, 180);
+  tmp.setColorBackground(c2);
+  
+  imgMap = new GuiImage(0, 20);
   imgMap.pre();
-  main.addCanvas(imgMap);
-
-  ypos -= gapY-2;
+  imgmapGroup.addCanvas(imgMap);
 
   mapScaleToggle = gui.addToggle("sca")
      .setValue(mapScale)
-     .setPosition(indentX,ypos)
+     .setPosition(indentX,0)
      .setSize(h,h)
-     .setGroup(main)
+     .setGroup(imgmapGroup)
      .setLabel("S")
-     .hide();
      ;
-   mapScaleToggle.getCaptionLabel().setPadding(8,-14);
+  mapScaleToggle.getCaptionLabel().setPadding(8,-14);
 
   mapRotToggle = gui.addToggle("rot")
      .setValue(mapRot)
-     .setPosition(indentX +1*h,ypos)
+     .setPosition(indentX +1*h,0)
      .setSize(h,h)
-     .setGroup(main)
+     .setGroup(imgmapGroup)
      .setLabel("R")
-     .hide()
      ;
-   mapRotToggle.getCaptionLabel().setPadding(8,-14);
+  mapRotToggle.getCaptionLabel().setPadding(8,-14);
 
   mapTraToggle = gui.addToggle("tra")
      .setValue(mapTra)
-     .setPosition(indentX +2*h,ypos)
+     .setPosition(indentX +2*h,0)
      .setSize(h,h)
-     .setGroup(main)
+     .setGroup(imgmapGroup)
      .setLabel("T")
-     .hide()
      ;
-   mapTraToggle.getCaptionLabel().setPadding(8,-14);
+  mapTraToggle.getCaptionLabel().setPadding(8,-14);
      
   invertMapToggle = gui.addToggle("invertMap")
      .setValue(invertMap)
-     .setPosition(indentX +4*h,ypos)
+     .setPosition(indentX +4*h,0)
      .setSize(h,h)
-     .setGroup(main)
+     .setGroup(imgmapGroup)
      .setLabel("I")
-     .hide()
      ;
-   invertMapToggle.getCaptionLabel().setPadding(8,-14);
+  invertMapToggle.getCaptionLabel().setPadding(8,-14);
 
   closeImgMapButton = gui.addButton("X")
      .setValue(0)
-     .setPosition(indentX+w-h,ypos)
+     .setPosition(indentX+w-h,0)
      .setSize(h, h)
-     .setGroup("main")
-     .hide()
+     .setGroup(imgmapGroup)
      ;
-   closeImgMapButton.getCaptionLabel().setPadding(8,-14);
-
-
- ypos += gapY+imgMapHeight;
-
+  closeImgMapButton.getCaptionLabel().setPadding(8,-14);
 
   mapFramePrevButton = gui.addButton("f<")
      .setLabel("<")
      .setValue(0)
-     .setPosition(indentX+w+4,ypos)
+     .setPosition(indentX+w+4,imgMapHeight+h)
      .setSize(h, h)
-     .setGroup("main")
+     .setGroup(imgmapGroup)
      .hide()
      ;
   mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
@@ -625,21 +625,19 @@ void setupGUI() {
   mapFrameNextButton = gui.addButton("f>")
      .setLabel(">")
      .setValue(0)
-     .setPosition(indentX+w+h+8,ypos)
+     .setPosition(indentX+w+h+8,imgMapHeight+h)
      .setSize(h, h)
-     .setGroup("main")
+     .setGroup(imgmapGroup)
      .hide()
      ;
   mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
 
-  ypos += gapY;
-
   mapFrameFirstButton = gui.addButton("ffirst")
      .setLabel("<I")
      .setValue(0)
-     .setPosition(indentX+w+4,ypos)
+     .setPosition(indentX+w+4,imgMapHeight+h+gapY)
      .setSize(h, h)
-     .setGroup("main")
+     .setGroup(imgmapGroup)
      .hide()
      ;
   mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
@@ -647,28 +645,26 @@ void setupGUI() {
   mapFrameLastButton = gui.addButton("flast")
      .setLabel("I>")
      .setValue(0)
-     .setPosition(indentX+w+h+8,ypos)
+     .setPosition(indentX+w+h+8,imgMapHeight+h+gapY)
      .setSize(h, h)
-     .setGroup("main")
+     .setGroup(imgmapGroup)
      .hide()
      ;
   mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
 
-
   imgmapHistogramRange = gui.addRange("contrast")
              .setBroadcast(false) 
-             .setPosition(indentX, ypos)
+             .setPosition(indentX, imgMapHeight) // gets repositioned on imgload
              .setSize(180,14)
              .setHandleSize(10)
              .setRange(0f,1f)
              .setRangeValues(0f,1f)
              .setBroadcast(true)
-             .setGroup("main")
-             .hide()
+             .setGroup(imgmapGroup)
              ;
   styleLabel(imgmapHistogramRange, "contrast");
 
-  //ypos += gapY+imgMapHeight;
+  ypos = (int)imgmapGroup.getPosition()[1]+gapY+imgMapHeight;
 
 
 // ---------------------------------------------------------------------------
@@ -676,7 +672,7 @@ void setupGUI() {
 // ---------------------------------------------------------------------------
 
  style = gui.addGroup("style")
-           .setPosition(indentX,ypos)
+           .setPosition(indentX, ypos)
            .setBackgroundHeight(100)
            .activateEvent(true)
            .setGroup(main)
@@ -684,8 +680,6 @@ void setupGUI() {
            ;
   if(globalStyle) style.open();
   else style.close();
-  
-  ypos += gapY;
 
   strokeToggle = gui.addToggle("customStroke")
      .setLabel("X")
@@ -759,11 +753,11 @@ void setupGUI() {
      .open()
      .setGroup(style)
      ;
-     controlP5.Label l = styleLineGroup.getCaptionLabel();
-     l.setHeight(20);
-     l.getStyle().setPadding(4, 4, 4, 4);
-     l.getStyle().setMargin(8, 0, 0, 190);
-     l.setColorBackground(c2);
+     tmp = styleLineGroup.getCaptionLabel();
+     tmp.setHeight(20);
+     tmp.getStyle().setPadding(4, 4, 4, 4);
+     tmp.getStyle().setMargin(8, 0, 0, 190);
+     tmp.setColorBackground(c2);
   
    linejoinRadioButton = gui.addRadioButton("linejoinmode")
      .setPosition(0,0)
@@ -797,6 +791,7 @@ void setupGUI() {
        t.getCaptionLabel().getStyle().movePadding(0,0,0,8);
      }
      
+     ypos += gapY;
      
 // ---------------------------------------------------------------------------
 //  GUI SETUP - ANIMATE MENU
@@ -1475,7 +1470,7 @@ void toggleMenu() {
   if (showMENU) {
     surface.setSize(viewwidth+guiwidth, viewheight+insets.top);
     //frame.setSize(fwidth+guiwidth, fheight+insets.top);
-    style.setPosition(indentX, imgMap.y+imgMapHeight+h);
+//style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.getGroup("main").open();
   } else {
     surface.setSize(viewwidth, viewheight+insets.top);    
@@ -1562,11 +1557,12 @@ void linecapmode(int m) {
 }
 
 void reorderGuiElements() {
-  int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+10;
+  int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+h+gapY;
   int styleheight = style.isOpen() ? 90 : 4;
   int animateheight = animate.isOpen() ? 70 : 4;
-  imgmapHistogramRange.setPosition(indentX, imgMap.y+imgmapheight-7);
-  style.setPosition(indentX, imgMap.y+imgmapheight+h+h);
+  
+  imgmapHistogramRange.setPosition(indentX, imgMap.y+(int)mapheight+3);
+  style.setPosition(indentX, imgmapGroup.getPosition()[1]+imgmapheight+gapY); //ypos = (int)imgmapGroup.getPosition()[1]+gapY+imgMapHeight;
   animate.setPosition(indentX, style.getPosition()[1]+gapY+styleheight);
   lastguielem.setPosition(indentX, animate.getPosition()[1]+h/2+animateheight);
   
@@ -1735,14 +1731,7 @@ void updateImgMap() {
   if(map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) {
     mapwidth = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(h));
     mapheight = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(w));
-    //style.setPosition(indentX, imgMap.y+mapheight+h);
-//    style.setPosition(indentX, imgMap.y + ((int)(((float)map.get(mapIndex).height / (float)map.get(mapIndex).width) * (float)(w))) +h);
-    closeImgMapButton.show();
-    mapRotToggle.show();
-    mapScaleToggle.show();
-    mapTraToggle.show();
-    invertMapToggle.show();
-    imgmapHistogramRange.show();
+    imgmapGroup.show();
     penner_sca.setVisible(!mapScale);
     penner_rot.setVisible(!mapRot);
     penner_tra.setVisible(!mapTra);
@@ -1763,13 +1752,7 @@ void updateImgMap() {
   } else {
       mapwidth = 0;
       mapheight = 0;
-      //style.setPosition(indentX, imgMap.y+gapY);
-      closeImgMapButton.hide();
-      mapRotToggle.hide();
-      mapScaleToggle.hide();
-      mapTraToggle.hide();
-      invertMapToggle.hide();
-      imgmapHistogramRange.hide();
+      imgmapGroup.hide();
       mapFramePrevButton.hide();
       mapFrameNextButton.hide();
       mapFrameFirstButton.hide();
