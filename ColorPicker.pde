@@ -38,6 +38,7 @@ public class ColorPicker extends PApplet {
   private boolean preview = true;
   private boolean undoable = true;
   private boolean showalpha = true;
+  private boolean hideafternextloop = false;
 
   private Slider2D s2D;
   private Slider s1Dh, s1Da;
@@ -261,6 +262,11 @@ public class ColorPicker extends PApplet {
     image(hueBuffer, s1Dh.getPosition()[0], s1Dh.getPosition()[1]);
     if(showalpha) image(alphaChecker, s1Da.getPosition()[0], s1Da.getPosition()[1]);
     if(showalpha) image(alphaBuffer, s1Da.getPosition()[0], s1Da.getPosition()[1]);
+    
+    if(hideafternextloop) { 
+      hideafternextloop = false;
+      hideNow(); 
+    }
   }
 
 
@@ -277,11 +283,15 @@ public class ColorPicker extends PApplet {
   }
 
   public void hide() {
+    hideafternextloop = true;
+  }
+  
+  public void hideNow() {
     this.noLoop();
     surface.setVisible(false);
     opened = false;
   }
-
+  
   public void show() {
     this.loop();
     updateColor();
