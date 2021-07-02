@@ -58,7 +58,7 @@ public class ColorPicker extends PApplet {
   public ColorPicker(PApplet theParent, String theName, color[] col, boolean showAlphaSlider) {
     this(theParent, theName, col);
     showalpha = showAlphaSlider;
-    w -= 25;
+    if(!showalpha) { w -= 25; }
   }
 
   public ColorPicker(PApplet theParent, String theName, color[] col, color[] recents) {
