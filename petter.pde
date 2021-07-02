@@ -59,6 +59,7 @@ ArrayList<PImage> map;
 PShape ref;
 PShape nfo;
 PShape s;
+PImage checker;
 
 int mapIndex = 0;
 int absPageOffset = 25;
@@ -169,6 +170,8 @@ void setup() {
   
   PImage pettericon = loadImage("i/icon.png");
   surface.setIcon(pettericon);
+
+  checker = createCheckerboard(200, 200);
 
   smooth();
   shapeMode(CENTER);
@@ -312,6 +315,14 @@ void draw() {
       shapecolorBang.setColorForeground(shapecolor[0]);
       shapecolorSaveLabel.setValue( color(red(shapecolor[0]), green(shapecolor[0]), blue(shapecolor[0]) ));
       shapecolorAlphaSaveLabel.setValue(alpha(shapecolor[0]));   
+    }
+  }
+
+  if(alpha(bgcolor[0])!= 255f && !exportCurrentFrame) { // draw checkerboard in gui when bgcolor has alpha
+    for(int j = 0; j < viewheight; j+=200) {
+      for(int i = 0; i < viewwidth; i+=200) {
+        image(checker, i, j);
+      }
     }
   }
 

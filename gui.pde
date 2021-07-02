@@ -1617,7 +1617,7 @@ void toggleRandom() {
 
 void changebgcolor(float i) {
   if(bg_copi == null) {
-    bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, false, recentcolors);
+    bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, true, recentcolors);
     String[] args = {"colorpicker1"};
     PApplet.runSketch(args, bg_copi);
   } else {
@@ -2058,6 +2058,36 @@ public void loadSystemFonts() {
   print("Loading system fonts... ");
   systemfonts = PFont.list();
   println("DONE");
+}
+
+PImage createCheckerboard(int ww, int hh) { 
+  int sw = ww;
+  int sh = hh;
+  int col;
+  int quadsize = 10;
+  int[] checkercolors = {150, 180};
+  boolean swap = false;
+  PImage checkerboard = createImage(sw, sh, RGB);
+  checkerboard.loadPixels();
+
+  for ( int j = 0; j < sh; j++ ) {
+    if(j%(quadsize*2) < quadsize) {
+      swap = true;
+    } else {
+      swap = false;
+    }
+    for ( int i = 0; i < sw; i++ ) {
+      int px = (j*sw)+i;
+      if(px%(quadsize*2) < quadsize) {
+        col = checkercolors[swap?0:1];
+      } else {
+        col = checkercolors[swap?1:0];
+      }
+      checkerboard.pixels[px] = color(col);
+    }
+  }  
+  checkerboard.updatePixels();
+  return checkerboard;
 }
 
 float ease(int type, float a, float b, float c, float d) {
