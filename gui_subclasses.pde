@@ -390,6 +390,40 @@ class GuiImage extends Canvas {
 }
 
 
+// ---------------------------------------------------------------------------
+//  ColorBangView
+// ---------------------------------------------------------------------------
+
+class ColorBangView implements ControllerView<Bang> {
+  
+  public void display( PGraphics g , Bang c ) {
+    //draw checkerboard 
+    g.fill(64);
+    g.rect(0, 0, 10, 10);
+    g.rect(10, 10, 10, 10);
+    g.fill(192);
+    g.rect(10, 0, 10, 10);
+    g.rect(0, 10, 10, 10);
+
+    if (c.isActive()) {
+      g.fill(c.getColor().getActive());
+    } else {
+      g.fill(c.getColor().getForeground());
+    }
+
+    g.rect(0, 0, c.getWidth(), c.getHeight());
+    
+    if (c.isLabelVisible()) {    
+      int x = c.getWidth()/2 - c.getCaptionLabel().getWidth()/2;
+      int y = c.getHeight()/2 - c.getCaptionLabel().getHeight()/2 - 1;
+      translate(x, y);
+      
+      if(brightness(c.getColor().getForeground()) < 175) { c.getCaptionLabel().setColor(255); } 
+      else { c.getCaptionLabel().setColor(0); }
+      c.getCaptionLabel().draw(g);
+    }
+  }
+}
 
 
 // ---------------------------------------------------------------------------

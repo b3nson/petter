@@ -209,9 +209,10 @@ void setupGUI() {
      .setSize(h, h)
      .setGroup(main)
      ;
-     //styleLabel(bgcolorBang, "BG");
-     bgcolorBang.getCaptionLabel().setPadding(8,-14);
-     bgcolorBang.setColorForeground(bgcolor[0]);
+   bgcolorBang.setView(new ColorBangView());
+   bgcolorBang.setColorForeground(bgcolor[0]);
+
+     
    indentX += h+12;
  
    showGuiExportToggle = gui.addToggle("guiExport")
@@ -697,7 +698,7 @@ void setupGUI() {
      .setSize(h, h)
      .setGroup(style)
      ;
-     strokecolorBang.getCaptionLabel().setPadding(8,-14);
+     strokecolorBang.setView(new ColorBangView());
      strokecolorBang.setColorForeground(strokecolor[0]);
      
   strokeModeToggle = gui.addToggle("strokeMode")
@@ -736,12 +737,12 @@ void setupGUI() {
      fillToggle.getCaptionLabel().setPadding(8,-14);
 
    shapecolorBang = gui.addBang("changeshapecolor")
-     .setLabel("filloptions")
+     .setLabel("C")
      .setPosition(indentX+h+h/2,indentY+sep)
      .setSize(h, h)
      .setGroup(style)
      ;
-     styleLabel(shapecolorBang, "filloptions");
+     shapecolorBang.setView(new ColorBangView());
      shapecolorBang.setColorForeground(shapecolor[0]);
 
    styleLineGroup = gui.addGroup("linejoin/linecap")
