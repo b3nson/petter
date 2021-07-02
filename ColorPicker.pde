@@ -437,20 +437,22 @@ PImage createCheckerboard(int ww, int hh) {
   int sw = ww;
   int sh = hh;
   int col;
+  int quadsize = 5;
+
   int[] checkercolors = {64, 192};
   boolean swap = false;
   PImage checkerboard = createImage(sw, sh, RGB);
   checkerboard.loadPixels();
 
   for ( int j = 0; j < sh; j++ ) {
-    if(j%10 < 5) {
+    if(j%(quadsize*2) < quadsize) {
       swap = true;
     } else {
       swap = false;
     }
     for ( int i = 0; i < sw; i++ ) {
       int px = (j*sw)+i;
-      if(px%10 < 5) {
+      if(px%(quadsize*2) < quadsize) {
         col = checkercolors[swap?0:1];
       } else {
         col = checkercolors[swap?1:0];
