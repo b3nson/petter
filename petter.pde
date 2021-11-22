@@ -460,6 +460,7 @@ void draw() {
   // ---------------------------------------------------
 
   if (nfo != null && showNfo && nfoOnTop) {
+    pushStyle();
     shapeMode(CENTER); 
     pushMatrix();
     scale(zoom);
@@ -467,12 +468,15 @@ void draw() {
     scale(nfoscale);
     shape(nfo);
     popMatrix();
+    popStyle();
   }
 
   if (exportCurrentFrame && guiExportNow) { 
     if (ref != null && showRef) {
+      pushStyle();
       shapeMode(CORNER);
       shape(ref, 0, 0, viewwidth, viewheight);
+      popStyle();
     }
     gui.getWindow().draw(pdf);
     scaleGUI(tmpzoom); //recreate prev zoom
@@ -517,8 +521,10 @@ void draw() {
 
   if (!exportCurrentFrame) {
     if (ref != null && showRef) {
+      pushStyle();
       shapeMode(CORNER);
       shape(ref, 0, 0, viewwidth, viewheight);
+      popStyle();
     }  
     gui.draw();
   }
