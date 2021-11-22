@@ -721,7 +721,7 @@ void setupGUI() {
      .snapToTickMarks(false)
      //.setDecimalPrecision(2)
      //.setScrollSensitivity(0.004)
-     .setSensitivity(0.004)
+     .setScrollSensitivity(0.004)
      .setGroup(style)
      ;   
      styleLabel(strokeWeightSlider, "strokeoptions");     
@@ -1616,7 +1616,7 @@ void toggleRandom() {
   seed = mouseX;
 }
 
-void changebgcolor(float i) {
+void changebgcolor() {
   if(bg_copi == null) {
     bg_copi = new ColorPicker(this, "backgroundcolor", bgcolor, true, recentcolors);
     String[] args = {"colorpicker1"};
@@ -1627,7 +1627,7 @@ void changebgcolor(float i) {
   colorpicking = true;
 
 }
-void changestrokecolor(float i) {
+void changestrokecolor() {
   if(stroke_copi == null) {
     stroke_copi = new ColorPicker(this, "strokecolor", strokecolor, recentcolors);
     String[] args = {"colorpicker2"};
@@ -1638,7 +1638,7 @@ void changestrokecolor(float i) {
   colorpicking = true;
 
 }
-void changeshapecolor(float i) {
+void changeshapecolor() {
   if(shape_copi == null) {
     shape_copi = new ColorPicker(this, "fillcolor", shapecolor, recentcolors);
     String[] args = {"colorpicker3"};

@@ -545,7 +545,7 @@ PImage createCheckerboard(int ww, int hh) {
   }
 
   void mouseWheel(MouseEvent event) {
-    float e = event.getAmount();
+    float e = event.getCount();
     cp5.setMouseWheelRotation((int)e);
   }
 }

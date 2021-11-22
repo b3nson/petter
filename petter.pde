@@ -722,7 +722,7 @@ void keyReleased() {
 }
 
 void mouseWheel(MouseEvent event) {
-  float e = event.getAmount();
+  float e = event.getCount();
   if (keysDown[CONTROL]) {
     nfoscale += e/100;
   } else {

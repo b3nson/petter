@@ -653,7 +653,7 @@ class TileEditor extends PApplet {
   }
 
   private void deleteTile(int index) {    
-    if(svglength > 1) { 
+    if(svglength > 0) { 
       tileeditorshapelist.remove(index);
       svglength = tileeditorshapelist.size();
       if (svgindex > svglength-1) {
@@ -802,7 +802,7 @@ class TileEditor extends PApplet {
   
   private void explodeTile(Tile t, boolean recursive) {
     explodeOrigin = (Tile)t;
-    getSubShapes((PShape)t, t.getWidth(), t.getHeight());
+    getSubShapes((PShape)t, t.getWidth(), t.getHeight(), recursive);
     deleteTile(tileeditorshapelist.indexOf(explodeOrigin));
     explodeOrigin = null;
   }
@@ -819,18 +819,18 @@ class TileEditor extends PApplet {
     }    
     svgindex = tileeditorshapelist.indexOf(commonOrigin); 
     svg = tileeditorshapelist.get(svgindex);
+    
   }
 
-  private void getSubShapes(PShape s, float w, float h) {
+  private void getSubShapes(PShape s, float w, float h, boolean recursive) {
     PShape[] children = s.getChildren();
-
     for (int i = children.length-1; i >= 0; i--) {
       int t = children[i].getFamily();
       if (t == PShape.PATH || t == PShape.PRIMITIVE || t == PShape.GEOMETRY) {
         tileeditorshapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
       } else if (t == PConstants.GROUP) {
         if (recursive) {
-          getSubShapes(children[i], w, h);
+          getSubShapes(children[i], w, h, recursive);
         } else {
           if (children[i].getChildCount() != 0) {
             tileeditorshapelist.add(svgindex, ((PShape) new TileShape(children[i], w, h, explodeOrigin)) );
@@ -908,8 +908,8 @@ class TileEditor extends PApplet {
   }
 
   void fontsizeBoxCallback(CallbackEvent theEvent) {
-    if(theEvent.getAction() == ControlP5.ACTION_RELEASED || 
-       theEvent.getAction() == ControlP5.ACTION_RELEASEDOUTSIDE) {
+    if(theEvent.getAction() == ControlP5.ACTION_RELEASE || 
+       theEvent.getAction() == ControlP5.ACTION_RELEASE_OUTSIDE) {
        fontsize = (int) fontsizeBox.getValue();
        createFont();
        createLetter();
@@ -1001,7 +1001,7 @@ class TileEditor extends PApplet {
     hide(); 
   }
 
-  void changetypecolor(float i) {
+  void changetypecolor() {
     if(type_copi == null) {
       type_copi = new ColorPicker(this, "typecolor", typecolor, recentcolors);
       type_copi.setUndoable(false);
@@ -1127,7 +1127,7 @@ class TileEditor extends PApplet {
   }
 
   void mouseWheel(MouseEvent event) {
-    float e = event.getAmount();
+    float e = event.getCount();
     if (!typeEditorOpened) {
       if (keysDown[ALT]) {
         rotation -= e*0.0174533;
