@@ -65,7 +65,7 @@ public class TileSVG extends PShapeSVG implements Tile {
     handleLFKN_VDB();
     if(globalStyle) enableGlobalStyle();
   }
-  
+
   public void draw(PGraphics g) {
     try {
       g.pushMatrix();
@@ -139,7 +139,7 @@ public class TileSVG extends PShapeSVG implements Tile {
     } else {
       if(globalStyle) {
         this.enableStyle(); 
-       super.enableStyle();
+        super.enableStyle();
       }
     }
   }

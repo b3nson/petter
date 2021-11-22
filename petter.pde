@@ -541,21 +541,24 @@ void draw() {
           (stroke_copi != null && stroke_copi.isOpen()) ||
           (shape_copi != null && shape_copi.isOpen()) ||
           (type_copi != null && type_copi.isOpen())
-         ) { 
+         ) {
+        pushStyle();
         color c = get(mouseX, mouseY);
+        strokeWeight(1);
         noFill();
         stroke(255);
         rect(mouseX+13, mouseY+13, 22, 22);
         fill(c);
         stroke(0);
         rect(mouseX+14, mouseY+14, 20, 20);
+        popStyle();
        } else {
          colorpicking = false; 
        }
     }
   }
 
-
+  pushStyle();
   shapeMode(CENTER);
   noStroke();
 
@@ -563,6 +566,7 @@ void draw() {
   dropSVGrep.draw();
   dropSVGnfo.draw();
   dropIMG.draw();
+  popStyle();
 
   if (showHELP) {
     fpsLabel.setText(str((int)frameRate));

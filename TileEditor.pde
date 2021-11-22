@@ -450,13 +450,13 @@ class TileEditor extends PApplet {
     // --------------------------------------------------- draw tileditor
 
     if (!typeEditorOpened) {
-      
       background(50);
       shapeMode(CENTER);
 
       if (svg != null) {
         pushMatrix();
-
+        pushStyle();
+        
         translate(w/2, h/2);
         scale(zoom);
         strokeWeight(1f/zoom);
@@ -467,9 +467,11 @@ class TileEditor extends PApplet {
         float tw = tileeditorshapelist.get(0).width;
         float th = tileeditorshapelist.get(0).height;
         rect(0, 0, tw, th);
-        
+        popStyle();
+
         shape(svg);
-      
+        
+        pushStyle();
         //mastertilesizeBox stroke
         noFill();
         if (svgindex == 0) { 
@@ -487,6 +489,7 @@ class TileEditor extends PApplet {
         line( -10, 0, 10, 0 );
         line( 0, -10, 0, 10 );
 
+        popStyle();
         popMatrix();
       }
     } 
@@ -494,6 +497,7 @@ class TileEditor extends PApplet {
     // --------------------------------------------------- draw typeditor
 
     else { //typeEditorOpened
+      pushStyle();
       rectMode(CENTER);
       shapeMode(CORNER);
       background(50);
@@ -520,14 +524,16 @@ class TileEditor extends PApplet {
         translate(w/2, h/2);
         scale(zoom);
         translate(-w/2, -h/2);
-
+        popStyle();
+        
         if (ts != null) {   
           pushMatrix();
           translate(0, ((float)fontsize / 100f) * baseline);
           shape(ts, ((float)w/2f)-50, ((float)h/2)-50) ;
           popMatrix();
         }
-
+        
+        pushStyle();
         //typetilesizeBox stroke
         strokeWeight(1f/zoom);
         noFill();
@@ -536,7 +542,7 @@ class TileEditor extends PApplet {
         //mastertilesizeBox stroke
         stroke(0, 150, 255, 80);
         rect(w/2, h/2, tileeditorshapelist.get(0).width, tileeditorshapelist.get(0).height);
-
+        popStyle();
         popMatrix();
       }
       
