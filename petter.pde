@@ -37,9 +37,10 @@ ControlP5 gui;
 ControlFont font;
 SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
-DropTargetIMG dropIMG;
+//DropTargetIMG dropIMG;
 ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
+MapEditor mapEditor;
 Memento undo;
 PGraphics pdf; 
 
@@ -186,11 +187,11 @@ void setup() {
   dropSVGadd = new DropTargetSVG(this, ADDSVG);
   dropSVGrep = new DropTargetSVG(this, REPLACESVG);
   dropSVGnfo = new DropTargetSVG(this, NFOSVG);
-  dropIMG = new DropTargetIMG(this); 
+  //dropIMG = new DropTargetIMG(this); 
   drop.addDropListener(dropSVGadd);
   drop.addDropListener(dropSVGrep);
   drop.addDropListener(dropSVGnfo);
-  drop.addDropListener(dropIMG);
+  //drop.addDropListener(dropIMG);
 
   undo = new Memento(gui, 50);
 
@@ -571,7 +572,7 @@ void draw() {
   dropSVGadd.draw();
   dropSVGrep.draw();
   dropSVGnfo.draw();
-  dropIMG.draw();
+//dropIMG.draw();
   popStyle();
 
   if (showHELP) {
@@ -658,6 +659,8 @@ void keyPressed() {
     if (keysDown[DOWN] && keysDown[SHIFT]) ytilenum += 10;
     else ytilenum += 1;   
     updateytilenumSlider();
+  } else if (keysDown[TAB]) {      
+    toggleMenu();
   } else if (keysDown['Z']) {
     undo.undo();
   } else if (keysDown['Y']) {
@@ -667,8 +670,6 @@ void keyPressed() {
     generateName();
     generateTimestamp();
     if(showExportLabel) showExportLabel(false);
-  } else if (keysDown['M']) {
-    toggleMenu();
   } else if (keysDown['0']) {
     toggleSettings();
   } else if (keysDown['X']) {
@@ -711,7 +712,9 @@ void keyPressed() {
     nextImgMapFrame();
   } else if (keysDown['T']) {
     toggleTileEditor();
-  } else if (keysDown[',']) {
+  } else if (keysDown['M']) {
+    toggleMapEditor();
+  }else if (keysDown[',']) {
     changeSliderRange(false);
   } else if (keysDown['.']) {
     changeSliderRange(true);

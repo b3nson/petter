@@ -152,35 +152,40 @@ class DropTargetIMG extends DropListener {
     this.app = app;
     cw = viewwidth;
     ch = viewheight;
-    setTargetRect(cw+10, 10, guiwidth-20, height-20);
+    //setTargetRect(cw+10, 10, guiwidth-20, height-20);
+    setTargetRect(10,10,100,100);
   }
 
   void draw() {
-    if (over) {
-      fill(col);
-      rect(cw+10, 10, guiwidth-20, height-20);
-    }
+    //if (over) {
+      app.fill(col);
+      app.rect(10,10,100,100);
+      //app.rect(cw+10, 10, guiwidth-20, height-20);
+    //}
   }
 
   void updateTargetRect(int newwidth, int newheight) {
     cw = newwidth;
     ch = newheight;
-    setTargetRect(cw+10, 10, guiwidth-20, height-20);
+    //setTargetRect(cw+10, 10, guiwidth-20, height-20);
+    setTargetRect(10,10,100,100);
   }
 
   void dropEnter() {
-    over = true;
+ println("DROPENTER");
+    this.over = true;
   }
 
   void dropLeave() {
-    over = false;
+println("DROPLEAVE    ");
+    this.over = false;
   }
 
   String lastImgDropped = "x";
   String lastUrlDropped = "y";
 
   void dropEvent(DropEvent theDropEvent) {
-
+ println("DROPP");
     boolean url = theDropEvent.isURL();
     boolean file = theDropEvent.isFile();
     boolean img = theDropEvent.isImage();  

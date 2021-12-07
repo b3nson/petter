@@ -1665,7 +1665,22 @@ void toggleTileEditor() {
     }
   }
 }
-  
+
+void toggleMapEditor() {
+  if(mapEditor == null) {
+    mapEditor = new MapEditor(this, 500, 600);
+    String[] args = {"Petter - MAPEDITOR"};
+    PApplet.runSketch(args, mapEditor);
+    //mapEditor.setTileList(svg);
+  } else {
+    if(mapEditor.opened) {
+      mapEditor.hide(); 
+    } else {
+      mapEditor.show();
+    }
+  }
+} 
+ 
 void changeSliderRange(boolean increase) {
   if(gui.isMouseOver()) {
     try {
@@ -1832,7 +1847,7 @@ void resizeFrame(int newW, int newH) {
   dropSVGadd.updateTargetRect(viewwidth, viewheight);
   dropSVGrep.updateTargetRect(viewwidth, viewheight);
   dropSVGnfo.updateTargetRect(viewwidth, viewheight);
-  dropIMG.updateTargetRect(viewwidth, viewheight);
+  //dropIMG.updateTargetRect(viewwidth, viewheight);
   
   exportinfo.setSize(viewwidth, infoheight);
   exportinfo.setPosition(0, viewheight-infoheight);
