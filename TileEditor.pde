@@ -957,6 +957,7 @@ class TileEditor extends PApplet {
 
   public void show() {
     this.loop();
+    frameRate(30);
     opened = true;
     surface.setVisible(true);
     keysDown[lastKey] = false; //reset missing keyRelease

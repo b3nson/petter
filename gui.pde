@@ -1304,7 +1304,10 @@ void controlEvent(ControlEvent theEvent) {
         canvasResize();  
       }
     }
-  } 
+  }
+  else if (theEvent.isFrom("ytilenum") || theEvent.isFrom("xtilenum")) {
+    if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
+  }
   else if (theEvent.isFrom("rotType")) {
     rotType = (int)theEvent.getController().getValue();
     penner_rot.setColorBackground(color(100));
@@ -1701,11 +1704,13 @@ void changeSliderRange(boolean increase) {
 
 void updatextilenumSlider() {
   xTileNumSlider.setValue(xtilenum);
+  if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
   undo.setUndoStep(); 
 }
 
 void updateytilenumSlider() {
   yTileNumSlider.setValue(ytilenum);
+  if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
   undo.setUndoStep(); 
 }
 
@@ -1823,6 +1828,7 @@ void canvasResize() {
   pagewidth = (int) wBox.getValue();
   pageheight = (int) hBox.getValue();
   resizeFrame(pagewidth, pageheight);
+  if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
 }
 
 void resizeFrame(int newW, int newH) {
