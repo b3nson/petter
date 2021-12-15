@@ -29,17 +29,18 @@ class MapEditor extends PApplet {
   boolean mapEditorCreated = false;
   
   int w, h;  
+    
+  int petterw, petterh, xtiles, ytiles;
   
-int petterw, petterh, xtiles, ytiles;
-
-ArrayList<EffectorMap> effectorList;
-
-EffectorMap traMap;
-EffectorMap rotMap;
-EffectorMap scaMap;
-
-Group toggles;
-Toggle togT, togR, togS;
+  ArrayList<EffectorMap> effectorList;
+  
+  EffectorMap traMap;
+  EffectorMap rotMap;
+  EffectorMap scaMap;
+  
+  Group toggles;
+  Toggle togT, togR, togS;
+  Button closeButton;
 
   public MapEditor(PApplet theParent, int theWidth, int theHeight) {
     super();   
@@ -57,15 +58,14 @@ Toggle togT, togR, togS;
   // ---------------------------------------------------------------------------
 
 
-  public void setup() { 
+  public void setup() {
     cp5 = new ControlP5(this, font);
     
     effectorList = new ArrayList<EffectorMap>();
   
-    addEffectorMap("imgmap", new PackMap());
-    addEffectorMap("noisemap", new TestMap());  
+    addEffectorMap("noisemap", new PerlinNoiseMap()); 
+    addEffectorMap("imgmap", new PackMap()); 
     addEffectorMap("patternmap", new PatternMap());
-    addEffectorMap("blamap", new TestMap());  
   
     setupGui();
   
@@ -81,36 +81,51 @@ Toggle togT, togR, togS;
   
   private void setupGui() {
     toggles = cp5.addGroup("toggles")
-                 .setPosition(20,h-40)
+                 .setPosition(0,h-40)
                  .hideBar()
                  ;
   
     togT = cp5.addToggle("T")
        .setLabel("T")
-       .setPosition(0, 0)
-       .setSize(20, 20)
+       .setPosition(20, 0)
+       .setSize(26, 26)
        .setValue(false)
-       .plugTo(this, "toggleEffectorUse")
+       .plugTo(this, "toggleMapUsage")
        .setGroup(toggles);
-    togT.getCaptionLabel().setPadding(10,-10);
+    togT.getCaptionLabel().setPadding(12,-17);
   
     togR = cp5.addToggle("R")
        .setLabel("R")
-       .setPosition(25, 0)
-       .setSize(20, 20)
+       .setPosition(50, 0)
+       .setSize(26, 26)
        .setValue(false)
-       .plugTo(this, "toggleEffectorUse")
+       .plugTo(this, "toggleMapUsage")
        .setGroup(toggles);
-    togR.getCaptionLabel().setPadding(10,-10);
+    togR.getCaptionLabel().setPadding(12,-17);
        
     togS = cp5.addToggle("S")
        .setLabel("S")
-       .setPosition(50, 0)
-       .setSize(20, 20)
+       .setPosition(80, 0)
+       .setSize(26, 26)
        .setValue(false)
-       .plugTo(this, "toggleEffectorUse")
+       .plugTo(this, "toggleMapUsage")
        .setGroup(toggles);
-    togS.getCaptionLabel().setPadding(10,-10);
+    togS.getCaptionLabel().setPadding(12,-17);
+
+    closeButton = cp5.addButton("CLOSE")
+      .setPosition(w-70-20, 0)
+      .setSize(70, 26)
+      .plugTo(this, "hide")
+      .setGroup(toggles);
+
+    
+    //ControllerProperties prop = cp5.getProperties();
+    //prop.remove(typeGroup);
+    //prop.remove(fontlist);
+    //prop.remove(fontsizeBox);     
+    //prop.remove(baselineBox);   
+    //prop.remove(createTypeTileButton);
+    //prop.remove(typecolorBang);
   }
 
   // ---------------------------------------------------------------------------
@@ -122,14 +137,15 @@ Toggle togT, togR, togS;
     background(50);
     shapeMode(CENTER);
     
-        
-    
+    currentMap().draw(this.g);
+//    effectorList.get(1).draw(g);
 
-  pushStyle();
-  shapeMode(CENTER);
-  noStroke();
-  //dropIMGx.draw();
-  popStyle();
+  //pushStyle();
+  //shapeMode(CENTER);
+  //noStroke();
+  ////dropIMGx.draw();
+  //popStyle();
+  
   }//draw
   
 
@@ -137,7 +153,27 @@ Toggle togT, togR, togS;
   // ---------------------------------------------------------------------------
   //  MAP ACTIONS
   // ---------------------------------------------------------------------------
+
+  public boolean traMapActive() {
+    return traMap==null?false:true;
+  }
+  public boolean rotMapActive() {
+    return rotMap==null?false:true;
+  }
+  public boolean scaMapActive() {
+    return scaMap==null?false:true;
+  }
   
+  public float getTraMapValue(float tilex, float tiley) {   
+    return traMap.getMapValue(tilex, tiley);  
+  }
+  public float getRotMapValue(float tilex, float tiley) {   
+    return rotMap.getMapValue(tilex, tiley);  
+  }  
+  public float getScaMapValue(float tilex, float tiley) {   
+    return scaMap.getMapValue(tilex, tiley);  
+  }
+
   public void updatePetterBounds(int w, int h, int xtiles, int ytiles) { //pagewidth, pageheight, xtilenum, ytilenum
     this.petterw = w;
     this.petterh = h;
@@ -146,19 +182,19 @@ Toggle togT, togR, togS;
     currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
   }
   
-  public void toggleEffectorUse(ControlEvent theEvent) {
+  public void toggleMapUsage(ControlEvent theEvent) {
     Controller c = theEvent.getController();
     float val = c.getValue();
     if(c == togT) {
       traMap = (val==0?null:currentMap());
+      penner_tra.setVisible(val==0?true:false);
     } else if(c == togR) {
       rotMap = (val==0?null:currentMap());
+      penner_rot.setVisible(val==0?true:false);
     } else if(c == togS) {
       scaMap = (val==0?null:currentMap()); 
+      penner_sca.setVisible(val==0?true:false);
     }
-    //switch off/on other toggles
-    //disable petter-rel-slider, ...
-    //activate use
   }  
 
   private void addEffectorMap(String mapname, EffectorMap newmap) {
@@ -209,8 +245,7 @@ Toggle togT, togR, togS;
   private int currentTabId() {
     return cp5.getWindow().getCurrentTab().getId();
   }
-  
-  
+   
   
   // ---------------------------------------------------------------------------
   //  GUI EVENTHANDLING
@@ -223,6 +258,7 @@ Toggle togT, togR, togS;
       currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
      }
   }
+
 
   // ---------------------------------------------------------------------------
   //  GUI ACTIONS
@@ -237,6 +273,7 @@ Toggle togT, togR, togS;
     currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
     }
   }
+  
   private void showPrefTab() {
     int cid = currentTab().getId();
     if(cid > 0) {
@@ -266,10 +303,6 @@ Toggle togT, togR, togS;
     opened = true;
     surface.setVisible(true);
     keysDown[lastKey] = false; //reset missing keyRelease
-
-    //setDeleteButtonStatus();
-    //setMoveButtonStatus();
-    //setCountLabel();
   }
 
   public void exit() { //on native window-close

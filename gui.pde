@@ -1704,13 +1704,11 @@ void changeSliderRange(boolean increase) {
 
 void updatextilenumSlider() {
   xTileNumSlider.setValue(xtilenum);
-  if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
   undo.setUndoStep(); 
 }
 
 void updateytilenumSlider() {
   yTileNumSlider.setValue(ytilenum);
-  if(mapEditor != null) mapEditor.updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum);
   undo.setUndoStep(); 
 }
 
