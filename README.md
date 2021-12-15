@@ -24,9 +24,10 @@ SHORTCUTS
 GENERAL 
 ------------------------------------------------------------------------
 
-M		-	Show/Hide MAIN-MENU
+TAB		-	Show/Hide MAIN-MENU
 H		- 	Show/Hide this HELP
 T		- 	Show/Hide TileEditor
+M		- 	Show/Hide MapEditor
 + / - 		- 	ZOOM IN / OUT
 Z / Y 		- 	UNDO / REDO
 D 		-	RESET TO DEFAULT
