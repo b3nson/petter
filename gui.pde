@@ -19,7 +19,6 @@ import java.awt.Insets;
 
 CallbackListener cbAllUndo, cbDropdownHover;
 CallbackListener cbColorChange;
-GuiImage imgMap;
 Insets insets;
 
 boolean showMENU = true;
@@ -67,14 +66,12 @@ Boolean shiftProcessed = false;
 
 Group main, imgmapGroup, style, animate, help, helptextbox, info, exportinfo, styleLineGroup;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
-Range imgmapHistogramRange;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
-Button mapFrameNextButton, mapFramePrevButton, mapFrameFirstButton, mapFrameLastButton;
-Button closeImgMapButton, animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
+Button animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 RadioButton linecapRadioButton, linejoinRadioButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
-Toggle mapScaleToggle, mapRotToggle, mapTraToggle, invertMapToggle, pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
+Toggle pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
@@ -93,7 +90,6 @@ void setupGUI() {
   gui.setColorForeground(color(30));
   gui.setColorCaptionLabel(color(255, 255, 255));
   gui.setColorValueLabel(color(255, 255, 255));
-
   gui.enableShortcuts();  
 
 // ---------------------------------------------------------------------------
@@ -544,129 +540,6 @@ void setupGUI() {
   
   ypos += gapY;
 
-// ---------------------------------------------------------------------------
-//  GUI SETUP - IMGMAP MENU
-// ---------------------------------------------------------------------------
-  
-  imgmapGroup = gui.addGroup("imgmap")
-           .setPosition(0, ypos)
-           .setBackgroundHeight(0)
-           .activateEvent(true)
-           .setGroup(main)
-           .open()
-           .setSize(0,0)
-           .disableCollapse()
-           .hide()
-           ;
-           
-  tmp = imgmapGroup.getCaptionLabel();
-  tmp.setHeight(20);
-  tmp.getStyle().setPadding(4, 4, 4, 4);
-  tmp.getStyle().setMargin(8, 0, 0, 180);
-  tmp.setColorBackground(c2);
-  
-  imgMap = new GuiImage(0, 20);
-  imgMap.pre();
-  imgmapGroup.addCanvas(imgMap);
-
-  mapScaleToggle = gui.addToggle("sca")
-     .setValue(mapScale)
-     .setPosition(indentX,0)
-     .setSize(h,h)
-     .setGroup(imgmapGroup)
-     .setLabel("S")
-     ;
-  mapScaleToggle.getCaptionLabel().setPadding(8,-14);
-
-  mapRotToggle = gui.addToggle("rot")
-     .setValue(mapRot)
-     .setPosition(indentX +1*h,0)
-     .setSize(h,h)
-     .setGroup(imgmapGroup)
-     .setLabel("R")
-     ;
-  mapRotToggle.getCaptionLabel().setPadding(8,-14);
-
-  mapTraToggle = gui.addToggle("tra")
-     .setValue(mapTra)
-     .setPosition(indentX +2*h,0)
-     .setSize(h,h)
-     .setGroup(imgmapGroup)
-     .setLabel("T")
-     ;
-  mapTraToggle.getCaptionLabel().setPadding(8,-14);
-     
-  invertMapToggle = gui.addToggle("invertMap")
-     .setValue(invertMap)
-     .setPosition(indentX +4*h,0)
-     .setSize(h,h)
-     .setGroup(imgmapGroup)
-     .setLabel("I")
-     ;
-  invertMapToggle.getCaptionLabel().setPadding(8,-14);
-
-  closeImgMapButton = gui.addButton("X")
-     .setValue(0)
-     .setPosition(indentX+w-h,0)
-     .setSize(h, h)
-     .setGroup(imgmapGroup)
-     ;
-  closeImgMapButton.getCaptionLabel().setPadding(8,-14);
-
-  mapFramePrevButton = gui.addButton("f<")
-     .setLabel("<")
-     .setValue(0)
-     .setPosition(indentX+w+4,imgMapHeight+h)
-     .setSize(h, h)
-     .setGroup(imgmapGroup)
-     .hide()
-     ;
-  mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
-   
-  mapFrameNextButton = gui.addButton("f>")
-     .setLabel(">")
-     .setValue(0)
-     .setPosition(indentX+w+h+8,imgMapHeight+h)
-     .setSize(h, h)
-     .setGroup(imgmapGroup)
-     .hide()
-     ;
-  mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
-
-  mapFrameFirstButton = gui.addButton("ffirst")
-     .setLabel("<I")
-     .setValue(0)
-     .setPosition(indentX+w+4,imgMapHeight+h+gapY)
-     .setSize(h, h)
-     .setGroup(imgmapGroup)
-     .hide()
-     ;
-  mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
-   
-  mapFrameLastButton = gui.addButton("flast")
-     .setLabel("I>")
-     .setValue(0)
-     .setPosition(indentX+w+h+8,imgMapHeight+h+gapY)
-     .setSize(h, h)
-     .setGroup(imgmapGroup)
-     .hide()
-     ;
-  mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
-
-  imgmapHistogramRange = gui.addRange("contrast")
-             .setBroadcast(false) 
-             .setPosition(indentX, imgMapHeight) // gets repositioned on imgload
-             .setSize(180,14)
-             .setHandleSize(10)
-             .setRange(0f,1f)
-             .setRangeValues(0f,1f)
-             .setBroadcast(true)
-             .setGroup(imgmapGroup)
-             ;
-  styleLabel(imgmapHistogramRange, "contrast");
-
-  ypos = (int)imgmapGroup.getPosition()[1]+gapY+imgMapHeight;
-
 
 // ---------------------------------------------------------------------------
 //  GUI SETUP - STYLE MENU
@@ -1021,7 +894,7 @@ void setupGUI() {
   info.bringToFront();
   
   ControllerProperties cprop = gui.getProperties();
-  cprop.remove(closeImgMapButton);
+  //cprop.remove(closeImgMapButton);
   cprop.remove(tileeditorBang);
   cprop.remove(bgcolorBang);
   cprop.remove(strokecolorBang);
@@ -1041,22 +914,13 @@ void setupGUI() {
   cprop.remove(help);
   cprop.remove(helptextLabel);
   cprop.remove(helptextbox);
-  cprop.remove(mapFramePrevButton);
-  cprop.remove(mapFrameNextButton);
-  cprop.remove(mapFrameFirstButton);
-  cprop.remove(mapFrameLastButton);
   cprop.remove(lastguielem);
   cprop.remove(dragOffset);
   cprop.remove(zoomLabel);
   cprop.remove(fpsLabel);
   cprop.remove(exportinfo);
   cprop.remove(exportConfirmationLabel);
-  
   //cprop.remove(pageOrientationToggle);
-  //cprop.remove(invertMapToggle);
-  //cprop.remove(mapScaleToggle);
-  //cprop.remove(mapRotToggle);
-  //cprop.remove(mapTraToggle); 
 
   registerForAnimation(xTileNumSlider);
   registerForAnimation(yTileNumSlider);
@@ -1347,31 +1211,6 @@ void controlEvent(ControlEvent theEvent) {
     int val = (int)theEvent.getController().getValue();
     loadSettings((String)settingFiles.get(val), true);
   } 
-  else if (theEvent.isFrom(closeImgMapButton)) {
-    mapScale = false;
-    mapRot = false;
-    mapTra = false;
-    mapTraToggle.setValue(0);
-    mapScaleToggle.setValue(0);
-    mapRotToggle.setValue(0);
-    invertMapToggle.setValue(0);
-    map.clear();
-    mapIndex = 0;
-    //map = null;
-    updateImgMap();
-  } 
-  else if (theEvent.isFrom(mapScaleToggle)) {
-    mapScale = ((Toggle)theEvent.getController()).getState();
-    updateImgMap();
-  } 
-  else if (theEvent.isFrom(mapRotToggle)) {
-    mapRot = ((Toggle)theEvent.getController()).getState();
-    updateImgMap();
-  }
-  else if (theEvent.isFrom(mapTraToggle)) {
-    mapTra = ((Toggle)theEvent.getController()).getState();
-    updateImgMap();
-  }   
   else if (theEvent.isFrom(wBox)) {
     canvasResize();
   } 
@@ -1407,18 +1246,6 @@ void controlEvent(ControlEvent theEvent) {
   } 
   else if (theEvent.isFrom(clearInOutValuesButton)) {
     deleteRegisteredValues();
-  }      
-  else if (theEvent.isFrom(mapFramePrevButton)) {
-    prevImgMapFrame(); 
-  }   
-  else if (theEvent.isFrom(mapFrameNextButton)) {
-    nextImgMapFrame();
-  }
-  else if (theEvent.isFrom(mapFrameFirstButton)) {
-    firstImgMapFrame();
-  }
-  else if (theEvent.isFrom(mapFrameLastButton)) {
-    lastImgMapFrame();
   } 
   else if (theEvent.isFrom(bgcolorSaveLabel)) {
     if(focused) {bgcolor[0] = int(bgcolorSaveLabel.getValue());} //set color on undo/redo/loadsettings
@@ -1479,7 +1306,6 @@ void toggleMenu() {
   if (showMENU) {
     surface.setSize(viewwidth+guiwidth, viewheight+insets.top);
     //frame.setSize(fwidth+guiwidth, fheight+insets.top);
-//style.setPosition(indentX, imgMap.y+imgMapHeight+h);
     gui.getGroup("main").open();
   } else {
     surface.setSize(viewwidth, viewheight+insets.top);    
@@ -1569,9 +1395,7 @@ void reorderGuiElements() {
   int imgmapheight = mapheight == 0 ? (int)mapheight : (int)mapheight+h+gapY;
   int styleheight = style.isOpen() ? 90 : 4;
   int animateheight = animate.isOpen() ? 70 : 4;
-  
-  imgmapHistogramRange.setPosition(indentX, imgMap.y+(int)mapheight+3);
-  style.setPosition(indentX, imgmapGroup.getPosition()[1]+imgmapheight+gapY); //ypos = (int)imgmapGroup.getPosition()[1]+gapY+imgMapHeight;
+
   animate.setPosition(indentX, style.getPosition()[1]+gapY+styleheight);
   lastguielem.setPosition(indentX, animate.getPosition()[1]+h/2+animateheight);
   
@@ -1751,73 +1575,36 @@ void togglePageOrientation() {
   yTileNumSlider.setValue(ytilenum); 
 }
 
-void updateImgMap() {
-  if(map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) {
-    mapwidth = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(h));
-    mapheight = ( ( (float)map.get(mapIndex).height / (float)map.get(mapIndex).width ) * (float)(w));
-    imgmapGroup.show();
-    penner_sca.setVisible(!mapScale);
-    penner_rot.setVisible(!mapRot);
-    penner_tra.setVisible(!mapTra);
-    if(map.size() > 1) {
-      frames = map.size();
-      mapFramePrevButton.show();
-      mapFrameNextButton.show();
-      mapFrameFirstButton.show();
-      mapFrameLastButton.show();
-    } else {
-      frames = 25;
-      mapFramePrevButton.hide();
-      mapFrameNextButton.hide();
-      mapFrameFirstButton.hide();
-      mapFrameLastButton.hide();
-    }
-    animFrameNumBox.setValue(frames);
-  } else {
-      mapwidth = 0;
-      mapheight = 0;
-      imgmapGroup.hide();
-      mapFramePrevButton.hide();
-      mapFrameNextButton.hide();
-      mapFrameFirstButton.hide();
-      mapFrameLastButton.hide();
-      penner_sca.show();
-      penner_rot.show();
-      penner_tra.show();
+void nextImgMapFrame() {
+  if(map.size() > mapIndex+1) {
+    mapIndex++;
   }
-  reorderGuiElements();
 }
 
-  void nextImgMapFrame() {
-    if(map.size() > mapIndex+1) {
-      mapIndex++;
-    }
-  }
+void prevImgMapFrame() {
+  if(mapIndex != 0) {
+    mapIndex--;
+  }  
+}
 
-  void prevImgMapFrame() {
-    if(mapIndex != 0) {
-      mapIndex--;
-    }  
-  }
-  
-  void firstImgMapFrame() {
-      mapIndex = 0;
-  }
-  
-  void lastImgMapFrame() {
-      mapIndex = map.size()-1;
-  }
-  
-  void specImgMapFrame(int f) {
-    if(map.size() != 0) {
-      if(f < map.size()) {
-        mapIndex = f;
-      }  else {
-        mapIndex = f%map.size();
-      }
+void firstImgMapFrame() {
+    mapIndex = 0;
+}
+
+void lastImgMapFrame() {
+    mapIndex = map.size()-1;
+}
+
+void specImgMapFrame(int f) {
+  if(map.size() != 0) {
+    if(f < map.size()) {
+      mapIndex = f;
+    }  else {
+      mapIndex = f%map.size();
     }
   }
-  
+}
+
 // ---------------------------------------------------------------------------
 //  FRAME RESIZING, ZOOM AND SCROLL
 // ---------------------------------------------------------------------------
@@ -1851,7 +1638,6 @@ void resizeFrame(int newW, int newH) {
   dropSVGadd.updateTargetRect(viewwidth, viewheight);
   dropSVGrep.updateTargetRect(viewwidth, viewheight);
   dropSVGnfo.updateTargetRect(viewwidth, viewheight);
-  //dropIMG.updateTargetRect(viewwidth, viewheight);
   
   exportinfo.setSize(viewwidth, infoheight);
   exportinfo.setPosition(0, viewheight-infoheight);
@@ -2054,7 +1840,7 @@ void generateTimestamp() {
   timestamp = year() +"" +nf(month(), 2) +"" +nf(day(), 2) +"" +"-" +nf(hour(), 2) +"" +nf(minute(), 2) +"" +nf(second(), 2);  
 }
 
-// This function returns all the files in a directory as an array of Strings  
+// return all files in a directory as string-array  
 String[] listFileNames(String dir) {
   File file = new File(dir);
   if (file.isDirectory()) {

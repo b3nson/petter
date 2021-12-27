@@ -17,23 +17,17 @@
 class MapEditor extends PApplet {
 
   PApplet parent;
-
   private ControlP5 cp5;
-  private SDrop dropx;
-  
-  DropTargetIMG dropIMGx;
-  
+
   boolean opened = true;
   boolean reset = false;
   boolean mapEditorOpened = false;
   boolean mapEditorCreated = false;
   
   int w, h;  
-    
   int petterw, petterh, xtiles, ytiles;
   
   ArrayList<EffectorMap> effectorList;
-  
   EffectorMap traMap;
   EffectorMap rotMap;
   EffectorMap scaMap;
@@ -53,28 +47,21 @@ class MapEditor extends PApplet {
     size(w, h, JAVA2D);
   } 
   
+
   // ---------------------------------------------------------------------------
   //  GUI SETUP
   // ---------------------------------------------------------------------------
-
 
   public void setup() {
     cp5 = new ControlP5(this, font);
     
     effectorList = new ArrayList<EffectorMap>();
-  
-    addEffectorMap("noisemap", new PerlinNoiseMap()); 
-    addEffectorMap("imgmap", new PackMap()); 
+    addEffectorMap("imgmap", new ImageMap());
+    addEffectorMap("noisemap", new PerlinNoiseMap());  
     addEffectorMap("patternmap", new PatternMap());
   
     setupGui();
-  
     updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum); // set inital values from pettermain
-    
-    //dropx = new SDrop((Component)this.surface.getNative(), this);
-    //dropIMGx = new DropTargetIMG(this); 
-    //dropx.addDropListener(dropIMGx);
-    
     show();
     smooth();
   }
@@ -118,38 +105,23 @@ class MapEditor extends PApplet {
       .plugTo(this, "hide")
       .setGroup(toggles);
 
-    
+    //TODO
     //ControllerProperties prop = cp5.getProperties();
     //prop.remove(typeGroup);
-    //prop.remove(fontlist);
-    //prop.remove(fontsizeBox);     
-    //prop.remove(baselineBox);   
-    //prop.remove(createTypeTileButton);
-    //prop.remove(typecolorBang);
   }
+
 
   // ---------------------------------------------------------------------------
   //  DRAW
   // ---------------------------------------------------------------------------
-  
-  
+    
   void draw() {
     background(50);
     shapeMode(CENTER);
-    
     currentMap().draw(this.g);
-//    effectorList.get(1).draw(g);
-
-  //pushStyle();
-  //shapeMode(CENTER);
-  //noStroke();
-  ////dropIMGx.draw();
-  //popStyle();
-  
   }//draw
   
 
-  
   // ---------------------------------------------------------------------------
   //  MAP ACTIONS
   // ---------------------------------------------------------------------------
@@ -208,7 +180,7 @@ class MapEditor extends PApplet {
        .setLabel(mapname)
        .setHeight(20)
        .setWidth(50)
-       //.setColorActive(color(80))
+       //.setColorActive(color(50))
        .setId(effectorindex)
        ; 
    
@@ -312,11 +284,11 @@ class MapEditor extends PApplet {
   private void closeAndApply() {
     hide(); 
   }
-  
+
+
   // ---------------------------------------------------------------------------
   //  INPUT EVENTS
   // ---------------------------------------------------------------------------
-  
 
   void keyPressed() {
     if (key == CODED) {
@@ -362,4 +334,10 @@ class MapEditor extends PApplet {
     processKey(keyCode, false); //debounce parent
   }
   
+  void mouseEntered() {
+    currentMap().mouseEntered();
+  }
+  void mouseExited() {
+    currentMap().mouseExited();
+  }
 }

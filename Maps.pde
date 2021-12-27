@@ -19,8 +19,484 @@ public interface EffectorMap {
   void draw(PGraphics g);
   void updateCanvasBounds(int petterw, int petterh, int xtiles, int ytiles);
   float getMapValue(float tilex, float tiley);
+  void mouseEntered();
+  void mouseExited();
   
 }
+
+
+
+// ---------------------------------------------------------------------------
+//  ImageMap
+// ---------------------------------------------------------------------------
+
+public class ImageMap extends DropListener implements EffectorMap {
+
+  PApplet p;
+  SDrop drop;
+
+  int petterw, petterh;
+  int imgw, imgh;
+  int rectw, recth, rectx, recty;
+  int cropX, cropY, cropW, cropH;
+  int dragOffsetX, dragOffsetY;
+  int droptargetx, droptargety, droptargetwidth, droptargetheight;
+  int cornerSize = 16;
+  int maxw = 400;
+  int maxh = 400;
+
+  float iar; //image-aspect-ratio
+  float car; //canvas-aspect-ratio
+  float par; //petter-aspect-ratio
+
+  boolean mouseInside = false;
+  boolean insideCorner1 = false;
+  boolean insideCorner3 = false;
+  boolean insideRect = false;
+  boolean canStartDrag = false;
+  boolean drag = false;
+  boolean startedInside = false;
+  boolean dragC1 = false;
+  boolean dragC3 = false;
+  boolean over = false;
+  boolean newvaliddrop = false;
+  boolean imgloaded = false;
+
+  int dropColor = color(16, 181, 198, 150);
+  int c1 = color(16, 181, 198, 255);
+  int c1aaa = color(16, 181, 198, 60);
+  int c2 = color(0, 255, 150, 255);
+  int c2aaa = color(0, 255, 150, 30);
+  int c2aa = color(0, 255, 150, 100);
+  int c2a = color(0, 255, 150, 160);
+  int rectStrokeColor = c1;
+  int rectFillColor = c1aaa;
+  int cornerColor = c1;  
+
+  int h = 20;
+  
+  Range imgmapHistogramRange;
+  Textlabel infolabel;
+  Group gifseqGroup;
+  Button mapFramePrevButton, mapFrameNextButton, mapFrameFirstButton, mapFrameLastButton;
+  
+  ImageMap() {
+    super();
+  }
+
+  void setup(ControlP5 cp5, String name, Group tabgroup) {
+    p = cp5.papplet;
+    drop = new SDrop((Component)p.getSurface().getNative(), this);
+    drop.addDropListener(this);
+    updateTargetRect(20, 40, p.width-40, p.height-100);
+    
+    p.colorMode(RGB, 255,255,255,255);
+    
+    println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor) +"   SETUP");
+    
+    imgmapHistogramRange = cp5.addRange("contrast")
+       .setBroadcast(false) 
+       .setPosition(20,0)
+       .setSize(tabgroup.getWidth()-80, 20)
+       .setHandleSize(10)
+       .setRange(0f,1f)
+       .setRangeValues(0f,1f)
+       .setVisible(false)
+       .setGroup(tabgroup)
+       ;
+    styleLabel(imgmapHistogramRange, "contrast");
+    
+    infolabel = cp5.addTextlabel("infolabel" )
+      .setPosition((p.width)/2-36, (p.height)/2-30)
+      .setText("Drop image here.")
+      .setGroup(tabgroup);
+      ;
+      
+  gifseqGroup = cp5.addGroup("gifseq")
+      .setPosition(20,30)
+      .hideBar()
+      .open()
+      .setVisible(false)
+      .setGroup(tabgroup)
+      ;
+      
+  mapFramePrevButton = cp5.addButton("f<")
+     .setLabel("<")
+     .setValue(0)
+     .setPosition(0,0)
+     .setSize(h, h)
+     .plugTo(this, "prevMapFrame")
+     .setGroup(gifseqGroup)
+     ;
+  mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
+   
+  mapFrameNextButton = cp5.addButton("f>")
+     .setLabel(">")
+     .setValue(0)
+     .setPosition(h+4,0)
+     .setSize(h, h)
+     .plugTo(this, "nextMapFrame")
+     .setGroup(gifseqGroup)
+     ;
+  mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
+
+  mapFrameFirstButton = cp5.addButton("ffirst")
+     .setLabel("<I")
+     .setValue(0)
+     .setPosition(h+h+4+6,0)
+     .setSize(h, h)
+     .plugTo(this, "firstMapFrame")
+     .setGroup(gifseqGroup)
+     ;
+  mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
+   
+  mapFrameLastButton = cp5.addButton("flast")
+     .setLabel("I>")
+     .setValue(0)
+     .setPosition(h+h+h+6+4+4,0)
+     .setSize(h, h)
+     .plugTo(this, "lastMapFrame")
+     .setGroup(gifseqGroup)
+     ;
+  mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
+
+
+    //invert maps
+    //edge behaviour: black/white/green/repeat
+    //deletebutton
+    //rethink shortcuts
+  }
+
+  void draw(PGraphics g) {
+
+    if (map.size() != 0 && mapIndex < map.size()) {
+      if (map.get(mapIndex) != null) {
+        try {          
+          if(newvaliddrop && map.get(mapIndex).width > 0) { //async img loaded
+            //calc image-draw-size   
+            iar = (float)map.get(mapIndex).width / (float)map.get(mapIndex).height;
+            car = float(maxw)/float(maxh);
+            if(iar > car) { // quer
+              imgw = maxw;
+              imgh = round(float(maxw) / iar);
+            } else {        //hoch
+              imgh = maxh;
+              imgw = round(float(maxh) * iar);
+            }
+           
+            //calc initial rect-draw-size 
+            if(iar > par) { //image querer als pettercanvas
+              rectw = (int) (imgh*par);
+              recth = imgh;
+            } else { //image höher als pettercanvas
+              rectw = imgw;
+              recth = (int ) (imgw/par);
+            }
+            
+            rectx = 0;
+            recty = 0;
+            recalcImageCropbox();
+            newvaliddrop = false;
+            imgloaded = true;
+          }          
+          
+          if(imgloaded) {
+            g.pushMatrix();
+            g.pushStyle();
+            g.imageMode(CENTER);
+            g.translate((g.width)/2, (g.height)/2);
+            g.image(map.get(mapIndex), 0, 0, imgw, imgh); //problem during svg-export
+            g.popStyle();
+            
+            float rectwhalf = (float)rectw/2;
+            float recthhalf = (float)recth/2f;
+            int mx = p.pmouseX - g.width/2;// + mouseXOffset;
+            int my = p.pmouseY - g.height/2 ;//+ mouseYOffset;
+            int mxrel = mx - rectx;
+            int myrel = my - recty;
+                        
+            //mouse inside selectrect
+            if ( (mxrel >= -rectwhalf && mxrel <= rectwhalf && myrel >= -recthhalf && myrel <= recthhalf   ) || drag == true ) {
+              rectStrokeColor = c2a;
+              rectFillColor = c2aa;
+              cornerColor = rectStrokeColor;
+              insideRect = true;
+              insideCorner1 = false;
+              insideCorner3 = false;
+              
+              if (mxrel >= rectwhalf-cornerSize && myrel >= recthhalf-cornerSize) {
+                insideCorner3 = true;
+                 cornerColor = c2;
+                 rectStrokeColor = c2;
+              } else if (mxrel <= -rectwhalf+cornerSize && myrel <= -recthhalf+cornerSize) {
+                insideCorner1 = true;
+                cornerColor = c2;
+                rectStrokeColor = c2;
+              }
+            } else { //outside selectrect
+              rectStrokeColor = c1;
+              rectFillColor = c1aaa;
+              cornerColor = rectStrokeColor;
+              insideRect = false;
+              insideCorner1 = false;
+              insideCorner3 = false;
+              canStartDrag = false;
+            }
+
+            if (insideRect && !p.mousePressed) {
+              canStartDrag = true;
+            } 
+            
+            if (insideRect && canStartDrag && p.mousePressed && !drag) {
+              startedInside = true;
+              drag = true;
+              dragOffsetX = mxrel;
+              dragOffsetY = myrel;
+              if (insideCorner1) {
+                dragC1 = true;
+                dragOffsetX = (int)(rectwhalf+dragOffsetX)*2;
+              } else if (insideCorner3) {
+                dragC3 = true;
+                dragOffsetX = (int)(rectwhalf-dragOffsetX)*2;
+              }
+            }
+            
+            if (drag) {
+              if (p.mousePressed && startedInside) {
+                if (dragC1 || dragC3) {   
+                  rectw = abs(mxrel)*2 + dragOffsetX;
+                  recth = (int) ((float)rectw/par);
+                  rectwhalf = (float)rectw/2;
+                  recthhalf = (float)recth/2;
+                } else {
+                  rectx = mx-dragOffsetX;
+                  recty = my-dragOffsetY;
+                }
+                rectStrokeColor = c2;
+                rectFillColor = c2aaa;
+                cornerColor = c2;
+              } else {
+                startedInside = false;
+                insideRect = false;
+                drag = false; 
+                dragC1 = false;
+                dragC3 = false;       
+                insideCorner1 = false;
+                insideCorner3 = false;
+              }
+              recalcImageCropbox();
+            }
+
+            //rectx = constrain(a, x-e, ww);
+            //recty = constrain(b, y-f, y+hh);
+            g.pushStyle();
+            g.colorMode(RGB, 255,255,255,255);
+            g.rectMode(CENTER);
+            
+            g.fill(cornerColor);
+            g.noStroke();
+            g.triangle(rectx+rectwhalf, recty+recthhalf, rectx+rectwhalf, recty+recthhalf-cornerSize, rectx+rectwhalf-cornerSize, recty+recthhalf);
+            g.triangle(rectx-rectwhalf, recty-recthhalf, rectx-rectwhalf, recty-recthhalf+cornerSize, rectx-rectwhalf+cornerSize, recty-recthhalf);
+            
+            g.fill(rectFillColor);
+            g.stroke(rectStrokeColor);
+            g.rect(rectx, recty, rectw, recth);
+            
+            if(drag) { //crosshair
+              g.line(rectx-3, recty, rectx+3, recty);
+              g.line(rectx, recty-3, rectx, recty+3);
+            }
+  
+            g.popStyle();
+            g.popMatrix();
+            
+          } //img loaded
+        } catch(NullPointerException e) { println(e); }
+      }
+    }
+    
+    if (over) {
+      g.colorMode(RGB, 255,255,255,255);
+      println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor));
+      g.pushStyle();
+      g.fill(dropColor);
+      g.noStroke();
+      g.rectMode(CORNER);
+      g.rect(droptargetx, droptargety, droptargetwidth, droptargetheight);
+      g.popStyle();
+    }
+  } //draw
+  
+  
+  // --- PETTER-CALLBACK ----------------------------------------------------|
+
+  void updateCanvasBounds(int petterw, int petterh, int xtiles, int ytiles) {
+    this.petterw = petterw;
+    this.petterh = petterh;
+    par = float(petterw)/float(petterh);
+  }
+
+  float getMapValue(float tilex, float tiley) {
+    float mapValuex = 0f;    
+
+    try {
+      //map von petterpos auf cropped großbild-pos
+      float absScreenXPos = map(tilex, 0, petterw, cropX, cropW ) ;
+      float absScreenYPos = map(tiley, 0, petterh, cropY, cropH );
+
+      int px = (int)constrain(absScreenYPos, 0, map.get(mapIndex).height-1)*(int)map.get(mapIndex).width-1+(int)constrain(absScreenXPos, 0, map.get(mapIndex).width-1);
+      color col;
+      try {
+        col = map.get(mapIndex).pixels[px];
+        if (col == color(0, 255, 0)) { //green doesn't get mapped
+          return -1;
+        }
+      } catch(ArrayIndexOutOfBoundsException e) { 
+        //println("OUTOFBOUNDS " +e);
+        //col = color(255,255,255);
+        return -1;
+      }
+      //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
+      mapValuex = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
+      //histogram/contrast
+      mapValuex = constrain(map(mapValuex, constrain(imgmapHistogramRange.getLowValue()-0.00001, 0, 0.9999), constrain(imgmapHistogramRange.getHighValue(), 0.0001,1f) , 0f , 1f), 0.0, 1.0);
+    } catch(Exception e) {println(e);} //ArrayIndexOutOfBoundsException | NullPointerException
+    
+    return mapValuex;
+  }
+
+  void mouseEntered() {
+    mouseInside = true;
+  }
+  void mouseExited() {
+    mouseInside = false;
+  }
+
+ // --- INTERNAL UTIL ------------------------------------------------------|
+
+  void recalcImageCropbox() {
+    //left-top-corner: map rectxy-center auf rectxy-corner -> map rectxy von previewimg-dims auf auf originalimg-dims
+    cropX = (int)map( (imgw-rectw)/2 + rectx, 0, imgw, 0, map.get(mapIndex).width);
+    cropY = (int)map( (imgh-recth)/2 + recty, 0, imgh, 0, map.get(mapIndex).height);
+    
+    //right-bottom-corner: map rectwh von previewimg-dims auf originalimg-dims + versatz
+    cropW = (int)map(rectw, 0, imgw, 0, map.get(mapIndex).width ) + cropX;
+    cropH = (int)map(recth, 0, imgh, 0, map.get(mapIndex).height) + cropY;
+  }
+
+   void updateTargetRect(int xx, int yy, int ww, int hh) {
+    droptargetx = xx;
+    droptargety = yy;
+    droptargetwidth = ww;
+    droptargetheight = hh;
+    setTargetRect(droptargetx, droptargety, droptargetwidth, droptargetheight);
+  }
+
+  void showUiControls(boolean flag) {
+    imgmapHistogramRange.setVisible(flag);
+    if(map.size() > 1) {
+      gifseqGroup.setVisible(flag);
+    }
+  }
+
+  // --- UI-CALLBACK --------------------------------------------------------|
+  
+
+  void prevMapFrame() {
+     prevImgMapFrame(); 
+  }
+  void nextMapFrame() {
+     nextImgMapFrame();
+  }
+  void firstMapFrame() {
+     firstImgMapFrame();
+  }
+  void lastMapFrame() {
+     lastImgMapFrame();
+  }
+
+  //else if (theEvent.isFrom(closeImgMapButton)) {
+  //  mapScale = false;
+  //  mapRot = false;
+  //  mapTra = false;
+  //  mapTraToggle.setValue(0);
+  //  mapScaleToggle.setValue(0);
+  //  mapRotToggle.setValue(0);
+  //  invertMapToggle.setValue(0);
+  //  map.clear();
+  //  mapIndex = 0;
+  //  //map = null;
+  //  //updateImgMap();
+  //} 
+  
+  void dropEnter() {
+    this.over = true;
+    showUiControls(false);
+  }
+
+  void dropLeave() {
+    if(!newvaliddrop && imgloaded) {
+      showUiControls(true);
+    }
+    this.over = false;
+  }
+
+  String lastImgDropped = "x";
+  String lastUrlDropped = "y";
+  
+  void dropEvent(DropEvent theDropEvent) {
+    boolean url = theDropEvent.isURL();
+    boolean file = theDropEvent.isFile();
+    boolean img = theDropEvent.isImage();  
+
+    //somewhat complicated testing due to different behaviour on linux and osx
+    //there seems to be a bug in sDrop (not correctly working in linux)
+    if ((url&&!file&&img) || (!url&&file&&img)) {
+      if (!url&&file&&img) {
+        lastImgDropped = trim(theDropEvent.filePath());
+      }
+      if (url&&!file&&img) {
+        lastUrlDropped = theDropEvent.url();
+        try {
+          lastUrlDropped = trim(split(lastUrlDropped, "file://")[1]);
+        } 
+        catch(ArrayIndexOutOfBoundsException e) {
+          lastUrlDropped = "";
+        }
+      } 
+      if ( (lastUrlDropped.equals(lastImgDropped)) == false) {
+        String path = url ? theDropEvent.url() : theDropEvent.filePath();
+        String ext = path.substring(path.lastIndexOf('.') + 1);
+        map.clear();
+        mapIndex = 0;
+        if (ext.equals("gif")) {
+          ArrayList<PImage> tmpimg = new ArrayList<PImage>(Arrays.asList(Gif.getPImages(p, path)));
+          map = tmpimg;
+          if(map.size() > 1) frames = map.size();
+        } else {
+          frames = 25;
+          map.add(requestImage(path));
+        }
+        animFrameNumBox.setValue(frames);
+        mapIndex = 0;
+        newvaliddrop = true;
+        imgloaded = false;
+        showUiControls(true);
+        infolabel.setVisible(false);
+      } else {
+        lastImgDropped = "x";
+        lastUrlDropped = "y";
+        showUiControls(false);
+      }
+    }
+    this.over = false;
+  }
+}//ImageMap
+
+
+
+
+
 
 
 
@@ -62,10 +538,11 @@ public class PerlinNoiseMap implements EffectorMap {
      .plugTo(this, "noiseScaleChange")
      .setValue(noiseScale)
      .setScrollSensitivity(0.04)
-     .setLabel("noisescale")
+     .setLabel("scale")
      .setGroup(tabgroup)
      ;
-   
+     styleLabel(scaleSlider, "scale");
+     
    detailSlider = cp5.addSlider("noisedetail")
      .setPosition(20,25)
      .setSize(tabgroup.getWidth()-80, 20)
@@ -73,9 +550,10 @@ public class PerlinNoiseMap implements EffectorMap {
      .plugTo(this, "noiseDetailChange")
      .setValue(noiseDetail)
      .setScrollSensitivity(0.04)
-     .setLabel("noisedetail")
+     .setLabel("detail")
      .setGroup(tabgroup)
      ;
+     styleLabel(detailSlider, "detail");
      
    seedBang = cp5.addBang("noiseSeedChange")
      .setPosition(20, 50)
@@ -147,7 +625,10 @@ public class PerlinNoiseMap implements EffectorMap {
     return map(flowfield[fieldx][fieldy].x, 0f, TWO_PI, 0f, 1f);
   }
   
-  // --- INTERNAL UTIL ------------------------------------------------------|
+  void mouseEntered() {}
+  void mouseExited() {}
+
+ // --- INTERNAL UTIL ------------------------------------------------------|
   
   private void generateNoisemap() {
     tmpflowfield = new PVector[tmpcols][tmprows];
@@ -189,17 +670,6 @@ public class PerlinNoiseMap implements EffectorMap {
 
 
 
-// ---------------------------------------------------------------------------
-//  TestMap
-// ---------------------------------------------------------------------------
-
-public class PackMap extends PatternMap {
-    PackMap() {
-    super();
-  }
-}
-
-
 
 
 
@@ -238,7 +708,8 @@ public class PatternMap implements EffectorMap {
      .setLabel("cols")
      .setGroup(tabgroup)
      ;
-   
+     styleLabel(colSlider, "cols");
+     
    rowSlider = cp5.addSlider("pmrows")
      .setPosition(20,25)
      .setSize(tabgroup.getWidth()-80, 20)
@@ -249,6 +720,7 @@ public class PatternMap implements EffectorMap {
      .setLabel("rows")
      .setGroup(tabgroup)
      ;
+     styleLabel(rowSlider, "rows");
   }
   
   void draw(PGraphics g) {
@@ -293,7 +765,10 @@ public class PatternMap implements EffectorMap {
       return map(white, 0, 255, 0, 1);    
     }
   }
-
+  
+  void mouseEntered() {}
+  void mouseExited() {}
+  
   // --- UI-CALLBACK --------------------------------------------------------|
   
   void changeCols(int v) {

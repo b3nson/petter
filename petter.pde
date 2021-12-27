@@ -415,6 +415,7 @@ void draw() {
       if (mapEditor != null && mapEditor.traMapActive()) {
         try {
           mapValue = mapEditor.getTraMapValue(tilex, tiley);
+          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
           totaltranslatex += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransX));
           totaltranslatey += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransY));
         } catch (ArrayIndexOutOfBoundsException e) {}
@@ -429,6 +430,7 @@ void draw() {
       if (mapEditor != null && mapEditor.rotMapActive()) {
         try {
           mapValue = mapEditor.getRotMapValue(tilex, tiley);
+          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
           totalrotate += ((invertMap?(1.0-mapValue):mapValue) * (relRot));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
@@ -441,6 +443,7 @@ void draw() {
       if (mapEditor != null && mapEditor.scaMapActive()) {
         try {
           mapValue = mapEditor.getScaMapValue(tilex, tiley);
+          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
           totalscale *= ((invertMap?(1.0-mapValue):mapValue) * (relScale));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
