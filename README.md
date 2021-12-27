@@ -109,7 +109,7 @@ https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
 ```
 Petter - vector-graphic-based pattern generator.
 http://www.lafkon.net/petter/
-Copyright (C) 2015 LAFKON/Benjamin Stephan
+Copyright (C) 2021 LAFKON/Benjamin Stephan
  
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

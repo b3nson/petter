@@ -44,7 +44,7 @@ MapEditor mapEditor;
 Memento undo;
 PGraphics pdf; 
 
-String version = "0.5";
+String version = "0.6";
 String settingspath = "i/settings/";
 String outputpath = "o/";
 String tmppath = "tmp/";
@@ -365,7 +365,7 @@ void draw() {
   scale(zoom);
   translate(pageOffset + manualOffsetX, pageOffset + manualOffsetY);
   scale(((float)(pagewidth-(2*pageOffset)) / (float)pagewidth)); //scale for offset
-  
+
 
   // ---------------------------------------------------
   // MAIN LOOP
@@ -379,36 +379,7 @@ void draw() {
       float tilex = (tilewidth/2)+(tilewidth*(loopDirection?i:j));
       float tiley = (tileheight/2)+(tileheight*(loopDirection?j:i));
       translate(tilex, tiley);
-//==========================================================================================
-//==========================================================================================
-//==========================================================================================
-      //this.rotMap scaMap traMap variablen LÖSCHEN???
 
-        
-      //}
-      //if ((mapScale || mapRot || mapTra) && (map.size() != 0 && mapIndex < map.size() && map.get(mapIndex) != null) ) {
-      //  int cropX = (int)map((imgMap.a - imgMap.x), 0, imgMap.ww, 0, map.get(mapIndex).width);
-      //  int cropY = (int)map((imgMap.b - imgMap.y), 0, imgMap.hh, 0, map.get(mapIndex).height);
-      //  int cropW = (int)map(imgMap.e, 0, imgMap.ww, 0, map.get(mapIndex).width ) + cropX;
-      //  int cropH = (int)map(imgMap.f, 0, imgMap.hh, 0, map.get(mapIndex).height) + cropY;
-      //  absScreenX = map(tilex, 0, pagewidth, cropX, cropW ) ;
-      //  absScreenY = map(tiley, 0, pageheight, cropY, cropH );
-      //  try {
-      //    color col = map.get(mapIndex).pixels[(int)constrain(absScreenY, 0, map.get(mapIndex).height)*(int)map.get(mapIndex).width+(int)constrain(absScreenX, 0, map.get(mapIndex).width)];
-      //    if (col == color(0, 255, 0)) { //green doesn't get mapped
-      //      popMatrix();                            //WHY THIS??????????????????out of inner for-loop
-      //      abscount++;
-      //      continue;
-      //    }
-      //    //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
-      //    mapValue = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
-      //    //histogram/contrast
-      //    mapValue = constrain(map(mapValue, constrain(imgmapHistogramRange.getLowValue()-0.00001, 0, 0.9999), constrain(imgmapHistogramRange.getHighValue(), 0.0001,1f) , 0f , 1f), 0.0, 1.0);
-      //  } catch(Exception e) {} //ArrayIndexOutOfBoundsException | NullPointerException
-      //}
-//==========================================================================================
-//==========================================================================================
-//==========================================================================================
       //TRANSLATE-------------------------------------
       totaltranslatex = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
       totaltranslatey = absTransY*(map(i, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
@@ -456,7 +427,7 @@ void draw() {
       } else {
         s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
       }
-        
+
       if (s != null) {
         shape(s);
       }

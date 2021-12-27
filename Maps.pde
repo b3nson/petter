@@ -21,7 +21,6 @@ public interface EffectorMap {
   float getMapValue(float tilex, float tiley);
   void mouseEntered();
   void mouseExited();
-  
 }
 
 
@@ -44,7 +43,8 @@ public class ImageMap extends DropListener implements EffectorMap {
   int cornerSize = 16;
   int maxw = 400;
   int maxh = 400;
-
+  int h = 20;
+  
   float iar; //image-aspect-ratio
   float car; //canvas-aspect-ratio
   float par; //petter-aspect-ratio
@@ -72,8 +72,6 @@ public class ImageMap extends DropListener implements EffectorMap {
   int rectStrokeColor = c1;
   int rectFillColor = c1aaa;
   int cornerColor = c1;  
-
-  int h = 20;
   
   Range imgmapHistogramRange;
   Textlabel infolabel;
@@ -91,8 +89,7 @@ public class ImageMap extends DropListener implements EffectorMap {
     updateTargetRect(20, 40, p.width-40, p.height-100);
     
     p.colorMode(RGB, 255,255,255,255);
-    
-    println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor) +"   SETUP");
+    //println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor) +"   SETUP");
     
     imgmapHistogramRange = cp5.addRange("contrast")
        .setBroadcast(false) 
@@ -111,60 +108,60 @@ public class ImageMap extends DropListener implements EffectorMap {
       .setText("Drop image here.")
       .setGroup(tabgroup);
       ;
-      
-  gifseqGroup = cp5.addGroup("gifseq")
-      .setPosition(20,30)
-      .hideBar()
-      .open()
-      .setVisible(false)
-      .setGroup(tabgroup)
-      ;
-      
-  mapFramePrevButton = cp5.addButton("f<")
-     .setLabel("<")
-     .setValue(0)
-     .setPosition(0,0)
-     .setSize(h, h)
-     .plugTo(this, "prevMapFrame")
-     .setGroup(gifseqGroup)
-     ;
-  mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
-   
-  mapFrameNextButton = cp5.addButton("f>")
-     .setLabel(">")
-     .setValue(0)
-     .setPosition(h+4,0)
-     .setSize(h, h)
-     .plugTo(this, "nextMapFrame")
-     .setGroup(gifseqGroup)
-     ;
-  mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
 
-  mapFrameFirstButton = cp5.addButton("ffirst")
-     .setLabel("<I")
-     .setValue(0)
-     .setPosition(h+h+4+6,0)
-     .setSize(h, h)
-     .plugTo(this, "firstMapFrame")
-     .setGroup(gifseqGroup)
-     ;
-  mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
-   
-  mapFrameLastButton = cp5.addButton("flast")
-     .setLabel("I>")
-     .setValue(0)
-     .setPosition(h+h+h+6+4+4,0)
-     .setSize(h, h)
-     .plugTo(this, "lastMapFrame")
-     .setGroup(gifseqGroup)
-     ;
-  mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
+    gifseqGroup = cp5.addGroup("gifseq")
+        .setPosition(20,30)
+        .hideBar()
+        .open()
+        .setVisible(false)
+        .setGroup(tabgroup)
+        ;
 
+    mapFramePrevButton = cp5.addButton("f<")
+       .setLabel("<")
+       .setValue(0)
+       .setPosition(0,0)
+       .setSize(h, h)
+       .plugTo(this, "prevMapFrame")
+       .setGroup(gifseqGroup)
+       ;
+    mapFramePrevButton.getCaptionLabel().setPadding(8,-14);
 
-    //invert maps
-    //edge behaviour: black/white/green/repeat
-    //deletebutton
-    //rethink shortcuts
+    mapFrameNextButton = cp5.addButton("f>")
+       .setLabel(">")
+       .setValue(0)
+       .setPosition(h+4,0)
+       .setSize(h, h)
+       .plugTo(this, "nextMapFrame")
+       .setGroup(gifseqGroup)
+       ;
+    mapFrameNextButton.getCaptionLabel().setPadding(8,-14);
+
+    mapFrameFirstButton = cp5.addButton("ffirst")
+       .setLabel("<I")
+       .setValue(0)
+       .setPosition(h+h+4+6,0)
+       .setSize(h, h)
+       .plugTo(this, "firstMapFrame")
+       .setGroup(gifseqGroup)
+       ;
+    mapFrameFirstButton.getCaptionLabel().setPadding(8,-14);
+
+    mapFrameLastButton = cp5.addButton("flast")
+       .setLabel("I>")
+       .setValue(0)
+       .setPosition(h+h+h+6+4+4,0)
+       .setSize(h, h)
+       .plugTo(this, "lastMapFrame")
+       .setGroup(gifseqGroup)
+       ;
+    mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
+
+  //TODO
+  //invert maps
+  //edge behaviour: black/white/green/repeat
+  //deletebutton
+  //rethink shortcuts
   }
 
   void draw(PGraphics g) {
@@ -317,7 +314,7 @@ public class ImageMap extends DropListener implements EffectorMap {
     
     if (over) {
       g.colorMode(RGB, 255,255,255,255);
-      println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor));
+      //println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor));
       g.pushStyle();
       g.fill(dropColor);
       g.noStroke();
