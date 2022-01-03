@@ -1,7 +1,7 @@
 /**
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
- * Copyright (C) 2020 LAFKON/Benjamin Stephan
+ * Copyright (C) 2022 LAFKON/Benjamin Stephan
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -532,6 +532,11 @@ public class PerlinNoiseMap implements EffectorMap {
      .setPosition(20,0)
      .setSize(tabgroup.getWidth()-80, 20)
      .setRange(0.002, 0.5)
+     .setSliderMode(Slider.FLEXIBLE)
+     .setScrollSensitivity(0.005)
+     .setNumberOfTickMarks(tickMarks)
+     .showTickMarks(false)   
+     .snapToTickMarks(false)
      .plugTo(this, "noiseScaleChange")
      .setValue(noiseScale)
      .setScrollSensitivity(0.04)
@@ -544,6 +549,11 @@ public class PerlinNoiseMap implements EffectorMap {
      .setPosition(20,25)
      .setSize(tabgroup.getWidth()-80, 20)
      .setRange(1, 8)
+     .setSliderMode(Slider.FLEXIBLE)
+     .setScrollSensitivity(0.005)
+     .setNumberOfTickMarks(tickMarks)
+     .showTickMarks(false)   
+     .snapToTickMarks(false)
      .plugTo(this, "noiseDetailChange")
      .setValue(noiseDetail)
      .setScrollSensitivity(0.04)
@@ -698,10 +708,14 @@ public class PatternMap implements EffectorMap {
    colSlider = cp5.addSlider("pmcols")
      .setPosition(20,0)
      .setSize(tabgroup.getWidth()-80, 20)
-     .setRange(1, 250)
+     .setRange(1, 150)
      .plugTo(this, "changeCols")
      .setValue(cols)
+     .setSliderMode(Slider.FLEXIBLE)
      .setScrollSensitivity(0.04)
+     .setNumberOfTickMarks(tickMarks)
+     .showTickMarks(false)   
+     .snapToTickMarks(false)
      .setLabel("cols")
      .setGroup(tabgroup)
      ;
@@ -710,10 +724,14 @@ public class PatternMap implements EffectorMap {
    rowSlider = cp5.addSlider("pmrows")
      .setPosition(20,25)
      .setSize(tabgroup.getWidth()-80, 20)
-     .setRange(1, 250)
+     .setRange(1, 150)
      .plugTo(this, "changeRows")
      .setValue(rows)
+     .setSliderMode(Slider.FLEXIBLE)
      .setScrollSensitivity(0.04)
+     .setNumberOfTickMarks(tickMarks)
+     .showTickMarks(false)   
+     .snapToTickMarks(false)
      .setLabel("rows")
      .setGroup(tabgroup)
      ;
