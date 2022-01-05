@@ -270,23 +270,33 @@ class MapEditor extends PApplet {
   private void showNextTab() {
     int cid = currentTab().getId();
     if(cid < cp5.getWindow().getTabs().size()-2) {
-    ControllerInterface<Tab> ct = (ControllerInterface<Tab>)cp5.getWindow().getTabs().get(cid+2); // next + not global[0]
-    ((Tab)ct).bringToFront();
-    updateToggles();
-    currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
+      showTab(cid+2);
     }
   }
-  
+
   private void showPrefTab() {
     int cid = currentTab().getId();
     if(cid > 0) {
-    ControllerInterface<Tab> ct = (ControllerInterface<Tab>)cp5.getWindow().getTabs().get(cid); // -not global[0]
+      showTab(cid);
+    }
+  }
+
+  private void showNextTabCycle() {
+    int cid = currentTab().getId();
+    if(cid < cp5.getWindow().getTabs().size()-2) {
+      showNextTab();
+    } else {
+      showTab(1);
+    }
+  }
+
+  private void showTab(int tabindex) {
+    ControllerInterface<Tab> ct = (ControllerInterface<Tab>)cp5.getWindow().getTabs().get(tabindex);
     ((Tab)ct).bringToFront();
     updateToggles();
     currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
-    }
   }
-  
+
   private void updateToggles() {
     toggles.moveTo(currentTab());  
     togT.changeValue(traMap==currentMap()?1f:0f);
@@ -323,21 +333,15 @@ class MapEditor extends PApplet {
 
   void keyPressed() {
     if (key == CODED) {
-      if (keyCode == UP) {
-        petterh += 10;
-      } else if (keyCode == DOWN) {
-        petterh -= 10;
-      } else if (keyCode == LEFT) {
-        showPrefTab();
-      } else if (keyCode == RIGHT) {
-        showNextTab();
-      } else { //forward to pettermain
+      //if (keyCode == UP) {} 
+      //else if (keyCode == DOWN) {} 
+      //else { //forward to pettermain
         if (!mapEditorOpened) {
           parent.key=key;
           parent.keyCode=keyCode;
           parent.keyPressed();
         }
-      }
+      //}
     } else {
       if (key == RETURN || key == ENTER) {
         closeAndApply();
@@ -345,6 +349,8 @@ class MapEditor extends PApplet {
         key=0;
         keyCode=0;
         closeAndApply();
+      } else if (key == TAB) {
+        showNextTabCycle();
       } else if (key == 'm') {
         hide();
       } else if (key == 't') { 
