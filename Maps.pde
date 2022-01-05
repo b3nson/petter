@@ -62,16 +62,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   boolean newvaliddrop = false;
   boolean imgloaded = false;
 
-  int dropColor = color(16, 181, 198, 150);
-  int c1 = color(16, 181, 198, 255);
-  int c1aaa = color(16, 181, 198, 60);
-  int c2 = color(0, 255, 150, 255);
-  int c2aaa = color(0, 255, 150, 30);
-  int c2aa = color(0, 255, 150, 100);
-  int c2a = color(0, 255, 150, 160);
-  int rectStrokeColor = c1;
-  int rectFillColor = c1aaa;
-  int cornerColor = c1;  
+  int dropColor, c1, c1aaa, c2, c2aaa, c2aa, c2a, rectStrokeColor, rectFillColor, cornerColor;
   
   Range imgmapHistogramRange;
   Textlabel infolabel;
@@ -87,10 +78,20 @@ public class ImageMap extends DropListener implements EffectorMap {
     drop = new SDrop((Component)p.getSurface().getNative(), this);
     drop.addDropListener(this);
     updateTargetRect(20, 40, p.width-40, p.height-100);
-    
-    p.colorMode(RGB, 255,255,255,255);
-    //println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor) +"   SETUP");
-    
+
+    //define colors in setup, otherwise sporadic wrong colors
+    colorMode(RGB, 255,255,255,255);
+    dropColor = color(16, 181, 198, 150);
+    c1 = color(16, 181, 198, 255);
+    c1aaa = color(16, 181, 198, 60);
+    c2 = color(0, 255, 150, 255);
+    c2aaa = color(0, 255, 150, 30);
+    c2aa = color(0, 255, 150, 100);
+    c2a = color(0, 255, 150, 160);
+    rectStrokeColor = c1;
+    rectFillColor = c1aaa;
+    cornerColor = c1; 
+
     imgmapHistogramRange = cp5.addRange("contrast")
        .setBroadcast(false) 
        .setPosition(20,0)
@@ -161,7 +162,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   //non-uniform targetRect
   //edge behaviour: black/white/green/repeat
   //deletebutton
-  //rethink shortcuts
+  //rethink shortcuts 
   }
 
   void draw(PGraphics g) {
