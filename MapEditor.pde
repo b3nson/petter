@@ -23,7 +23,8 @@ class MapEditor extends PApplet {
   boolean reset = false;
   boolean mapEditorOpened = false;
   boolean mapEditorCreated = false;
-  
+  boolean invertT, invertR, invertS = false;
+
   int w, h;  
   int petterw, petterh, xtiles, ytiles;
   
@@ -33,7 +34,7 @@ class MapEditor extends PApplet {
   EffectorMap scaMap;
   
   Group toggles;
-  Toggle togT, togR, togS;
+  Toggle togT, togR, togS, invT, invR, invS;
   Button closeButton;
 
   public MapEditor(PApplet theParent, int theWidth, int theHeight) {
@@ -68,7 +69,7 @@ class MapEditor extends PApplet {
   
   private void setupGui() {
     toggles = cp5.addGroup("toggles")
-                 .setPosition(0,h-40)
+                 .setPosition(0,h-40-14)
                  .hideBar()
                  ;
   
@@ -80,7 +81,15 @@ class MapEditor extends PApplet {
        .plugTo(this, "toggleMapUsage")
        .setGroup(toggles);
     togT.getCaptionLabel().setPadding(12,-17);
-  
+
+    invT = cp5.addToggle("invertT")
+       .setLabel("I")
+       .setPosition(20, 28)
+       .setSize(26, 12)
+       .setValue(false)
+       .setGroup(toggles);
+    invT.getCaptionLabel().setPadding(12,-11);
+
     togR = cp5.addToggle("R")
        .setLabel("R")
        .setPosition(50, 0)
@@ -89,7 +98,15 @@ class MapEditor extends PApplet {
        .plugTo(this, "toggleMapUsage")
        .setGroup(toggles);
     togR.getCaptionLabel().setPadding(12,-17);
-       
+
+    invR = cp5.addToggle("invertR")
+       .setLabel("I")
+       .setPosition(50, 28)
+       .setSize(26, 12)
+       .setValue(false)
+       .setGroup(toggles);
+    invR.getCaptionLabel().setPadding(12,-11);
+    
     togS = cp5.addToggle("S")
        .setLabel("S")
        .setPosition(80, 0)
@@ -99,8 +116,16 @@ class MapEditor extends PApplet {
        .setGroup(toggles);
     togS.getCaptionLabel().setPadding(12,-17);
 
+    invS = cp5.addToggle("invertS")
+       .setLabel("I")
+       .setPosition(80, 28)
+       .setSize(26, 12)
+       .setValue(false)
+       .setGroup(toggles);
+    invS.getCaptionLabel().setPadding(12,-11);
+    
     closeButton = cp5.addButton("CLOSE")
-      .setPosition(w-70-20, 0)
+      .setPosition(w-70-20, 14)
       .setSize(70, 26)
       .plugTo(this, "hide")
       .setGroup(toggles);
@@ -136,14 +161,14 @@ class MapEditor extends PApplet {
     return scaMap==null?false:true;
   }
   
-  public float getTraMapValue(float tilex, float tiley) {   
-    return traMap.getMapValue(tilex, tiley);  
+  public float getTraMapValue(float tilex, float tiley) {
+    return invertT?1-traMap.getMapValue(tilex, tiley):traMap.getMapValue(tilex, tiley);
   }
   public float getRotMapValue(float tilex, float tiley) {   
-    return rotMap.getMapValue(tilex, tiley);  
+    return invertR?1-rotMap.getMapValue(tilex, tiley):rotMap.getMapValue(tilex, tiley);  
   }  
   public float getScaMapValue(float tilex, float tiley) {   
-    return scaMap.getMapValue(tilex, tiley);  
+    return invertS?1-scaMap.getMapValue(tilex, tiley):scaMap.getMapValue(tilex, tiley);  
   }
 
   public void updatePetterBounds(int w, int h, int xtiles, int ytiles) { //pagewidth, pageheight, xtilenum, ytilenum
@@ -178,7 +203,7 @@ class MapEditor extends PApplet {
     cp5.getTab(mapname)
        .activateEvent(true)
        .setLabel(mapname)
-       .setHeight(20)
+       .setHeight(22)
        .setWidth(50)
        //.setColorActive(color(50))
        .setId(effectorindex)
@@ -217,7 +242,13 @@ class MapEditor extends PApplet {
   private int currentTabId() {
     return cp5.getWindow().getCurrentTab().getId();
   }
-   
+
+  private void invertMap() {
+    if(traMap==currentMap()) invT.toggle();
+    if(rotMap==currentMap()) invR.toggle();
+    if(scaMap==currentMap()) invS.toggle();
+  }
+  
   
   // ---------------------------------------------------------------------------
   //  GUI EVENTHANDLING
@@ -262,7 +293,7 @@ class MapEditor extends PApplet {
     togR.changeValue(rotMap==currentMap()?1f:0f);
     togS.changeValue(scaMap==currentMap()?1f:0f);
   }
-
+  
   public void hide() {
     this.noLoop();
     opened = false;
@@ -322,6 +353,8 @@ class MapEditor extends PApplet {
         togR.toggle();
       } else if(key == 's') {
         togS.toggle();
+      } else if(key == 'i') {
+        invertMap();
       } else { //forward to pettermain
         parent.key = key;
         parent.keyCode = keyCode;

@@ -158,7 +158,7 @@ public class ImageMap extends DropListener implements EffectorMap {
     mapFrameLastButton.getCaptionLabel().setPadding(8,-14);
 
   //TODO
-  //invert maps
+  //non-uniform targetRect
   //edge behaviour: black/white/green/repeat
   //deletebutton
   //rethink shortcuts
@@ -168,7 +168,7 @@ public class ImageMap extends DropListener implements EffectorMap {
 
     if (map.size() != 0 && mapIndex < map.size()) {
       if (map.get(mapIndex) != null) {
-        try {          
+        try {
           if(newvaliddrop && map.get(mapIndex).width > 0) { //async img loaded
             //calc image-draw-size   
             iar = (float)map.get(mapIndex).width / (float)map.get(mapIndex).height;
@@ -357,7 +357,7 @@ public class ImageMap extends DropListener implements EffectorMap {
       mapValuex = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
       //histogram/contrast
       mapValuex = constrain(map(mapValuex, constrain(imgmapHistogramRange.getLowValue()-0.00001, 0, 0.9999), constrain(imgmapHistogramRange.getHighValue(), 0.0001,1f) , 0f , 1f), 0.0, 1.0);
-    } catch(Exception e) {println(e);} //ArrayIndexOutOfBoundsException | NullPointerException
+    } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
     
     return mapValuex;
   }
