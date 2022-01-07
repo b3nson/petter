@@ -1,3 +1,4 @@
+
 /**
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
@@ -13,6 +14,7 @@
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
 
+import processing.javafx.*;
 import processing.pdf.*;
 import processing.svg.*;
 import penner.easing.*;
@@ -32,7 +34,7 @@ final static boolean[] keysDown = new boolean[KEYS];
 
 ControlP5 gui;
 ControlFont font;
-SDrop drop;
+//SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
@@ -157,7 +159,7 @@ int manualNFOY = viewheight/6*5;
 
 void setup() {  
   frameRate(100);
-  size(905, 842, JAVA2D);
+  size(905, 842, FX2D);
   colorMode(RGB, 255);
 
   //surface.setResizable(true);
@@ -179,13 +181,13 @@ void setup() {
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
 
-  drop = new SDrop(this);
+  //drop = new SDrop(this);
   dropSVGadd = new DropTargetSVG(this, ADDSVG);
   dropSVGrep = new DropTargetSVG(this, REPLACESVG);
   dropSVGnfo = new DropTargetSVG(this, NFOSVG);
-  drop.addDropListener(dropSVGadd);
-  drop.addDropListener(dropSVGrep);
-  drop.addDropListener(dropSVGnfo);
+  //drop.addDropListener(dropSVGadd);
+  //drop.addDropListener(dropSVGrep);
+  //drop.addDropListener(dropSVGnfo);
 
   undo = new Memento(gui, 50);
 
