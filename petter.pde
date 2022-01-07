@@ -19,9 +19,6 @@ import penner.easing.*;
 import controlP5.*;
 import drop.*;
 import gifAnimation.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
-import java.awt.Component;
 import java.util.*;
 
 static int ROT = 0;
