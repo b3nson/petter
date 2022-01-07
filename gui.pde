@@ -1498,7 +1498,6 @@ void toggleMapEditor() {
     mapEditor = new MapEditor(this, 500, 600);
     String[] args = {"Petter - MAPEDITOR"};
     PApplet.runSketch(args, mapEditor);
-    //mapEditor.setTileList(svg);
   } else {
     if(mapEditor.opened) {
       mapEditor.hide(); 
