@@ -91,7 +91,7 @@ P	- view/testrun animation
 ### Use of contributed Libraries:
 - `penner.easing` - http://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://github.com/sojamo/controlp5 (> v2.2.3)
-- `sojamo.drop` - http://www.sojamo.de/libraries/drop/
+- `drop` - https://transfluxus.github.io/drop/
 - `gifAnimation` - http://extrapixel.github.io/gif-animation/ (>= [3.0](https://github.com/extrapixel/gif-animation/tree/3.0))
 
 ### Command-Line-Options:
