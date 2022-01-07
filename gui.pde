@@ -15,11 +15,9 @@
  
 import java.util.List;
 import java.util.Arrays;
-import java.awt.Insets;
 
 CallbackListener cbAllUndo, cbDropdownHover;
 CallbackListener cbColorChange;
-Insets insets;
 
 boolean showMENU = true;
 boolean showANIMATE = false;
@@ -1302,14 +1300,11 @@ void controlEvent(ControlEvent theEvent) {
 
 void toggleMenu() {
   showMENU = !(gui.getGroup("main").isOpen());
-  insets = frame.getInsets();
   if (showMENU) {
-    surface.setSize(viewwidth+guiwidth, viewheight+insets.top);
-    //frame.setSize(fwidth+guiwidth, fheight+insets.top);
+    surface.setSize(viewwidth+guiwidth, viewheight);
     gui.getGroup("main").open();
   } else {
-    surface.setSize(viewwidth, viewheight+insets.top);    
-    //frame.setSize(fwidth, fheight+insets.top);
+    surface.setSize(viewwidth, viewheight);    
     gui.getGroup("main").close();
   }
 }
@@ -1618,15 +1613,13 @@ void canvasResize() {
 void resizeFrame(int newW, int newH) {
   viewwidth = int(newW*zoom);
   viewheight = int(newH*zoom); 
-
-  insets = frame.getInsets();
   
   if (showMENU) {
     newW = viewwidth+guiwidth;
-    newH = viewheight+insets.top;
+    newH = viewheight;
   } else {
     newW = viewwidth;
-    newH = viewheight+insets.top;
+    newH = viewheight;
   }
   surface.setSize(newW, newH);
   gui.getGroup("main").setPosition(viewwidth+12, main.getPosition()[1]);
