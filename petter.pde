@@ -17,7 +17,7 @@ import processing.pdf.*;
 import processing.svg.*;
 import penner.easing.*;
 import controlP5.*;
-import sojamo.drop.*;
+import drop.*;
 import gifAnimation.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
@@ -183,7 +183,7 @@ void setup() {
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
 
-  drop = new SDrop((Component)this.surface.getNative(), this);
+  drop = new SDrop(this);
   dropSVGadd = new DropTargetSVG(this, ADDSVG);
   dropSVGrep = new DropTargetSVG(this, REPLACESVG);
   dropSVGnfo = new DropTargetSVG(this, NFOSVG);

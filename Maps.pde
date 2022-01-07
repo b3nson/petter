@@ -75,7 +75,7 @@ public class ImageMap extends DropListener implements EffectorMap {
 
   void setup(ControlP5 cp5, String name, Group tabgroup) {
     p = cp5.papplet;
-    drop = new SDrop((Component)p.getSurface().getNative(), this);
+    drop = new SDrop(p);
     drop.addDropListener(this);
     updateTargetRect(20, 40, p.width-40, p.height-100);
 
