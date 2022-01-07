@@ -37,7 +37,6 @@ ControlP5 gui;
 ControlFont font;
 SDrop drop;
 DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
-//DropTargetIMG dropIMG;
 ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
 MapEditor mapEditor;
@@ -187,11 +186,9 @@ void setup() {
   dropSVGadd = new DropTargetSVG(this, ADDSVG);
   dropSVGrep = new DropTargetSVG(this, REPLACESVG);
   dropSVGnfo = new DropTargetSVG(this, NFOSVG);
-  //dropIMG = new DropTargetIMG(this); 
   drop.addDropListener(dropSVGadd);
   drop.addDropListener(dropSVGrep);
   drop.addDropListener(dropSVGnfo);
-  //drop.addDropListener(dropIMG);
 
   undo = new Memento(gui, 50);
 
@@ -557,7 +554,6 @@ void draw() {
   dropSVGadd.draw();
   dropSVGrep.draw();
   dropSVGnfo.draw();
-//dropIMG.draw();
   popStyle();
 
   if (showHELP) {
