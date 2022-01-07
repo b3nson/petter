@@ -67,7 +67,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   Range imgmapHistogramRange;
   Textlabel infolabel;
   Group gifseqGroup;
-  Button mapFramePrevButton, mapFrameNextButton, mapFrameFirstButton, mapFrameLastButton;
+  Button closeImgButton, mapFramePrevButton, mapFrameNextButton, mapFrameFirstButton, mapFrameLastButton;
   
   ImageMap() {
     super();
@@ -110,6 +110,17 @@ public class ImageMap extends DropListener implements EffectorMap {
       .setGroup(tabgroup);
       ;
 
+    closeImgButton = cp5.addButton("closeImg")
+       .setLabel("X")
+       .setValue(0)
+       .setPosition(0,0)
+       .setSize(h, h)
+       .setVisible(false)
+       .plugTo(this, "closeImg")
+       .setGroup(tabgroup)
+       ;
+    closeImgButton.getCaptionLabel().setPadding(8,-14);
+    
     gifseqGroup = cp5.addGroup("gifseq")
         .setPosition(20,30)
         .hideBar()
@@ -161,7 +172,6 @@ public class ImageMap extends DropListener implements EffectorMap {
   //TODO
   //non-uniform targetRect
   //edge behaviour: black/white/green/repeat
-  //deletebutton
   //rethink shortcuts 
   }
 
@@ -191,6 +201,8 @@ public class ImageMap extends DropListener implements EffectorMap {
               recth = (int ) (imgw/par);
             }
             
+            closeImgButton.setPosition(20, g.height/2 - imgh/2 -40);
+            closeImgButton.setVisible(true);
             rectx = 0;
             recty = 0;
             recalcImageCropbox();
@@ -202,7 +214,7 @@ public class ImageMap extends DropListener implements EffectorMap {
             g.pushMatrix();
             g.pushStyle();
             g.imageMode(CENTER);
-            g.translate((g.width)/2, (g.height)/2);
+            g.translate(g.width/2, g.height/2);
             g.image(map.get(mapIndex), 0, 0, imgw, imgh); //problem during svg-export
             g.popStyle();
             
@@ -392,13 +404,14 @@ public class ImageMap extends DropListener implements EffectorMap {
 
   void showUiControls(boolean flag) {
     imgmapHistogramRange.setVisible(flag);
+    closeImgButton.hide();
     if(map.size() > 1) {
       gifseqGroup.setVisible(flag);
     }
   }
 
   // --- UI-CALLBACK --------------------------------------------------------|
-  
+
 
   void prevMapFrame() {
      prevImgMapFrame(); 
@@ -413,20 +426,15 @@ public class ImageMap extends DropListener implements EffectorMap {
      lastImgMapFrame();
   }
 
-  //else if (theEvent.isFrom(closeImgMapButton)) {
-  //  mapScale = false;
-  //  mapRot = false;
-  //  mapTra = false;
-  //  mapTraToggle.setValue(0);
-  //  mapScaleToggle.setValue(0);
-  //  mapRotToggle.setValue(0);
-  //  invertMapToggle.setValue(0);
-  //  map.clear();
-  //  mapIndex = 0;
-  //  //map = null;
-  //  //updateImgMap();
-  //} 
-  
+  void closeImg() {
+    imgloaded = false;
+    map.clear();
+    mapIndex = 0;
+    infolabel.setVisible(true);
+    showUiControls(false);
+    mapEditor.deactivateMapUsage(this);
+  } 
+
   void dropEnter() {
     this.over = true;
     showUiControls(false);

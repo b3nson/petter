@@ -55,6 +55,7 @@ class MapEditor extends PApplet {
 
   public void setup() {
     cp5 = new ControlP5(this, font);
+    cp5.setAutoDraw(false);
     
     effectorList = new ArrayList<EffectorMap>();
     addEffectorMap("imgmap", new ImageMap());
@@ -144,6 +145,7 @@ class MapEditor extends PApplet {
     background(50);
     shapeMode(CENTER);
     currentMap().draw(this.g);
+    cp5.draw();
   }//draw
   
 
@@ -193,7 +195,22 @@ class MapEditor extends PApplet {
       penner_sca.setVisible(val==0?true:false);
     }
   }  
-
+  
+  public void deactivateMapUsage(EffectorMap map) {
+    if(traMap == map) {
+      togT.setState(false);
+      traMap = null;
+    }
+    if(rotMap == map) {
+      togR.setState(false);
+      rotMap = null;
+    }
+    if(scaMap == map) {
+      togS.setState(false);
+      scaMap = null;
+    }  
+  }
+  
   private void addEffectorMap(String mapname, EffectorMap newmap) {
     cp5.getTab("default").remove();
     effectorList.add(newmap);
@@ -205,7 +222,6 @@ class MapEditor extends PApplet {
        .setLabel(mapname)
        .setHeight(22)
        .setWidth(50)
-       //.setColorActive(color(50))
        .setId(effectorindex)
        ; 
    
