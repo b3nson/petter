@@ -61,6 +61,7 @@ class MapEditor extends PApplet {
     addEffectorMap("imgmap", new ImageMap());
     addEffectorMap("noisemap", new PerlinNoiseMap());  
     addEffectorMap("patternmap", new PatternMap());
+    addEffectorMap("eraser", new EraserMap());
   
     setupGui();
     updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum); // set inital values from pettermain

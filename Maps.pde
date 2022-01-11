@@ -808,3 +808,193 @@ public class PatternMap implements EffectorMap {
   }
   
 }//PatternMap
+
+
+
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------------------------------------
+//  EraserMap
+// ---------------------------------------------------------------------------
+
+public class EraserMap implements EffectorMap {
+  
+  PApplet p;
+  ControlP5 cp5;
+  PGraphics canvas;
+
+  private int ww, hh, x, y, petterw, petterh, xtiles, ytiles;
+  private int maxw = 400;
+  private int maxh = 400;
+  private int white = color(255, 255, 255, 255);
+  private int green = color(0, 255, 0, 255);
+  private float brushSize = 10; 
+  private float maxRectCornerX, maxRectCornerY, petRectCornerX, petRectCornerY;
+  private boolean invBrush = false;
+  
+  Slider brushSizeSlider;
+  Bang clearBang;
+  Toggle invBrushToggle;
+  
+  EraserMap() {
+    super();
+  }
+
+ void setup(ControlP5 cp5, String name, Group tabgroup) {
+   this.cp5 = cp5;
+   this.p = cp5.papplet;
+   
+   brushSizeSlider = cp5.addSlider("emsize")
+     .setPosition(20,0)
+     .setSize(tabgroup.getWidth()-80, 20)
+     .setRange(1, 150)
+     .plugTo(this, "changeBrushSize")
+     .setValue(brushSize)
+     .setSliderMode(Slider.FLEXIBLE)
+     .setScrollSensitivity(0.04)
+     .setNumberOfTickMarks(tickMarks)
+     .showTickMarks(false)   
+     .snapToTickMarks(false)
+     .setLabel("brushsize")
+     .setGroup(tabgroup)
+     ;
+     styleLabel(brushSizeSlider, "brushsize");
+
+   clearBang = cp5.addBang("clearCanvas")
+     .setPosition(20, 25)
+     .setSize(20, 20)
+     .plugTo(this, "clearCanvas")
+     .setLabel("clr")
+     .setGroup(tabgroup)
+     ;
+     clearBang.getCaptionLabel().setPadding(3,-14);
+     clearBang.setColorForeground(color(100));
+     
+  invBrushToggle = cp5.addToggle("invBrush")
+     .setPosition(44, 25)
+     .setSize(20, 20)
+     .plugTo(this, "invertBrush")
+     .setLabel("I")
+     .setValue(invBrush)
+     .setGroup(tabgroup)
+     ;
+     invBrushToggle.getCaptionLabel().setPadding(8,-14);
+     
+     canvas = createGraphics(maxw, maxh, JAVA2D);
+  }
+  
+  void draw(PGraphics g) {
+    g.pushStyle();
+    g.rectMode(CORNER);
+
+    //draw line to canvas
+    if (p.mousePressed) {
+      canvas.beginDraw();
+      canvas.stroke(invBrush?white:green);
+      canvas.strokeWeight(brushSize);
+      canvas.strokeCap(ROUND);
+      if(!cp5.isMouseOver()) {
+        canvas.line(p.mouseX-maxRectCornerX, p.mouseY-maxRectCornerY, p.pmouseX-maxRectCornerX, p.pmouseY-maxRectCornerY);
+      }
+      canvas.endDraw();
+    }
+    
+    //petterrect bgfill
+    g.fill(255);
+    g.rect(petRectCornerX, petRectCornerY, ww, hh);
+    
+    //draw canvas
+    p.image(canvas, maxRectCornerX, maxRectCornerY );
+
+    //brushtip
+    g.stroke(0);
+    g.strokeWeight(1f);
+    g.noFill();
+    g.ellipse(p.mouseX, p.mouseY, brushSize, brushSize);
+
+    //petterrect outline
+    g.stroke(255);
+    g.rect(petRectCornerX, petRectCornerY, ww, hh);
+    
+    //draw griddots. dirty...needs tilewidth/height from pettermain
+    float tw = (float(ww)/xtiles);
+    float tscale = tw/tilewidth;    
+    float th = tileheight*tscale;
+    g.stroke(c1);
+    g.rectMode(CENTER);
+    for(int i=0; i<xtiles; i++) {
+      for(int j=0; j<ytiles; j++) {
+        g.rect(i*tw +tw/2 +petRectCornerX , j*th +th/2 +petRectCornerY , 1, 1);
+      }
+    }
+    
+    g.popStyle();
+  }
+  
+  // --- PETTER-CALLBACK ----------------------------------------------------|
+  
+  void updateCanvasBounds(int petterw, int petterh, int xtiles, int ytiles) {
+    this.petterw = petterw;
+    this.petterh = petterh;
+    this.xtiles = xtiles;
+    this.ytiles = ytiles;
+    float par = float(petterw)/float(petterh);
+    float car = float(maxw)/float(maxh);
+    if(par > car) { // quer
+      this.ww = maxw;
+      this.hh = round(float(maxw) / par);
+    }
+    else {  //hoch
+      this.hh = maxh;
+      this.ww = round(float(maxh) * par);
+    }
+    maxRectCornerX = (p.width-maxw)/2;
+    maxRectCornerY = (p.height-maxh)/2;
+    petRectCornerX = (p.width-ww)/2;
+    petRectCornerY = (p.height-hh)/2;    
+  }
+  
+  float getMapValue(float tilex, float tiley) {
+    try {
+      int absScreenXPos = round(map(tilex, 0, petterw-1, 0, ww-1) +(float(maxw-ww)*0.5));
+      int absScreenYPos = round(map(tiley, 0, petterh-1, 0, hh-1) +(float(maxh-hh)*0.5));
+      color col;
+      
+      try {
+        col = canvas.pixels[(absScreenYPos)*maxw +absScreenXPos];
+        if (col == color(0, 255, 0)) { //green doesn't get mapped
+          return -1f;
+        }
+      } catch(ArrayIndexOutOfBoundsException e) { 
+        //println("OUTOFBOUNDS " +e);
+        return -1f;
+      }
+    } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
+    return 1f;
+  }
+  
+  // --- UI-CALLBACK --------------------------------------------------------|
+  
+  void mouseEntered() {}
+  void mouseExited() {}
+  
+  void changeBrushSize(int v) {
+    brushSize = v;
+  }
+
+  void clearCanvas() {
+    canvas.clear();  
+  }
+  
+  void invertBrush(boolean flag) {
+    invBrush = flag;
+  }
+  
+}//EraserMap
