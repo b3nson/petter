@@ -86,10 +86,6 @@ float totaltranslatey = 0.0;
 float totalscale = 0.0;
 float totalrotate = 0.0;
 float customStrokeWeight = 2.0;
-boolean mapScale = false;
-boolean mapRot = false;
-boolean mapTra = false;
-boolean invertMap = false;
 boolean strokeMode = true;
 boolean globalStyle = false;
 boolean customStroke = true;
@@ -381,8 +377,8 @@ void draw() {
         try {
           mapValue = mapEditor.getTraMapValue(tilex, tiley);
           if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totaltranslatex += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransX));
-          totaltranslatey += ((invertMap?(1.0-mapValue):mapValue) * ((float)relTransY));
+          totaltranslatex += (mapValue * ((float)relTransX));
+          totaltranslatey += (mapValue * ((float)relTransY));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
@@ -396,7 +392,7 @@ void draw() {
         try {
           mapValue = mapEditor.getRotMapValue(tilex, tiley);
           if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totalrotate += ((invertMap?(1.0-mapValue):mapValue) * (relRot));
+          totalrotate += (mapValue * (relRot));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {
         totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
@@ -409,7 +405,7 @@ void draw() {
         try {
           mapValue = mapEditor.getScaMapValue(tilex, tiley);
           if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totalscale *= ((invertMap?(1.0-mapValue):mapValue) * (relScale));
+          totalscale *= (mapValue * (relScale));
         } catch (ArrayIndexOutOfBoundsException e) {}
       } else {  
         totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);
