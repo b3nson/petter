@@ -68,7 +68,7 @@ ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
 Button animSetInButton, animSetOutButton, animRunButton, animExportButton, animGotoInButton, animGotoOutButton, clearInOutValuesButton;
 RadioButton linecapRadioButton, linejoinRadioButton;
-Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang;
+Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang, mapeditorBang;
 Toggle pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
 Numberbox wBox, hBox, animFrameNumBox;
@@ -101,6 +101,26 @@ void setupGUI() {
            ;
    
   ypos += 20;
+  
+  tileeditorBang = gui.addBang("tileEditor")
+     .setLabel("TileEditor")
+     .setPosition(indentX, ypos)
+     .setSize(h*4+8, 20)
+     .setGroup(main)
+     ;
+     tileeditorBang.getCaptionLabel().setPadding(6,-14);
+     tileeditorBang.setColorForeground(color(100));  
+  
+  mapeditorBang = gui.addBang("mapEditor")
+     .setLabel("MapEditor")
+     .setPosition(indentX +94, ypos)
+     .setSize(h*4+6, 20)
+     .setGroup(main)
+     ;
+     mapeditorBang.getCaptionLabel().setPadding(6,-14);
+     mapeditorBang.setColorForeground(color(100));
+  
+  ypos += sep;  
   
   formatDropdown = new ScrollableListPlus(gui, "formats");
   formatDropdown
@@ -141,15 +161,6 @@ void setupGUI() {
      .setLock(true)
      .setGroup(main)
      ;
-
-  tileeditorBang = gui.addBang("tileEditor")
-     .setLabel("TE")
-     .setPosition(indentX +134, ypos)
-     .setSize(h, h)
-     .setGroup(main)
-     ;
-     tileeditorBang.getCaptionLabel().setPadding(6,-14);
-     tileeditorBang.setColorForeground(color(100));
 
   pageOrientationToggle = gui.addToggle("pageOrientation")
      .setLabel("p/l")
@@ -894,6 +905,7 @@ void setupGUI() {
   ControllerProperties cprop = gui.getProperties();
   //cprop.remove(closeImgMapButton);
   cprop.remove(tileeditorBang);
+  cprop.remove(mapeditorBang);
   cprop.remove(bgcolorBang);
   cprop.remove(strokecolorBang);
   cprop.remove(shapecolorBang);
@@ -1217,6 +1229,9 @@ void controlEvent(ControlEvent theEvent) {
   }
   else if (theEvent.isFrom(tileeditorBang)) {
     toggleTileEditor();
+  }
+  else if (theEvent.isFrom(mapeditorBang)) {
+    toggleMapEditor();
   }
   else if(theEvent.isFrom("animate")) {
     if(gui.getGroup("animate").isOpen())
