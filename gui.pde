@@ -903,7 +903,6 @@ void setupGUI() {
   info.bringToFront();
   
   ControllerProperties cprop = gui.getProperties();
-  //cprop.remove(closeImgMapButton);
   cprop.remove(tileeditorBang);
   cprop.remove(mapeditorBang);
   cprop.remove(bgcolorBang);
@@ -930,7 +929,6 @@ void setupGUI() {
   cprop.remove(fpsLabel);
   cprop.remove(exportinfo);
   cprop.remove(exportConfirmationLabel);
-  //cprop.remove(pageOrientationToggle);
 
   registerForAnimation(xTileNumSlider);
   registerForAnimation(yTileNumSlider);
@@ -946,7 +944,7 @@ void setupGUI() {
   registerForAnimation(strokeWeightSlider);
   registerForAnimation(offsetxSaveLabel);
   registerForAnimation(offsetySaveLabel);  
-  
+
   cprop.setFormat(ControlP5Constants.JSON);
 
   reorderGuiElements();
@@ -1705,9 +1703,7 @@ void menuScroll(int amount) {
 
 void toggleSettings() {
   if(settingsFilelist == null || (settingsFilelist != null && !settingsFilelist.isOpen())) {
-    
     gui.getProperties().setSnapshot("tmp");
-    
     if(settingsFilelist != null) {
       settingsFilelist.remove();
     }
@@ -1719,17 +1715,16 @@ void toggleSettings() {
     }
     
     settingsFilelist = new ScrollableListPlus(gui, "filelist");
-    settingsFilelist// = gui.addDropdownList("filelist")
+    settingsFilelist
       .setPosition(30, 30)
       //.setSize(180, fheight-60)
-      .setSize(180, 260)
-      .setItemHeight(15)
-      .setBarHeight(20)
+      .setSize(180, 280)
+      .setItemHeight(16)
+      .setBarHeight(24)
       .setType(ControlP5.DROPDOWN);
   
     settingsFilelist.onMove(cbDropdownHover).onEnter(cbDropdownHover).onLeave(cbDropdownHover);
   
-    //settingsFilelist.getCaptionLabel().toUpperCase(true);
     settingsFilelist.getCaptionLabel().set("LAST SAVED SETTINGS");
     settingsFilelist.getCaptionLabel().setColor(0xffffffff);
     settingsFilelist.getCaptionLabel().getStyle().marginTop = 3;
@@ -1784,7 +1779,7 @@ void loadDefaultSettings() {
 
 void findSettingFiles() {
   String[] allFiles = listFileNames(sketchPath("") +settingspath);
-  allFiles = reverse(allFiles);
+  allFiles = reverse(sort(allFiles));
   settingFiles = new ArrayList(); 
   for (int k = 0; k < allFiles.length; k++) {
     String file = allFiles[k];
