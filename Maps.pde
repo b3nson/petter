@@ -21,6 +21,7 @@ public interface EffectorMap {
   float getMapValue(float tilex, float tiley);
   void mouseEntered();
   void mouseExited();
+  void mouseWheel(int e);
 }
 
 
@@ -327,7 +328,6 @@ public class ImageMap extends DropListener implements EffectorMap {
     
     if (over) {
       g.colorMode(RGB, 255,255,255,255);
-      //println(dropColor +" = " +red(dropColor) +"  " +green(dropColor) +"  " +blue(dropColor) +"  " +alpha(dropColor));
       g.pushStyle();
       g.fill(dropColor);
       g.noStroke();
@@ -381,7 +381,16 @@ public class ImageMap extends DropListener implements EffectorMap {
   void mouseExited() {
     mouseInside = false;
   }
-
+  void mouseWheel(int e) {
+    int tmpw = rectw + e;
+    int tmph = (int) ((float)tmpw/par);
+    if(tmpw > 1 || tmph > 1) {
+      rectw = tmpw;
+      recth = tmph;
+      recalcImageCropbox();
+    }
+  }
+  
  // --- INTERNAL UTIL ------------------------------------------------------|
 
   void recalcImageCropbox() {
@@ -643,6 +652,7 @@ public class PerlinNoiseMap implements EffectorMap {
   
   void mouseEntered() {}
   void mouseExited() {}
+  void mouseWheel(int e) {}
 
  // --- INTERNAL UTIL ------------------------------------------------------|
   
@@ -792,6 +802,7 @@ public class PatternMap implements EffectorMap {
   
   void mouseEntered() {}
   void mouseExited() {}
+  void mouseWheel(int e) {}
   
   // --- UI-CALLBACK --------------------------------------------------------|
   
@@ -984,6 +995,10 @@ public class EraserMap implements EffectorMap {
   
   void mouseEntered() {}
   void mouseExited() {}
+  
+  void mouseWheel(int e) {
+    brushSizeSlider.setValue(brushSize+e);
+  }
   
   void changeBrushSize(int v) {
     brushSize = v;

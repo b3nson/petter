@@ -61,7 +61,7 @@ class MapEditor extends PApplet {
     addEffectorMap("imgmap", new ImageMap());
     addEffectorMap("noisemap", new PerlinNoiseMap());  
     addEffectorMap("patternmap", new PatternMap());
-    addEffectorMap("eraser", new EraserMap());
+    addEffectorMap("erasermap", new EraserMap());
   
     setupGui();
     updatePetterBounds(pagewidth, pageheight, xtilenum, ytilenum); // set inital values from pettermain
@@ -272,7 +272,6 @@ class MapEditor extends PApplet {
   // ---------------------------------------------------------------------------
 
   void controlEvent(ControlEvent theEvent) {
-    //println("ctrlevt: "+ theEvent);
     if (theEvent.isTab()) {
       updateToggles();
       currentMap().updateCanvasBounds(petterw, petterh, xtiles, ytiles);
@@ -395,5 +394,8 @@ class MapEditor extends PApplet {
   }
   void mouseExited() {
     currentMap().mouseExited();
+  }
+  void mouseWheel(MouseEvent event) {
+    currentMap().mouseWheel(event.getCount());
   }
 }
