@@ -58,6 +58,7 @@ color c3 = color(200, 200, 200);  //lightgray for separatorlines
 color bg = color(100);
 
 ArrayList settingFiles;
+String renderer ="";
 
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
@@ -1326,10 +1327,16 @@ void toggleHelp() {
   showHELP = !(gui.getGroup("help").isOpen());
   if (showHELP) {
     helptextbox.setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
+    renderer = getRenderer(this);
     help.open();
   } else {
     help.close();
   }
+  
+  try {
+    tileEditor.showHelp(showHELP);
+    mapEditor.showHelp(showHELP);
+  } catch(NullPointerException e) {}
 }
 
 void toggleAnimate() {
@@ -1852,6 +1859,14 @@ String[] listFileNames(String dir) {
   else {
     return null;
   }
+}
+
+static String getRenderer(PApplet p) {
+  Object window = p.getSurface().getNative();
+  PGraphics pg  = p.getGraphics();
+  if (window instanceof javafx.scene.canvas.Canvas) return "FX2D";
+  else if (pg.isGL()) return pg.is3D()? "P3D" : "P2D";
+  return "JAVA2D";
 }
 
 void printArrayList(ArrayList l) {

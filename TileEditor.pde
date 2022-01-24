@@ -34,6 +34,7 @@ class TileEditor extends PApplet {
   boolean typeEditorOpened = false;
   boolean typeEditorCreated = false;
   boolean fontlistLoaded = false;
+  boolean showFPS = false;
 
   int w, h;
   int svgindex = -1;
@@ -54,6 +55,7 @@ class TileEditor extends PApplet {
   float typeypos = 0f;
 
   String fontname = "Monospaced";
+  String renderer = "";
   char lastchar = 'P';
 
   ArrayList<PShape> tileeditorshapelist;
@@ -65,7 +67,7 @@ class TileEditor extends PApplet {
   Button addTextButton, duplicateTileButton;
   Toggle recursiveToggle, disableGlobalStyleToggle;
   Textfield tileCountLabel;
-  Textlabel tezoomLabel, sLabel, rLabel, pLabel;
+  Textlabel tezoomLabel, sLabel, rLabel, pLabel, fpsLabel;
 
   ScrollableListPlus fontlist;
   Numberbox fontsizeBox, baselineBox;
@@ -137,7 +139,15 @@ class TileEditor extends PApplet {
     ;   
 
     // ---------------------------------------------------
-
+    
+    fpsLabel = cp5.addTextlabel("fps" )
+     .setSize(100, 30)
+     .setPosition(10, 40)
+     .setText("fps")
+     .setVisible(false)
+     .setGroup(mainGroup)
+     ;
+   
     closeButton = cp5.addButton("CLOSE")
       .setPosition(w-70-10, this.h-52)
       .setSize(70, 26)
@@ -555,6 +565,9 @@ class TileEditor extends PApplet {
       }
     }
     // ---------------------------------------------------
+    if (showFPS) {
+      fpsLabel.setText(this.renderer +" @ " +str((int)this.frameRate));
+    }
   }//draw
 
 
@@ -969,6 +982,12 @@ class TileEditor extends PApplet {
 
   public void exit() { //on native window-close
     hide();
+  }
+
+  public void showHelp(boolean show) {
+    if(show) this.renderer = getRenderer(this);
+    showFPS = show;
+    fpsLabel.setVisible(show);
   }
 
   private void openTypeTileEditor() {

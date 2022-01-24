@@ -555,7 +555,7 @@ void draw() {
   popStyle();
 
   if (showHELP) {
-    fpsLabel.setText(str((int)frameRate));
+    fpsLabel.setText(renderer +" @ " +str((int)frameRate));
   }
 }//DRAW END
 

@@ -21,10 +21,11 @@ class MapEditor extends PApplet {
 
   boolean opened = true;
   boolean reset = false;
+  boolean showFPS = false;
   boolean mapEditorOpened = false;
   boolean mapEditorCreated = false;
   boolean invertT, invertR, invertS, invertSel, invertDel = false;
-
+  
   int w, h;  
   int petterw, petterh, xtiles, ytiles;
   
@@ -36,10 +37,13 @@ class MapEditor extends PApplet {
   EffectorMap selMap;
   EffectorMap delMap;
   
+  String renderer = "";
+  
   Group toggles;
   Toggle togT, togR, togS, invT, invR, invS;
   Toggle togSel, togDel, invSel, invDel;
   Button closeButton;
+  Textlabel fpsLabel;
 
   public MapEditor(PApplet theParent, int theWidth, int theHeight) {
     super();   
@@ -172,6 +176,13 @@ class MapEditor extends PApplet {
       .plugTo(this, "hide")
       .setGroup(toggles);
 
+    fpsLabel = cp5.addTextlabel("fps" )
+     .setSize(100, 30)
+     .setPosition(10, 30)
+     .setText("fps")
+     .setVisible(false)
+     ;
+     
     //TODO
     //ControllerProperties prop = cp5.getProperties();
     //prop.remove(typeGroup);
@@ -187,6 +198,10 @@ class MapEditor extends PApplet {
     shapeMode(CENTER);
     currentMap().draw(this.g);
     cp5.draw();
+    
+    if (showFPS) {
+      fpsLabel.setText(this.renderer +" @ " +str((int)this.frameRate));
+    }
   }//draw
   
 
@@ -380,7 +395,8 @@ class MapEditor extends PApplet {
   }
 
   private void updateToggles() {
-    toggles.moveTo(currentTab());  
+    toggles.moveTo(currentTab());
+    fpsLabel.moveTo(currentTab());
     togT.changeValue(traMap==currentMap()?1f:0f);
     togR.changeValue(rotMap==currentMap()?1f:0f);
     togS.changeValue(scaMap==currentMap()?1f:0f);
@@ -417,7 +433,13 @@ class MapEditor extends PApplet {
   public void exit() { //on native window-close
     hide();
   }
-  
+
+  public void showHelp(boolean show) {
+    if(show) this.renderer = getRenderer(this);
+    showFPS = show;
+    fpsLabel.setVisible(show);
+  }
+
   private void closeAndApply() {
     hide(); 
   }
