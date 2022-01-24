@@ -1647,10 +1647,6 @@ void resizeFrame(int newW, int newH) {
   gui.getGroup("helptextbox").setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
   gui.getGroup("info").setPosition(viewwidth, viewheight-infoheight);
   
-  dropSVGadd.updateTargetRect(viewwidth, viewheight);
-  dropSVGrep.updateTargetRect(viewwidth, viewheight);
-  dropSVGnfo.updateTargetRect(viewwidth, viewheight);
-  
   exportinfo.setSize(viewwidth, infoheight);
   exportinfo.setPosition(0, viewheight-infoheight);
   

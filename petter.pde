@@ -17,7 +17,6 @@ import processing.pdf.*;
 import processing.svg.*;
 import penner.easing.*;
 import controlP5.*;
-import drop.*;
 import gifAnimation.*;
 import java.util.*;
 
@@ -32,8 +31,6 @@ final static boolean[] keysDown = new boolean[KEYS];
 
 ControlP5 gui;
 ControlFont font;
-SDrop drop;
-DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
 ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
 MapEditor mapEditor;
@@ -174,14 +171,6 @@ void setup() {
 
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
-
-  drop = new SDrop(this);
-  dropSVGadd = new DropTargetSVG(this, ADDSVG);
-  dropSVGrep = new DropTargetSVG(this, REPLACESVG);
-  dropSVGnfo = new DropTargetSVG(this, NFOSVG);
-  drop.addDropListener(dropSVGadd);
-  drop.addDropListener(dropSVGrep);
-  drop.addDropListener(dropSVGnfo);
 
   undo = new Memento(gui, 50);
 
@@ -413,7 +402,7 @@ void draw() {
       }
       scale(totalscale*tilescale);
 
-      //TILESELECTION-----------------------------
+      //SELECTTILE-----------------------------
       if (mapEditor != null && mapEditor.selMapActive()) {
         mapValue = mapEditor.getSelMapValue(tilex, tiley);
         s = svg.get( round( map(mapValue, 0, 1, 0, svg.size()-1) ) );
@@ -544,15 +533,6 @@ void draw() {
        }
     }
   }
-
-  pushStyle();
-  shapeMode(CENTER);
-  noStroke();
-
-  dropSVGadd.draw();
-  dropSVGrep.draw();
-  dropSVGnfo.draw();
-  popStyle();
 
   if (showHELP) {
     fpsLabel.setText(renderer +" @ " +str((int)frameRate));

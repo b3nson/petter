@@ -25,6 +25,8 @@ static int NFOSVG = 2;
 class DropTargetSVG extends DropListener {
 
   PApplet app;
+  ControlP5 cp5;
+  
   boolean over = false;
   int mode = -1;
   int margin = 20;
@@ -35,17 +37,19 @@ class DropTargetSVG extends DropListener {
   int colNfo  = color(60, 105, 97, 180);
   Textlabel label;
 
-  DropTargetSVG(PApplet app, int mode) {
+  DropTargetSVG(PApplet app, ControlP5 cp5, int mode) {
     this.app = app;
+    this.cp5 = cp5;
     this.mode = mode;
     setTargetRect(viewwidth, viewheight, mode);
   }
 
-  void draw() {
+  void draw(PGraphics g) {
     if (over) {
-      fill(col);
-      rect(x, y, w, h);
-      label.draw(app);
+      g.fill(col);
+      g.rectMode(CORNER);
+      g.rect(x, y, w, h);
+      label.draw(g);
     }
   }
 
@@ -61,21 +65,21 @@ class DropTargetSVG extends DropListener {
       y = margin;
       w = cw-(2*margin);
       h = ((ch-(margin*2))/7)*3;
-      label = new Textlabel(gui, "ADD", cw/2-5, h/2, 400, 200);
+      label = new Textlabel(cp5, "ADD", cw/2-5, h/2, 400, 200);
       col = colTile;
     } else if (mode == REPLACESVG) {
       x = margin;
       w = cw-(2*margin);
       h = ((ch-(margin*2))/7)*3;
       y = h+margin;
-      label = new Textlabel(gui, "REPLACE", cw/2-20, (h/2)+h, 400, 200);
+      label = new Textlabel(cp5, "REPLACEALL", cw/2-20, (h/2)+h, 400, 200);
       col = colTile;
     } else if (mode == NFOSVG) {
       x = margin;
       h = (ch-(margin*2))/7;
       y = ch-h-margin;
       w = cw-(2*margin);
-      label = new Textlabel(gui, "NFO", cw/2-20, (h/2)+y-10, 400, 200);
+      label = new Textlabel(cp5, "NFO", cw/2-20, (h/2)+y-10, 400, 200);
       col = colNfo;
     } 
     setTargetRect(x, y, w, h);

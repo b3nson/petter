@@ -13,13 +13,16 @@
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
 
+import drop.*;
 
 class TileEditor extends PApplet {
 
   PApplet parent;
 
   private ControlP5 cp5;
-  
+  SDrop drop;
+  DropTargetSVG dropSVGadd, dropSVGrep, dropSVGnfo;
+
   PFont typefont;
   PGraphics clonetile;
   
@@ -97,6 +100,18 @@ class TileEditor extends PApplet {
     textAlign(CENTER, BASELINE);
 
     cp5 = new ControlP5(this, font);
+    cp5.setAutoDraw(false);
+    
+    drop = new SDrop(this);
+    dropSVGadd = new DropTargetSVG(this, cp5, ADDSVG);
+    dropSVGrep = new DropTargetSVG(this, cp5, REPLACESVG);
+    dropSVGnfo = new DropTargetSVG(this, cp5, NFOSVG);
+    drop.addDropListener(dropSVGadd);
+    drop.addDropListener(dropSVGrep);
+    drop.addDropListener(dropSVGnfo);
+    dropSVGadd.updateTargetRect(w, h);
+    dropSVGrep.updateTargetRect(w, h);
+    dropSVGnfo.updateTargetRect(w, h);
 
     mainGroup = cp5.addGroup("mainGroup")
       .setPosition(0, 0)
@@ -564,10 +579,23 @@ class TileEditor extends PApplet {
         }
       }
     }
+    
     // ---------------------------------------------------
-    if (showFPS) {
-      fpsLabel.setText(this.renderer +" @ " +str((int)this.frameRate));
+    
+    if(!(dropSVGadd.over || dropSVGrep.over || dropSVGnfo.over)) {
+      if (showFPS) {
+        fpsLabel.setText(this.renderer +" @ " +str((int)this.frameRate));
+      }
+      cp5.draw();
+    } else {
+      pushStyle();
+      noStroke();
+      dropSVGadd.draw(g);
+      dropSVGrep.draw(g);
+      dropSVGnfo.draw(g);
+      popStyle();
     }
+
   }//draw
 
 
@@ -1159,7 +1187,13 @@ class TileEditor extends PApplet {
       }
     }
   }
-
+  
+  void mouseExited() {
+    dropSVGadd.over = false;
+    dropSVGrep.over = false; 
+    dropSVGnfo.over = false;
+  }
+  
   void keyPressed() {
     if (key == CODED) {
       if (keyCode == LEFT) {
