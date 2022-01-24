@@ -173,7 +173,6 @@ public class ImageMap extends DropListener implements EffectorMap {
   //TODO
   //non-uniform targetRect
   //edge behaviour: black/white/green/repeat
-  //rethink shortcuts 
   }
 
   void draw(PGraphics g) {
@@ -647,7 +646,11 @@ public class PerlinNoiseMap implements EffectorMap {
     float yy = map(tiley, 0, pageheight, 0, h);    
     int fieldx = floor(xx / cellsize);
     int fieldy = floor(yy / cellsize);
-    return map(flowfield[fieldx][fieldy].x, 0f, TWO_PI, 0f, 1f);
+    try {
+      return map(flowfield[fieldx][fieldy].x, 0f, TWO_PI, 0f, 1f);
+    } catch(ArrayIndexOutOfBoundsException e) { 
+      return 0f;
+    }
   }
   
   void mouseEntered() {}
@@ -981,14 +984,13 @@ public class EraserMap implements EffectorMap {
       try {
         col = canvas.pixels[(absScreenYPos)*maxw +absScreenXPos];
         if (col == color(0, 255, 0)) { //green doesn't get mapped
-          return -1f;
+          return 1f;
         }
       } catch(ArrayIndexOutOfBoundsException e) { 
-        //println("OUTOFBOUNDS " +e);
-        return -1f;
+        return 1f;
       }
     } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
-    return 1f;
+    return 0f;
   }
   
   // --- UI-CALLBACK --------------------------------------------------------|

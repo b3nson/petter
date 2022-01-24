@@ -369,17 +369,24 @@ void draw() {
       float tilex = (tilewidth/2)+(tilewidth*(loopDirection?i:j));
       float tiley = (tileheight/2)+(tileheight*(loopDirection?j:i));
       translate(tilex, tiley);
+      
+      //SKIPTILE--------------------------------------
+      if (mapEditor != null && mapEditor.delMapActive()) {
+        mapValue = mapEditor.getDelMapValue(tilex, tiley);
+        if(mapValue == 1) { 
+          popMatrix(); 
+          if(!linebyline) abscount++; 
+          continue; 
+        }
+      }
 
       //TRANSLATE-------------------------------------
       totaltranslatex = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
       totaltranslatey = absTransY*(map(i, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
       if (mapEditor != null && mapEditor.traMapActive()) {
-        try {
-          mapValue = mapEditor.getTraMapValue(tilex, tiley);
-          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totaltranslatex += (mapValue * ((float)relTransX));
-          totaltranslatey += (mapValue * ((float)relTransY));
-        } catch (ArrayIndexOutOfBoundsException e) {}
+        mapValue = mapEditor.getTraMapValue(tilex, tiley);
+        totaltranslatex += (mapValue * ((float)relTransX));
+        totaltranslatey += (mapValue * ((float)relTransY));
       } else {
         totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
         totaltranslatey += (ease(TRA, abscount, 0, -relTransY, tilecount)+(relTransY/2));
@@ -389,11 +396,8 @@ void draw() {
       //ROTATE-------------------------------------
       totalrotate = absRot;
       if (mapEditor != null && mapEditor.rotMapActive()) {
-        try {
-          mapValue = mapEditor.getRotMapValue(tilex, tiley);
-          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totalrotate += (mapValue * (relRot));
-        } catch (ArrayIndexOutOfBoundsException e) {}
+        mapValue = mapEditor.getRotMapValue(tilex, tiley);
+        totalrotate += (mapValue * (relRot));
       } else {
         totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
       }
@@ -402,17 +406,18 @@ void draw() {
       //SCALE-------------------------------------
       totalscale = absScale;
       if (mapEditor != null && mapEditor.scaMapActive()) {
-        try {
-          mapValue = mapEditor.getScaMapValue(tilex, tiley);
-          if(mapValue == -1) { popMatrix(); if(!linebyline)abscount++; continue; }
-          totalscale *= (mapValue * (relScale));
-        } catch (ArrayIndexOutOfBoundsException e) {}
+        mapValue = mapEditor.getScaMapValue(tilex, tiley);
+        totalscale *= (mapValue * (relScale));
       } else {  
         totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);
       }
       scale(totalscale*tilescale);
 
-      if (random) {
+      //TILESELECTION-----------------------------
+      if (mapEditor != null && mapEditor.selMapActive()) {
+        mapValue = mapEditor.getSelMapValue(tilex, tiley);
+        s = svg.get( round( map(mapValue, 0, 1, 0, svg.size()-1) ) );
+      } else if (random) {
         s = svg.get(int(random(svg.size())));
       } else {
         s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
