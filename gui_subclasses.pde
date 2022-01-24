@@ -132,6 +132,7 @@ class DropTargetSVG extends DropListener {
           tmpmode = ADDSVG;
         }
         tileEditor.updateTileList(svg, tmpmode);
+        tileEditor.lastTile();
       }      
       println(path);
     }

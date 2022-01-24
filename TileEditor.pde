@@ -634,27 +634,21 @@ class TileEditor extends PApplet {
   }
 
   private void prevTile() {
-    if (svglength > 1) {
-      svgindex = (svgindex-1)%svglength;
-      if (svgindex == -1) svgindex = svglength-1;
-      setCountLabel();
-
-      ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
-      ((Tile)( svg )).setOffsetY(tmpy);
-
-      svg = tileeditorshapelist.get(svgindex);
-      updateLocalValuesfromTile();
-      setMoveButtonStatus();
-      setExplodeButtonStatus();
-      setDeleteButtonStatus();
-      setGlobalStyleButtonStatus();
-      setValueLabels();
-    }
+    showTile((svgindex-1)%svglength);
   }
 
   private void nextTile() {
+    showTile((svgindex+1)%svglength);
+  }
+
+  private void lastTile() {
+    showTile(svglength-1);
+  }
+  
+  private void showTile(int index) {
     if (svglength > 1) {
-      svgindex = (svgindex+1)%svglength;
+      svgindex = index;
+      if (svgindex == -1) svgindex = svglength-1;
       setCountLabel();
 
       ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
