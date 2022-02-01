@@ -12,7 +12,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  */
- 
+
 import java.util.List;
 import java.util.Arrays;
 
@@ -1858,9 +1858,10 @@ String[] listFileNames(String dir) {
 }
 
 static String getRenderer(PApplet p) {
-  Object window = p.getSurface().getNative();
+  Object srfc = p.getSurface();
   PGraphics pg  = p.getGraphics();
-  if (window instanceof javafx.scene.canvas.Canvas) return "FX2D";
+  //if (window instanceof javafx.PSurfacejavafx.scene.canvas.Canvas) return "FX2D";
+  if (srfc instanceof processing.javafx.PSurfaceFX) return "FX2D";
   else if (pg.isGL()) return pg.is3D()? "P3D" : "P2D";
   return "JAVA2D";
 }
