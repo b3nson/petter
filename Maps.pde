@@ -343,6 +343,17 @@ public class ImageMap extends DropListener implements EffectorMap {
     this.petterw = petterw;
     this.petterh = petterh;
     par = float(petterw)/float(petterh);
+  
+     //calc rect-draw-size 
+    if(iar > par) { //image querer als pettercanvas
+      float rectscale = (float)recth/(float)imgh;
+      rectw = (int) (imgh*par*rectscale);
+      recth = (int) (imgh*rectscale);
+    } else { //image höher als pettercanvas
+      float rectscale = (float)rectw/(float)imgw;
+      rectw = (int) (imgw*rectscale);
+      recth = (int) ((imgw/par)*rectscale);
+    }
   }
 
   float getMapValue(float tilex, float tiley) {
@@ -363,7 +374,7 @@ public class ImageMap extends DropListener implements EffectorMap {
       } catch(ArrayIndexOutOfBoundsException e) { 
         //println("OUTOFBOUNDS " +e);
         //col = color(255,255,255);
-        return -1;
+        return 1f;
       }
       //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
       mapValuex = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
