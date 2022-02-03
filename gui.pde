@@ -1331,12 +1331,14 @@ void toggleHelp() {
     help.open();
   } else {
     help.close();
-  }
-  
+  }  
   try {
     tileEditor.showHelp(showHELP);
+  } catch(NullPointerException e) {}
+  try {
     mapEditor.showHelp(showHELP);
   } catch(NullPointerException e) {}
+
 }
 
 void toggleAnimate() {
