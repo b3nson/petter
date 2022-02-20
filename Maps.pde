@@ -81,14 +81,14 @@ public class ImageMap extends DropListener implements EffectorMap {
     updateTargetRect(20, 40, p.width-40, p.height-100);
 
     //define colors in setup, otherwise sporadic wrong colors
-    colorMode(RGB, 255,255,255,255);
-    dropColor = color(16, 181, 198, 150);
-    c1 = color(16, 181, 198, 255);
-    c1aaa = color(16, 181, 198, 60);
-    c2 = color(0, 255, 150, 255);
-    c2aaa = color(0, 255, 150, 30);
-    c2aa = color(0, 255, 150, 100);
-    c2a = color(0, 255, 150, 160);
+    p.colorMode(RGB, 255,255,255,255);
+    dropColor = p.color(16, 181, 198, 150);
+    c1 = p.color(16, 181, 198, 255);
+    c1aaa = p.color(16, 181, 198, 60);
+    c2 = p.color(0, 255, 150, 255);
+    c2aaa = p.color(0, 255, 150, 30);
+    c2aa = p.color(0, 255, 150, 100);
+    c2a = p.color(0, 255, 150, 160);
     rectStrokeColor = c1;
     rectFillColor = c1aaa;
     cornerColor = c1; 
@@ -394,7 +394,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   void mouseWheel(int e) {
     int tmpw = rectw + e;
     int tmph = (int) ((float)tmpw/par);
-    if(tmpw > 1 || tmph > 1) {
+    if((tmpw > 1 || tmph > 1) && imgloaded) {
       rectw = tmpw;
       recth = tmph;
       recalcImageCropbox();
@@ -446,11 +446,11 @@ public class ImageMap extends DropListener implements EffectorMap {
   }
 
   void closeImg() {
+    showUiControls(false);
     imgloaded = false;
     map.clear();
     mapIndex = 0;
     infolabel.setVisible(true);
-    showUiControls(false);
     mapEditor.deactivateMapUsage(this);
   } 
 
