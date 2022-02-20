@@ -18,6 +18,7 @@ public interface EffectorMap {
   void setup(ControlP5 cp5, String name, Group tabgroup);
   void draw(PGraphics g);
   void updateCanvasBounds(int petterw, int petterh, int xtiles, int ytiles);
+  boolean getMapPermit(float tilex, float tiley);
   float getMapValue(float tilex, float tiley);
   void mouseEntered();
   void mouseExited();
@@ -62,6 +63,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   boolean over = false;
   boolean newvaliddrop = false;
   boolean imgloaded = false;
+  boolean killGreen = false;
 
   int dropColor, c1, c1aaa, c2, c2aaa, c2aa, c2a, rectStrokeColor, rectFillColor, cornerColor;
   
@@ -69,6 +71,7 @@ public class ImageMap extends DropListener implements EffectorMap {
   Textlabel infolabel;
   Group gifseqGroup;
   Button closeImgButton, mapFramePrevButton, mapFrameNextButton, mapFrameFirstButton, mapFrameLastButton;
+  Toggle killGreenButton;
   
   ImageMap() {
     super();
@@ -114,13 +117,24 @@ public class ImageMap extends DropListener implements EffectorMap {
     closeImgButton = cp5.addButton("closeImg")
        .setLabel("X")
        .setValue(0)
-       .setPosition(0,0)
+       .setPosition(20,30)
        .setSize(h, h)
        .setVisible(false)
        .plugTo(this, "closeImg")
        .setGroup(tabgroup)
        ;
     closeImgButton.getCaptionLabel().setPadding(8,-14);
+
+    killGreenButton = cp5.addToggle("killGreen")
+       .setLabel("XG")
+       .setValue(0)
+       .setPosition(tabgroup.getWidth()-40, 30)
+       .setSize(h, h)
+       .setVisible(false)
+       .plugTo(this, "killGreen")
+       .setGroup(tabgroup)
+       ;
+    killGreenButton.getCaptionLabel().setPadding(5,-14);
     
     gifseqGroup = cp5.addGroup("gifseq")
         .setPosition(20,30)
@@ -356,6 +370,28 @@ public class ImageMap extends DropListener implements EffectorMap {
     }
   }
 
+  boolean getMapPermit(float tilex, float tiley) {
+    if(killGreen) {
+      try {
+        float absScreenXPos = map(tilex, 0, petterw, cropX, cropW ) ;
+        float absScreenYPos = map(tiley, 0, petterh, cropY, cropH );
+  
+        int px = (int)constrain(absScreenYPos, 0, map.get(mapIndex).height-1)*(int)map.get(mapIndex).width-1+(int)constrain(absScreenXPos, 0, map.get(mapIndex).width-1);
+        color col;
+          try {
+            col = map.get(mapIndex).pixels[px];
+            if (col == color(0, 255, 0)) { //green doesn't get mapped
+              return false;
+            } else {
+              return true;
+            }
+          } catch(ArrayIndexOutOfBoundsException e) { return true;}
+      } catch(Exception e) { return true; } //IndexOutOfBoundsException | NullPointerException
+    } else {
+      return true;
+    }
+  }
+  
   float getMapValue(float tilex, float tiley) {
     float mapValuex = 0f;    
 
@@ -368,16 +404,13 @@ public class ImageMap extends DropListener implements EffectorMap {
       color col;
       try {
         col = map.get(mapIndex).pixels[px];
-        if (col == color(0, 255, 0)) { //green doesn't get mapped
-          return -1;
-        }
       } catch(ArrayIndexOutOfBoundsException e) { 
         //println("OUTOFBOUNDS " +e);
         //col = color(255,255,255);
         return 1f;
       }
       //http://de.wikipedia.org/wiki/Grauwert#In_der_Bildverarbeitung
-      mapValuex = ((red(col)/255f)*0.299f) + ((green(col)/255f)*0.587f) + ((blue(col)/255f)*0.114f);
+      mapValuex = ((p.red(col)/255f)*0.299f) + ((p.green(col)/255f)*0.587f) + ((p.blue(col)/255f)*0.114f);
       //histogram/contrast
       mapValuex = constrain(map(mapValuex, constrain(imgmapHistogramRange.getLowValue()-0.00001, 0, 0.9999), constrain(imgmapHistogramRange.getHighValue(), 0.0001,1f) , 0f , 1f), 0.0, 1.0);
     } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
@@ -423,6 +456,7 @@ public class ImageMap extends DropListener implements EffectorMap {
 
   void showUiControls(boolean flag) {
     imgmapHistogramRange.setVisible(flag);
+    killGreenButton.setVisible(flag);
     closeImgButton.hide();
     if(map.size() > 1) {
       gifseqGroup.setVisible(flag);
@@ -453,7 +487,11 @@ public class ImageMap extends DropListener implements EffectorMap {
     infolabel.setVisible(true);
     mapEditor.deactivateMapUsage(this);
   } 
-
+  
+  void killGreen(boolean state) {
+    killGreen = state;
+  }
+  
   void dropEnter() {
     this.over = true;
     showUiControls(false);
@@ -652,6 +690,10 @@ public class PerlinNoiseMap implements EffectorMap {
     generateNoisemap();
   }
 
+  boolean getMapPermit(float tilex, float tiley) {
+    return true;
+  }
+  
   float getMapValue(float tilex, float tiley) {
     float xx = map(tilex, 0, pagewidth, 0, w);
     float yy = map(tiley, 0, pageheight, 0, h);    
@@ -799,6 +841,10 @@ public class PatternMap implements EffectorMap {
     }
     cellwidth  = float(w)/float(cols);
     cellheight = float(h)/float(rows);
+  }
+
+  boolean getMapPermit(float tilex, float tiley) {
+    return true;
   }
   
   float getMapValue(float tilex, float tiley) {
@@ -986,7 +1032,26 @@ public class EraserMap implements EffectorMap {
     petRectCornerY = (p.height-hh)/2;    
   }
   
+  boolean getMapPermit(float tilex, float tiley) {
+    try {
+      int absScreenXPos = round(map(tilex, 0, petterw-1, 0, ww-1) +(float(maxw-ww)*0.5));
+      int absScreenYPos = round(map(tiley, 0, petterh-1, 0, hh-1) +(float(maxh-hh)*0.5));
+      color col;
+      try {
+        col = canvas.pixels[(absScreenYPos)*maxw +absScreenXPos];
+        if (col == color(0, 255, 0)) { //green doesn't get mapped
+          return false;
+        }
+      } catch(ArrayIndexOutOfBoundsException e) { 
+        return false;
+      }
+    } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
+    return true;
+  }
+  
   float getMapValue(float tilex, float tiley) {
+    /*
+    float mapValuex = 0f;
     try {
       int absScreenXPos = round(map(tilex, 0, petterw-1, 0, ww-1) +(float(maxw-ww)*0.5));
       int absScreenYPos = round(map(tiley, 0, petterh-1, 0, hh-1) +(float(maxh-hh)*0.5));
@@ -994,13 +1059,13 @@ public class EraserMap implements EffectorMap {
       
       try {
         col = canvas.pixels[(absScreenYPos)*maxw +absScreenXPos];
-        if (col == color(0, 255, 0)) { //green doesn't get mapped
-          return 1f;
-        }
+        mapValuex = ((p.red(col)/255f)*0.299f) + ((p.green(col)/255f)*0.587f) + ((p.blue(col)/255f)*0.114f);
       } catch(ArrayIndexOutOfBoundsException e) { 
-        return 1f;
+        return 0f;
       }
     } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
+    return mapValuex;
+    */
     return 0f;
   }
   

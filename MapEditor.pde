@@ -237,8 +237,17 @@ class MapEditor extends PApplet {
   public float getSelMapValue(float tilex, float tiley) {   
     return invertSel?1-selMap.getMapValue(tilex, tiley):selMap.getMapValue(tilex, tiley);  
   }
-  public float getDelMapValue(float tilex, float tiley) {   
+  public float getDelMapValue(float tilex, float tiley) {
     return invertDel?1-delMap.getMapValue(tilex, tiley):delMap.getMapValue(tilex, tiley);  
+  }
+  
+  public boolean getMapPermit(float tilex, float tiley) {
+    for(int i=0; i<effectorList.size(); i++) {
+      if(effectorList.get(i).getMapPermit(tilex, tiley) == false) {
+        return false;
+      }
+    }
+    return true;
   }
   
   public void updatePetterBounds(int w, int h, int xtiles, int ytiles) { //pagewidth, pageheight, xtilenum, ytilenum

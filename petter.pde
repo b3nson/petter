@@ -15,10 +15,12 @@
 
 import processing.pdf.*;
 import processing.svg.*;
+import processing.javafx.*;
 import penner.easing.*;
 import controlP5.*;
 import gifAnimation.*;
 import java.util.*;
+
 
 static int ROT = 0;
 static int TRA = 1;
@@ -132,7 +134,8 @@ String[][] formats = {
   { "A4", "595", "842" }, 
   { "A3", "842", "1191" }, 
   { "A2", "1191", "1684" }, 
-  { "Q1", "800", "800" }, 
+  { "Q1", "800", "800" },
+  { "WWE-Final", "576", "768" },
   { "FullHD", "1920", "1080" }
 };
 int viewwidth = 595;
@@ -150,9 +153,11 @@ int manualNFOY = viewheight/6*5;
 
 void setup() {  
   frameRate(100);
-  size(905, 842, JAVA2D);
+  size(905, 842, JAVA2D); //JAVA2D/FX2D
+  smooth();
   colorMode(RGB, 255);
-
+  shapeMode(CENTER);
+  
   //surface.setResizable(true);
   surface.setSize(905, 842);
   surface.setTitle("petter " +version);
@@ -162,9 +167,6 @@ void setup() {
   surface.setIcon(pettericon);
 
   checker = createCheckerboard(200, 200);
-
-  smooth();
-  shapeMode(CENTER);
 
   PFont pfont = createFont("i/fonts/PFArmaFive.ttf", 8, false);
   font = new ControlFont(pfont);
@@ -358,11 +360,10 @@ void draw() {
       float tilex = (tilewidth/2)+(tilewidth*(loopDirection?i:j));
       float tiley = (tileheight/2)+(tileheight*(loopDirection?j:i));
       translate(tilex, tiley);
-      
+
       //SKIPTILE--------------------------------------
-      if (mapEditor != null && mapEditor.delMapActive()) {
-        mapValue = mapEditor.getDelMapValue(tilex, tiley);
-        if(mapValue == 1) { 
+      if (mapEditor != null) {
+        if(mapEditor.getMapPermit(tilex, tiley) == false) {
           popMatrix(); 
           if(!linebyline) abscount++; 
           continue; 
