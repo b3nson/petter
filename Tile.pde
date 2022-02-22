@@ -91,7 +91,8 @@ public class TileSVG extends PShapeSVG implements Tile {
         g.strokeWeight(customStrokeWeight); //setAbsoluteStrokeWeight
         if(!strokeMode) {                   //setRelativeStrokeWeight
           if(tileEditor == null || !tileEditor.getG().equals(g)) { //dirty! if not tileeditor drawing
-            float relsw = ((ease(SCA, abscount, 1.0, relScale, tilecount))*(absScale)*(tilescale)*((Tile)s).getScaleX());
+            //float relsw = ((ease(SCA, abscount, 1.0, relScale, tilecount))*(absScale)*(tilescale)*((Tile)s).getScaleX());
+            float relsw = totalscale; // take totalscale-calc from petter-main
             if (relsw != 0f) { relsw = abs(customStrokeWeight*(1/relsw)); }
             g.strokeWeight(relsw);
           }
