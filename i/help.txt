@@ -1,4 +1,4 @@
-PETTER v0.5
+PETTER v0.6
 Vector-Graphic-based Pattern Generator.
 
 SHORTCUTS
@@ -28,10 +28,9 @@ S	-	Save PDF
 CREATE
 ------------------------------------------------------------------------
 
-DRAG'N'DROP SVG-FILES (on canvas)	
+DRAG'N'DROP SVG-FILES (on TileEditor)	
 		-	one or multiple SVGS to add/replace tiles
-		- (bottom-area) to add/replace nfo-graphic
-DRAG'N'DROP IMG-FILE (on menu)
+DRAG'N'DROP IMG-FILE (on MapEditor)
 		- set image as transformation-map
 
 LEFTCLICK-DRAG THE CANVAS	- repos artwork
