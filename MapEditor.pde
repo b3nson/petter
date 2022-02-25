@@ -41,7 +41,7 @@ class MapEditor extends PApplet {
   
   Group toggles;
   Toggle togT, togR, togS, invT, invR, invS;
-  Toggle togSel, togDel, invSel, invDel;
+  Toggle togSel, invSel;
   Button closeButton;
   Textlabel fpsLabel;
 
@@ -136,7 +136,7 @@ class MapEditor extends PApplet {
 
     togSel = cp5.addToggle("SEL")
        .setLabel("SEL")
-       .setPosition(150, 0)
+       .setPosition(120, 0)
        .setSize(26, 26)
        .setValue(false)
        .plugTo(this, "toggleMapUsage")
@@ -145,30 +145,11 @@ class MapEditor extends PApplet {
 
     invSel = cp5.addToggle("invertSel")
        .setLabel("I")
-       .setPosition(150, 28)
+       .setPosition(120, 28)
        .setSize(26, 12)
        .setValue(false)
        .setGroup(toggles);
     invSel.getCaptionLabel().setPadding(12,-11);
-
-    togDel = cp5.addToggle("DEL")
-       .setLabel("DEL")
-       .setPosition(180, 0)
-       .setSize(26, 26)
-       .setValue(false)
-       .plugTo(this, "toggleMapUsage")
-       .setVisible(false)
-       .setGroup(toggles);
-    togDel.getCaptionLabel().setPadding(7,-17);
-
-    invDel = cp5.addToggle("invertDel")
-       .setLabel("I")
-       .setPosition(180, 28)
-       .setSize(26, 12)
-       .setValue(false)
-       .setVisible(false)
-       .setGroup(toggles);
-    invDel.getCaptionLabel().setPadding(12,-11);
 
     closeButton = cp5.addButton("CLOSE")
       .setPosition(w-70-20, 14)
@@ -242,11 +223,13 @@ class MapEditor extends PApplet {
   }
   
   public boolean getMapPermit(float tilex, float tiley) {
-    for(int i=0; i<effectorList.size(); i++) {
-      if(effectorList.get(i).getMapPermit(tilex, tiley) == false) {
-        return false;
+    try {
+      for(int i=0; i<effectorList.size(); i++) {
+        if(effectorList.get(i).getMapPermit(tilex, tiley) == false) {
+          return false;
+        }
       }
-    }
+    } catch(NullPointerException e) {}
     return true;
   }
   
@@ -272,8 +255,6 @@ class MapEditor extends PApplet {
       penner_sca.setVisible(val==0?true:false);
     }  else if(c == togSel) {
       selMap = (val==0?null:currentMap()); 
-    }  else if(c == togDel) {
-      delMap = (val==0?null:currentMap()); 
     }
   }  
   
@@ -295,7 +276,6 @@ class MapEditor extends PApplet {
       selMap = null;
     }
     if(delMap == map) {
-      togDel.setState(false);
       delMap = null;
     }
   }
@@ -349,11 +329,10 @@ class MapEditor extends PApplet {
   }
 
   private void invertMap() {
-    if(traMap==currentMap()) invT.toggle();
-    if(rotMap==currentMap()) invR.toggle();
-    if(scaMap==currentMap()) invS.toggle();
-    if(selMap==currentMap()) invSel.toggle();
-    if(delMap==currentMap()) invDel.toggle();
+    if     (traMap==currentMap()) { invT.toggle(); }
+    else if(rotMap==currentMap()) { invR.toggle(); }
+    else if(scaMap==currentMap()) { invS.toggle(); }
+    else if(selMap==currentMap()) { invSel.toggle(); }
   }
   
   
@@ -410,18 +389,25 @@ class MapEditor extends PApplet {
     togR.changeValue(rotMap==currentMap()?1f:0f);
     togS.changeValue(scaMap==currentMap()?1f:0f);
     togSel.changeValue(selMap==currentMap()?1f:0f);
-    togDel.changeValue(delMap==currentMap()?1f:0f);
     
     if(cp5.getWindow().getCurrentTab().getName().equals("erasermap")) {
+      togT.hide();
+      invT.hide();
+      togR.hide();
+      invR.hide();
+      togS.hide();
+      invS.hide();
       togSel.hide();
       invSel.hide();
-      togDel.show();
-      invDel.show();
     } else {
+      togT.show();
+      invT.show();
+      togR.show();
+      invR.show();
+      togS.show();
+      invS.show();
       togSel.show();
       invSel.show();
-      togDel.hide();
-      invDel.hide();
     }
   }
   
