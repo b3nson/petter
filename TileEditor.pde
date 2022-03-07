@@ -2,12 +2,12 @@
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
  * Copyright (C) 2015 LAFKON/Benjamin Stephan
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -25,7 +25,7 @@ class TileEditor extends PApplet {
 
   PFont typefont;
   PGraphics clonetile;
-  
+
   PShape svg;
   TileShape ts;
   Tile explodeOrigin;
@@ -77,7 +77,7 @@ class TileEditor extends PApplet {
   Button createTypeTileButton;
 
   public TileEditor(PApplet theParent, int theWidth, int theHeight) {
-    super();   
+    super();
     parent = theParent;
     w = theWidth;
     h = theHeight;
@@ -92,7 +92,7 @@ class TileEditor extends PApplet {
   //  GUI SETUP
   // ---------------------------------------------------------------------------
 
-  public void setup() { 
+  public void setup() {
     //surface.setLocation(10, 10);
     shapeMode(CENTER);
     rectMode(CENTER);
@@ -101,7 +101,7 @@ class TileEditor extends PApplet {
 
     cp5 = new ControlP5(this, font);
     cp5.setAutoDraw(false);
-    
+
     drop = new SDrop(this);
     dropSVGadd = new DropTargetSVG(this, cp5, ADDSVG);
     dropSVGrep = new DropTargetSVG(this, cp5, REPLACESVG);
@@ -142,7 +142,7 @@ class TileEditor extends PApplet {
     tileCountLabel = cp5.addTextfield("TILECOUNT" )
       .setPosition(w/2 -20, 0)
       .setSize(40, 30)
-      .setText("    1 / 1") 
+      .setText("    1 / 1")
       .setFocus(false)
       .setLock(true)
       .setColor(255)
@@ -151,18 +151,18 @@ class TileEditor extends PApplet {
       .setLabelVisible(false)
       .setLabel("")
       .setGroup(mainGroup);
-    ;   
+    ;
 
     // ---------------------------------------------------
-    
+
     fpsLabel = cp5.addTextlabel("fps" )
-     .setSize(100, 30)
-     .setPosition(10, 40)
-     .setText("fps")
-     .setVisible(false)
-     .setGroup(mainGroup)
-     ;
-   
+      .setSize(100, 30)
+      .setPosition(10, 40)
+      .setText("fps")
+      .setVisible(false)
+      .setGroup(mainGroup)
+      ;
+
     closeButton = cp5.addButton("CLOSE")
       .setPosition(w-70-10, this.h-52)
       .setSize(70, 26)
@@ -170,7 +170,7 @@ class TileEditor extends PApplet {
       .setGroup(mainGroup);
     ;
 
-    // --------------------------------------------------- 
+    // ---------------------------------------------------
 
     mainTileGroup = cp5.addGroup("mainTileGroup")
       .setLabel("TILE")
@@ -188,7 +188,7 @@ class TileEditor extends PApplet {
 
     deleteTileButton = cp5.addButton("DELETE")
       .setLabel("DELETE")
-      .setPosition(0, 4) 
+      .setPosition(0, 4)
       .setSize(44, 26)
       .setId(6)
       .setGroup(mainTileGroup)
@@ -196,7 +196,7 @@ class TileEditor extends PApplet {
 
     resetTileButton = cp5.addButton("RESET")
       .setLabel("RESET")
-      .setPosition(49, 4)     
+      .setPosition(49, 4)
       .setSize(38, 26)
       .setId(5)
       .setGroup(mainTileGroup)
@@ -298,7 +298,7 @@ class TileEditor extends PApplet {
       .setGroup(mainAddGroup);
     ;
 
-    // ---------------------------------------------------      
+    // ---------------------------------------------------
 
     mainInfoGroup = cp5.addGroup("mainInfoGroup")
       .setLabel("INFO")
@@ -391,14 +391,14 @@ class TileEditor extends PApplet {
       .setId(101)
       .setGroup(typeGroup)
       .close();
-    ; 
+    ;
 
     fontsizeBox = cp5.addNumberbox("fontsizeBox")
       .setPosition(196, 10)
       .setSize(40, 20)
       .setLabel("fontsize")
       .setRange(1, 2000)
-      .setDecimalPrecision(0) 
+      .setDecimalPrecision(0)
       .setValue(100)
       .setLabelVisible(true)
       .setGroup(typeGroup)
@@ -409,12 +409,12 @@ class TileEditor extends PApplet {
       .setSize(40, 20)
       .setLabel("baseline")
       .setRange(-200, 200)
-      .setDecimalPrecision(2) 
+      .setDecimalPrecision(2)
       .setMultiplier(0.1)
       .setValue(0)
       .setLabelVisible(true)
       .setGroup(typeGroup)
-      ;  
+      ;
 
     typecolorBang = cp5.addBang("changetypecolor")
       .setLabel("C")
@@ -436,8 +436,8 @@ class TileEditor extends PApplet {
     ControllerProperties prop = cp5.getProperties();
     prop.remove(typeGroup);
     prop.remove(fontlist);
-    prop.remove(fontsizeBox);     
-    prop.remove(baselineBox);   
+    prop.remove(fontsizeBox);
+    prop.remove(baselineBox);
     prop.remove(createTypeTileButton);
     prop.remove(typecolorBang);
 
@@ -445,15 +445,17 @@ class TileEditor extends PApplet {
 
     fontsizeBox.addCallback(new CallbackListener() {
       public void controlEvent(CallbackEvent theEvent) {
-        fontsizeBoxCallback(theEvent);    
+        fontsizeBoxCallback(theEvent);
       }
-    });
-    
+    }
+    );
+
     fontlist.addCallback(new CallbackListener() {
       public void controlEvent(CallbackEvent theEvent) {
-       fontlistHoverCallback(theEvent);
+        fontlistHoverCallback(theEvent);
       }
-    });
+    }
+    );
   }//end setupTypeTileEditor
 
 
@@ -481,7 +483,7 @@ class TileEditor extends PApplet {
       if (svg != null) {
         pushMatrix();
         pushStyle();
-        
+
         translate(w/2, h/2);
         scale(zoom);
         strokeWeight(1f/zoom);
@@ -495,13 +497,13 @@ class TileEditor extends PApplet {
         popStyle();
 
         shape(svg);
-        
+
         pushStyle();
         //mastertilesizeBox stroke
         noFill();
-        if (svgindex == 0) { 
+        if (svgindex == 0) {
           stroke(0, 255, 150, 150);
-        } else { 
+        } else {
           stroke(0, 150, 255, 80);
         }
         strokeWeight(1f/zoom);
@@ -517,7 +519,7 @@ class TileEditor extends PApplet {
         popStyle();
         popMatrix();
       }
-    } 
+    }
 
     // --------------------------------------------------- draw typeditor
 
@@ -550,14 +552,14 @@ class TileEditor extends PApplet {
         scale(zoom);
         translate(-w/2, -h/2);
         popStyle();
-        
-        if (ts != null) {   
+
+        if (ts != null) {
           pushMatrix();
           translate(0, ((float)fontsize / 100f) * baseline);
           shape(ts, ((float)w/2f)-50, ((float)h/2)-50) ;
           popMatrix();
         }
-        
+
         pushStyle();
         //typetilesizeBox stroke
         strokeWeight(1f/zoom);
@@ -570,19 +572,19 @@ class TileEditor extends PApplet {
         popStyle();
         popMatrix();
       }
-      
+
       if (type_copi != null && type_copi.isOpen()) {
-        if(typecolor[0] != prevTypeColor) {
+        if (typecolor[0] != prevTypeColor) {
           typecolorBang.setColorForeground(typecolor[0]);
           createLetter();
           prevTypeColor = typecolor[0];
         }
       }
     }
-    
+
     // ---------------------------------------------------
-    
-    if(!(dropSVGadd.over || dropSVGrep.over || dropSVGnfo.over)) {
+
+    if (!(dropSVGadd.over || dropSVGrep.over || dropSVGnfo.over)) {
       if (showFPS) {
         fpsLabel.setText(this.renderer +" @ " +str((int)this.frameRate));
       }
@@ -595,7 +597,6 @@ class TileEditor extends PApplet {
       dropSVGnfo.draw(g);
       popStyle();
     }
-
   }//draw
 
 
@@ -644,7 +645,7 @@ class TileEditor extends PApplet {
   private void lastTile() {
     showTile(svglength-1);
   }
-  
+
   private void showTile(int index) {
     if (svglength > 1) {
       svgindex = index;
@@ -663,7 +664,7 @@ class TileEditor extends PApplet {
       setValueLabels();
     }
   }
-  
+
   private void moveTileOrder(int index, boolean direction) {
     PShape tmp = tileeditorshapelist.get(svgindex);
     tileeditorshapelist.remove(index);
@@ -687,16 +688,16 @@ class TileEditor extends PApplet {
     setValueLabels();
   }
 
-  private void deleteTile(int index) {    
-    if(svglength > 0) { 
+  private void deleteTile(int index) {
+    if (svglength > 0) {
       tileeditorshapelist.remove(index);
       svglength = tileeditorshapelist.size();
       if (svgindex > svglength-1) {
         svgindex--;
-      } 
+      }
       svg = tileeditorshapelist.get(svgindex);
       updateLocalValuesfromTile();
-  
+
       setCountLabel();
       setDeleteButtonStatus();
       setGlobalStyleButtonStatus();
@@ -706,7 +707,7 @@ class TileEditor extends PApplet {
     }
   }
 
-  private void duplicateTile(int index) { 
+  private void duplicateTile(int index) {
     Tile tmp = cloneTile( tileeditorshapelist.get(svgindex) );
     tileeditorshapelist.add(index+1, (PShape)tmp);
     svglength = tileeditorshapelist.size();
@@ -722,7 +723,7 @@ class TileEditor extends PApplet {
   private void toggleGlobalStyle(int svgindex) {
     ((Tile)tileeditorshapelist.get(svgindex)).toggleUseGlobalStyle();
   }
-  
+
   private void explodeimplode(int svgindex, boolean recursive) {
     Tile t = (Tile)tileeditorshapelist.get(svgindex);
     if ( t.getOrigin() != null ) {
@@ -739,14 +740,14 @@ class TileEditor extends PApplet {
     setGlobalStyleButtonStatus();
     setValueLabels();
   }
-  
-  private void updateScale() {    
+
+  private void updateScale() {
     ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleX(scalex);
     ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleY(scaley);
     sLabel.setText("S:  " +nf(scalex, 1, 2));
   }
 
-  private void updateRotation() {    
+  private void updateRotation() {
     ((Tile)( tileeditorshapelist.get(svgindex) )).setRotation(rotation);
     rLabel.setText("R:  " +nf(degrees(rotation), 1, 0));
   }
@@ -758,7 +759,7 @@ class TileEditor extends PApplet {
     ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetY( yo - offsety);
     pLabel.setText("P:  " +nf(xo - offsetx, 1, 0) +" X " +nf(yo - offsety, 1, 0));
   }
-  
+
   private void updateLocalValuesfromTile() {
     tmpx = ((Tile)( svg )).getOffsetX();
     tmpy = ((Tile)( svg )).getOffsetY();
@@ -768,11 +769,11 @@ class TileEditor extends PApplet {
   }
 
   public void updateGlobalStyle() {
-    if(ts != null) {
-      if(globalStyle) {
+    if (ts != null) {
+      if (globalStyle) {
         ts.enableGlobalStyle();
       } else {
-        ts.disableGlobalStyle(); 
+        ts.disableGlobalStyle();
       }
     }
   }
@@ -787,18 +788,18 @@ class TileEditor extends PApplet {
   void createLetter() {
     PShape typeShape;
     shapeMode(CORNER); //draws letters on correct y-baseline
-    typeShape = typefont.getShape(lastchar, 0);
+    typeShape = typefont.getShape(lastchar, 0f);
     typeShape.beginShape();
     typeShape.fill(typecolor[0]);
     typeShape.translate(-typeShape.width/2, typeypos); //x-center, because of shapeMode CORNER
-    typeShape.draw(g);
+    //typeShape.draw(g); //no need to draw here
     typeShape.endShape(CLOSE);
 
     ts = new TileShape(typeShape, 100, 100);
     ts.translate(50, 50);
     ts.setExplodable(false);
   }
-  
+
   void createTypeTile() {
     if (ts != null) {
       ts.translate(0, ((float)fontsize / 100f) * baseline);
@@ -819,22 +820,22 @@ class TileEditor extends PApplet {
   private Tile cloneTile(PShape toClone) {
     String filename = sketchPath +"/" +tmppath +toClone.hashCode() +".svg" ;
     clonetile = (PGraphicsSVG) createGraphics((int)toClone.getWidth(), (int)toClone.getHeight(), SVG, filename);
-    
+
     float[] p = ((Tile)toClone).getTransformParams();
     ((Tile)toClone).resetTransform();
-    
-    beginRecord(clonetile); 
+
+    beginRecord(clonetile);
     shape(toClone);
     endRecord();
-    
+
     ((Tile)toClone).setTransformParams(p);
     Tile newTile = new TileSVG(filename);
     newTile.setTransformParams(p);
     newTile.setExplodable(((Tile)toClone).isExplodable());
-    
+
     return newTile;
   }
-  
+
   private void explodeTile(Tile t, boolean recursive) {
     explodeOrigin = (Tile)t;
     getSubShapes((PShape)t, t.getWidth(), t.getHeight(), recursive);
@@ -851,10 +852,9 @@ class TileEditor extends PApplet {
         deleteTile(i);
         i--;
       }
-    }    
-    svgindex = tileeditorshapelist.indexOf(commonOrigin); 
+    }
+    svgindex = tileeditorshapelist.indexOf(commonOrigin);
     svg = tileeditorshapelist.get(svgindex);
-    
   }
 
   private void getSubShapes(PShape s, float w, float h, boolean recursive) {
@@ -875,12 +875,12 @@ class TileEditor extends PApplet {
       svglength = tileeditorshapelist.size();
     }
   }
-  
+
   public PGraphics getG() {
-     return this.g; 
+    return this.g;
   }
 
-  
+
   // ---------------------------------------------------------------------------
   //  GUI EVENTHANDLING
   // ---------------------------------------------------------------------------
@@ -921,7 +921,7 @@ class TileEditor extends PApplet {
       case(12): //DUPLICATE
       duplicateTile(svgindex);
       break;
-      case(13): //DISABLEGLOBALSTYLE      
+      case(13): //DISABLEGLOBALSTYLE
       toggleGlobalStyle(svgindex);
       break;
       case(11): //TYPETILEDITOR
@@ -935,7 +935,7 @@ class TileEditor extends PApplet {
       createTypeTile();
       break;
       case(101): //FONTLIST
-      fontname = (String)fontlist.getItem((int)fontlist.getValue()).get("text"); 
+      fontname = (String)fontlist.getItem((int)fontlist.getValue()).get("text");
       createFont();
       createLetter();
       break;
@@ -943,42 +943,42 @@ class TileEditor extends PApplet {
   }
 
   void fontsizeBoxCallback(CallbackEvent theEvent) {
-    if(theEvent.getAction() == ControlP5.ACTION_RELEASE || 
-       theEvent.getAction() == ControlP5.ACTION_RELEASE_OUTSIDE) {
-       fontsize = (int) fontsizeBox.getValue();
-       createFont();
-       createLetter();
+    if (theEvent.getAction() == ControlP5.ACTION_RELEASE ||
+      theEvent.getAction() == ControlP5.ACTION_RELEASE_OUTSIDE) {
+      fontsize = (int) fontsizeBox.getValue();
+      createFont();
+      createLetter();
     }
   }
 
   String hoverfontname = "";
   String orgfontname = "";
-  
+
   void fontlistHoverCallback(CallbackEvent theEvent) {
-    if(systemfonts != null) {  
-      if(theEvent.getAction() == ControlP5.ACTION_MOVE) {
+    if (systemfonts != null) {
+      if (theEvent.getAction() == ControlP5.ACTION_MOVE) {
         int i = fontlist.getItemHover();
-        if(i == -1) {   
+        if (i == -1 || i >= systemfonts.length) {
           hoverfontname = orgfontname;
         } else {
           hoverfontname = (String)fontlist.getItem(i).get("text");
-        }    
-        if( !hoverfontname.equals(fontname) ) {
-            fontname = hoverfontname;
-            createFont();
-            createLetter();
-         }
-      } else if(theEvent.getAction() == ControlP5.ACTION_ENTER) {
+        }
+        if ( !hoverfontname.equals(fontname) ) {
+          fontname = hoverfontname;
+          createFont();
+          createLetter();
+        }
+      } else if (theEvent.getAction() == ControlP5.ACTION_ENTER) {
         orgfontname = fontname;
         hoverfontname = " ";
-      } else if(theEvent.getAction() == ControlP5.ACTION_LEAVE) {       
+      } else if (theEvent.getAction() == ControlP5.ACTION_LEAVE) {
         fontname = (String)fontlist.getItem((int)fontlist.getValue()).get("text");
         createFont();
         createLetter();
       }
     }
   }
- 
+
 
   // ---------------------------------------------------------------------------
   //  GUI ACTIONS
@@ -987,7 +987,7 @@ class TileEditor extends PApplet {
   public void hide() {
     this.noLoop();
     opened = false;
-    surface.setVisible(false); 
+    surface.setVisible(false);
   }
 
   public void show() {
@@ -1007,7 +1007,7 @@ class TileEditor extends PApplet {
   }
 
   public void showHelp(boolean show) {
-    if(show) this.renderer = getRenderer(this);
+    if (show) this.renderer = getRenderer(this);
     showFPS = show;
     fpsLabel.setVisible(show);
   }
@@ -1018,7 +1018,7 @@ class TileEditor extends PApplet {
       setupTypeTileEditor();
     }
     addTextButton.moveTo(typeGroup).setPosition(w-20-10-70, this.h-20-10-26)
-        .setSize(70, 26).bringToFront().setLabel("CLOSE");
+      .setSize(70, 26).bringToFront().setLabel("CLOSE");
     typeGroup.open();
     mainGroup.close();
     typeEditorOpened = true;
@@ -1033,24 +1033,24 @@ class TileEditor extends PApplet {
     setMoveButtonStatus();
     setCountLabel();
     addTextButton.moveTo(mainAddGroup).setPosition(0, 4)
-        .setSize(30, 26).bringToFront().setLabel("+T");
+      .setSize(30, 26).bringToFront().setLabel("+T");
     mainGroup.open();
     typeGroup.close();
     typeEditorOpened = false;
   }
 
   private void closeAndApply() {
-    hide(); 
+    hide();
   }
 
   void changetypecolor() {
-    if(type_copi == null) {
+    if (type_copi == null) {
       type_copi = new ColorPicker(this, "typecolor", typecolor, recentcolors);
       type_copi.setUndoable(false);
       String[] args = {"colorpicker4"};
       PApplet.runSketch(args, type_copi);
     } else {
-      type_copi.show(); 
+      type_copi.show();
     }
     colorpicking = true;
   }
@@ -1082,10 +1082,10 @@ class TileEditor extends PApplet {
       deleteTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
     }
   }
-  
+
   private void setGlobalStyleButtonStatus() {
     Tile t = (Tile)tileeditorshapelist.get(svgindex);
-    if(t.getUseGlobalStyle()) {
+    if (t.getUseGlobalStyle()) {
       //set the value of the controller without sending the broadcast event
       disableGlobalStyleToggle.changeValue(0f);
     } else {
@@ -1093,7 +1093,7 @@ class TileEditor extends PApplet {
       disableGlobalStyleToggle.changeValue(1f);
     }
   }
-  
+
   private void setMoveButtonStatus() {
     if (svglength == 1) {
       moveTileForeButton.setBroadcast(false).setColorLabel(lockColor).setColorActive(bg).setColorForeground(bg);
@@ -1114,7 +1114,7 @@ class TileEditor extends PApplet {
 
   private void setExplodeButtonStatus() {
     Tile t = (Tile)tileeditorshapelist.get(svgindex);
-    if(t.isExplodable()) {
+    if (t.isExplodable()) {
       if ( t.getOrigin() != null ) {
         explodeTileButton.setBroadcast(true).setColorLabel(unlockColor).setColorActive(c1).setColorForeground(color(30));
         explodeTileButton.setLabel("IMPLODE");
@@ -1125,7 +1125,7 @@ class TileEditor extends PApplet {
         explodeTileButton.setLabel("EXPLODE");
         explodeTileButton.setHeight(16);
         recursiveToggle.show();
-      } 
+      }
     } else {
       explodeTileButton.setLabel("EXPLODE");
       explodeTileButton.setHeight(26);
@@ -1159,7 +1159,7 @@ class TileEditor extends PApplet {
 
       updateTranslate();
     }
-  }  
+  }
 
   void mouseReleased() {
     if (drag || reset) {
@@ -1181,13 +1181,13 @@ class TileEditor extends PApplet {
       }
     }
   }
-  
+
   void mouseExited() {
     dropSVGadd.over = false;
-    dropSVGrep.over = false; 
+    dropSVGrep.over = false;
     dropSVGnfo.over = false;
   }
-  
+
   void keyPressed() {
     if (key == CODED) {
       if (keyCode == LEFT) {
@@ -1213,9 +1213,9 @@ class TileEditor extends PApplet {
           hide();
         } else if (key == 'n') {
           setTileAsNFO();
-          if(!showNfo) {
+          if (!showNfo) {
             showNfo = true;
-            showNfoToggle.setState(showNfo); 
+            showNfoToggle.setState(showNfo);
           }
         } else if (keyCode == 93 || keyCode == 107) { //PLUS
           this.scaleGUI(true);
