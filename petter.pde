@@ -163,12 +163,12 @@ void setup() {
   surface.setTitle("petter " +version);
   sketchPath = sketchPath();
   
-  PImage pettericon = loadImage("i/icon.png");
+  PImage pettericon = loadImage("i/assets/icon.png");
   surface.setIcon(pettericon);
 
   checker = createCheckerboard(200, 200);
 
-  PFont pfont = createFont("i/fonts/PFArmaFive.ttf", 8, false);
+  PFont pfont = createFont("i/assets/PFArmaFive.ttf", 8, false);
   font = new ControlFont(pfont);
 
   gui = new ControlP5(this, font);
@@ -180,12 +180,12 @@ void setup() {
   svgpath = new ArrayList<String>();
   map = new ArrayList<PImage>();
   
-  try { svg.add(new TileSVG("i/default.svg"));}  catch(NullPointerException e) {svg.add(new TileShape(createShape(RECT, 0, 0, 50, 50),50f,50f));}
-  try { svgpath.add(sketchPath() +"/i/default.svg");}  catch(NullPointerException e) {}
-  try { ref = loadShape("i/ref.svg");}         catch(NullPointerException e) {showRef = false;}
-  try { nfo = new TileSVG("i/info.svg");}        catch(NullPointerException e) {showNfo = false;}
-  try { names = loadStrings("i/names.txt");}   catch(NullPointerException e) {}
-  try { helptext = loadStrings("i/help.txt");} catch(NullPointerException e) {} 
+  try { svg.add(new TileSVG("i/_petter-def.svg"));}  catch(NullPointerException e) {svg.add(new TileShape(createShape(RECT, 0, 0, 50, 50),50f,50f));}
+  try { svgpath.add(sketchPath() +"/i/_petter-def.svg");}  catch(NullPointerException e) {}
+  try { ref = loadShape("i/_petter-ref.svg");}         catch(NullPointerException e) {showRef = false;}
+  try { nfo = new TileSVG("i/_petter-nfo.svg");}        catch(NullPointerException e) {showNfo = false;}
+  try { names = loadStrings("i/assets/names.txt");}   catch(NullPointerException e) {}
+  try { helptext = loadStrings("i/assets/help.txt");} catch(NullPointerException e) {} 
 
   setupGUI();
 

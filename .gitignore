@@ -13,4 +13,8 @@ build
 *.pdf
 
 o/*.svg
+i/*.svg
+!i/_petter-def.svg
+!i/_petter-ref.svg
+!i/_petter-nfo.svg
 tmp
