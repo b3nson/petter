@@ -69,6 +69,7 @@ class MapEditor extends PApplet {
     addEffectorMap("imgmap", new ImageMap());
     addEffectorMap("noisemap", new PerlinNoiseMap());  
     addEffectorMap("patternmap", new PatternMap());
+    addEffectorMap("gradientmap", new GradientMap());
     addEffectorMap("erasermap", new EraserMap());
   
     setupGui();
@@ -486,13 +487,28 @@ class MapEditor extends PApplet {
     processKey(keyCode, false); //debounce parent
   }
   
-  void mouseEntered() {
-    currentMap().mouseEntered();
+  void mouseEntered(MouseEvent e) {
+    currentMap().mouseEvent(e);
   }
-  void mouseExited() {
-    currentMap().mouseExited();
+  void mouseExited(MouseEvent e) {
+    currentMap().mouseEvent(e);
   }
-  void mouseWheel(MouseEvent event) {
-    currentMap().mouseWheel(event.getCount());
+  void mouseClicked(MouseEvent e) {
+    currentMap().mouseEvent(e);
+  }
+  void mousePressed(MouseEvent e) {
+    currentMap().mouseEvent(e);
+  }
+  void mouseReleased(MouseEvent e) {
+    currentMap().mouseEvent(e);
+  }
+  void mouseMoved(MouseEvent e) {
+    //currentMap().mouseEvent(e);
+  }  
+  void mouseDragged(MouseEvent e) {
+    currentMap().mouseEvent(e);
+  }
+  void mouseWheel(MouseEvent e) {
+    currentMap().mouseEvent(e);
   }
 }
