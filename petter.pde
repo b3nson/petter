@@ -36,6 +36,7 @@ ControlFont font;
 ColorPicker bg_copi, stroke_copi, shape_copi, type_copi;
 TileEditor tileEditor;
 MapEditor mapEditor;
+Iterator iterator;
 Memento undo;
 PGraphics pdf; 
 
@@ -147,11 +148,13 @@ int guiwidth = 310;
 int manualNFOX = viewwidth/2;
 int manualNFOY = viewheight/6*5;
 
+
+
 // ---------------------------------------------------------------------------
 //  SETUP
 // ---------------------------------------------------------------------------
 
-void setup() {  
+void setup() {
   frameRate(100);
   size(905, 842, JAVA2D); //JAVA2D/FX2D
   smooth();
@@ -174,6 +177,9 @@ void setup() {
   gui = new ControlP5(this, font);
   gui.setAutoDraw(false);
 
+  setupIterators();
+  iterator = getIterator();
+  
   undo = new Memento(gui, 50);
 
   svg = new ArrayList<PShape>();
@@ -331,18 +337,21 @@ void draw() {
     shape(nfo);
     popMatrix();
   }
-
-  abscount = 0;
-  if (!linebyline) { tilecount = (xtilenum*ytilenum)-1; } 
-  else { tilecount = ytilenum-1; }
+  
   pageOffset = int(absPageOffset);
   tilewidth  = (float(pagewidth) / xtilenum);
   tilescale = tilewidth / svg.get(0).width;
   tileheight = svg.get(0).height * tilescale;
 
+  abscount = 0;
+  tilecount = (xtilenum*ytilenum)-1;
+  if(linebyline && iteratorIndex == 0) { 
+    tilecount = (loopDirection?xtilenum:ytilenum)-1; 
+  }
+
   randomSeed(seed);
 
-  pushMatrix();
+  pushMatrix(); //outer matrix
   scale(zoom);
   translate(pageOffset + manualOffsetX, pageOffset + manualOffsetY);
   scale(((float)(pagewidth-(2*pageOffset)) / (float)pagewidth)); //scale for offset
@@ -351,82 +360,99 @@ void draw() {
   // ---------------------------------------------------
   // MAIN LOOP
   // ---------------------------------------------------  
+  
+  
+  iterator.setTileGrid(xtilenum, ytilenum, loopDirection);
+  
+  while (iterator.hasNext()) {
+    pushMatrix(); //inner matrix
+    
+    int[] gridpos = iterator.next(); // get next tile on grid dependent on iterator    
+    int gridPosX = gridpos[0];
+    int gridPosY = gridpos[1];
+    
+    //Standard tile distribution
+    float tilex = (tilewidth/2)+(tilewidth*gridPosX);
+    float tiley = (tileheight/2)+(tileheight*gridPosY);
+    translate(tilex, tiley);
 
-  for (int i=0; i< (loopDirection?xtilenum:ytilenum); i++) {
-    for (int j=0; j< (loopDirection?ytilenum:xtilenum); j++ ) {
-      pushMatrix();
-      
-      //Standard tile distribution
-      float tilex = (tilewidth/2)+(tilewidth*(loopDirection?i:j));
-      float tiley = (tileheight/2)+(tileheight*(loopDirection?j:i));
-      translate(tilex, tiley);
-
-      //SKIPTILE--------------------------------------
-      if (mapEditor != null) {
-        if(mapEditor.getMapPermit(tilex, tiley) == false) {
-          popMatrix(); 
-          if(!linebyline) abscount++; 
-          continue; 
-        }
+    //SKIPTILE--------------------------------------
+    if (mapEditor != null) {
+      if(mapEditor.getMapPermit(tilex, tiley) == false) {
+        popMatrix(); 
+        if(linebyline && iteratorIndex == 0) { //only with scanline-iterator // same as on end of loop // refactor?
+          if(!loopDirection && gridPosX == xtilenum-1 ||
+              loopDirection && gridPosY == ytilenum-1 ) {
+            abscount++;  
+          }
+        } else { abscount++; }    
+        continue; 
       }
-
-      //TRANSLATE-------------------------------------
-      totaltranslatex = absTransX*(map(j, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
-      totaltranslatey = absTransY*(map(i, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
-      if (mapEditor != null && mapEditor.traMapActive()) {
-        mapValue = mapEditor.getTraMapValue(tilex, tiley);
-        totaltranslatex += (mapValue * ((float)relTransX));
-        totaltranslatey += (mapValue * ((float)relTransY));
-      } else {
-        totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
-        totaltranslatey += (ease(TRA, abscount, 0, -relTransY, tilecount)+(relTransY/2));
-      }
-      translate(totaltranslatex, totaltranslatey);
-
-      //ROTATE-------------------------------------
-      totalrotate = absRot;
-      if (mapEditor != null && mapEditor.rotMapActive()) {
-        mapValue = mapEditor.getRotMapValue(tilex, tiley);
-        totalrotate += (mapValue * (relRot));
-      } else {
-        totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
-      }
-      rotate(radians(totalrotate));
-
-      //SCALE-------------------------------------
-      totalscale = absScale;
-      if (mapEditor != null && mapEditor.scaMapActive()) {
-        mapValue = mapEditor.getScaMapValue(tilex, tiley);
-        totalscale *= (mapValue * (relScale));
-      } else {  
-        totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);
-      }
-      scale(totalscale*tilescale);
-
-      //SELECTTILE-----------------------------
-      if (mapEditor != null && mapEditor.selMapActive()) {
-        mapValue = mapEditor.getSelMapValue(tilex, tiley);
-        s = svg.get( round( map(mapValue, 0, 1, 0, svg.size()-1) ) );
-      } else if (random) {
-        s = svg.get(int(random(svg.size())));
-      } else {
-        s = svg.get( (((loopDirection?ytilenum:xtilenum)*i)+j)%svg.size() );
-      }
-
-      if (s != null) {
-        shape(s);
-      }
-
-      popMatrix();
-      if (!linebyline) {
-        abscount++;
-      }
-    } //for j
-    if (linebyline) {
-      abscount++;
     }
-  } //for i
-  popMatrix();
+
+    //TRANSLATE-------------------------------------
+    totaltranslatex = absTransX*(map(gridPosX, 0f, (float)xtilenum, (float)-xtilenum/2+0.5, (float)xtilenum/2+0.5 ));
+    totaltranslatey = absTransY*(map(gridPosY, 0f, (float)ytilenum, (float)-ytilenum/2+0.5, (float)ytilenum/2+0.5 ));      
+    if (mapEditor != null && mapEditor.traMapActive()) {
+      mapValue = mapEditor.getTraMapValue(tilex, tiley);
+      totaltranslatex += (mapValue * ((float)relTransX));
+      totaltranslatey += (mapValue * ((float)relTransY));
+    } else {
+      totaltranslatex += (ease(TRA, abscount, 0, -relTransX, tilecount)+(relTransX/2));
+      totaltranslatey += (ease(TRA, abscount, 0, -relTransY, tilecount)+(relTransY/2));
+    }
+    translate(totaltranslatex, totaltranslatey);
+
+    //ROTATE-------------------------------------
+    totalrotate = absRot;
+    if (mapEditor != null && mapEditor.rotMapActive()) {
+      mapValue = mapEditor.getRotMapValue(tilex, tiley);
+      totalrotate += (mapValue * (relRot));
+    } else {
+      totalrotate += ease(ROT, abscount, 0, relRot, tilecount);
+    }
+    rotate(radians(totalrotate));
+
+    //SCALE-------------------------------------
+    totalscale = absScale;
+    if (mapEditor != null && mapEditor.scaMapActive()) {
+      mapValue = mapEditor.getScaMapValue(tilex, tiley);
+      totalscale *= (mapValue * (relScale));
+    } else {  
+      totalscale *= ease(SCA, abscount, 1.0, relScale, tilecount);
+    }
+    scale(totalscale*tilescale);
+
+    //SELECTTILE-----------------------------
+    int svgindex = 0;
+    if (mapEditor != null && mapEditor.selMapActive()) {
+      mapValue = mapEditor.getSelMapValue(tilex, tiley);
+      svgindex = round( map(mapValue, 0, 1, 0, svg.size()-1) );
+    } else if (random) {
+      svgindex = int(random(svg.size()));
+    } else if (svg.size() > 1) {
+      svgindex = ((xtilenum*gridPosY)+(gridPosX)) %svg.size();
+    }
+    s = svg.get(svgindex);
+    
+    //DRAWTILE-----------------------------
+    if (s != null) {
+      shape(s);
+    }
+
+    popMatrix(); //inner matrix
+
+    //COUNT-----------------------------
+    if(linebyline && iteratorIndex == 0) { //only with scanline-iterator
+      if(!loopDirection && gridPosX == xtilenum-1 ||
+          loopDirection && gridPosY == ytilenum-1 ) {
+        abscount++;  
+      }
+    } else { abscount++; }
+    
+  } //while hasNext
+  popMatrix(); //outer matrix
+
 
   // ---------------------------------------------------
 
@@ -680,6 +706,10 @@ void keyPressed() {
     changeSliderRange(true);
   } else if (keysDown['D']) {
     loadDefaultSettings();
+  } else if (keysDown['1']) {
+    prevIterator();
+  } else if (keysDown['2']) {
+    nextIterator();
   }
 }
 
