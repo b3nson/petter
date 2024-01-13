@@ -91,6 +91,8 @@ boolean globalStyle = false;
 boolean customStroke = true;
 boolean customFill = true;
 boolean random = false;
+boolean loopDirection = false; //false = X before Y | true = Y before X
+boolean tileSelectionMode = false; //false = by gridorder | true = by iterator-order
 boolean linebyline = false;
 boolean dragAllowed = false;
 boolean showRef = false;
@@ -108,7 +110,6 @@ int fps = 0;
 float mapValue = 0f;
 
 int abscount = 0;
-boolean loopDirection = false; //false = X before Y | true = Y before X
 int rotType = 0;
 int scaType = 0;
 int traType = 0;
@@ -370,6 +371,7 @@ void draw() {
     int[] gridpos = iterator.next(); // get next tile on grid dependent on iterator    
     int gridPosX = gridpos[0];
     int gridPosY = gridpos[1];
+    int iterCount = gridpos[2];
     
     //Standard tile distribution
     float tilex = (tilewidth/2)+(tilewidth*gridPosX);
@@ -431,7 +433,11 @@ void draw() {
     } else if (random) {
       svgindex = int(random(svg.size()));
     } else if (svg.size() > 1) {
-      svgindex = ((xtilenum*gridPosY)+(gridPosX)) %svg.size();
+      if(!tileSelectionMode) {
+        svgindex = ((xtilenum*gridPosY)+(gridPosX)) %svg.size(); //grid-order
+      } else { 
+        svgindex = (iterCount-1) %svg.size();                    //iteration-order
+      }
     }
     s = svg.get(svgindex);
     
@@ -666,6 +672,9 @@ void keyPressed() {
   } else if (keysDown['L']) {
     linebyline = !linebyline;
     linebylineSaveLabel.setValue((int(linebyline)));
+  } else if (keysDown['E']) {
+    tileSelectionMode = !tileSelectionMode;
+    tileSelectionModeSaveLabel.setValue((int(tileSelectionMode)));
   } else if (keysDown['B']) {
     showRef = !showRef;
     showRefToggle.setState(showRef);

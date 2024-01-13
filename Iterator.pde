@@ -77,7 +77,7 @@ public class Scanline implements Iterator {
   
   private int firstOrderIndex = 0;
   private int secondOrderIndex = 0;
-  private int[] gridPos = {0, 0};
+  private int[] gridPos = {0, 0, 0};
   
   private int firstOrderPos = 0;
   private int secondOrderPos = 0;  
@@ -123,6 +123,7 @@ public class Scanline implements Iterator {
 
     gridPos[0] = loopdir?secondOrderPos:firstOrderPos;
     gridPos[1] = loopdir?firstOrderPos:secondOrderPos;
+    gridPos[2] = tileCountCur;
         
     return gridPos;
   }
@@ -145,7 +146,7 @@ public class Snake implements Iterator {
   
   private int firstOrderIndex = 0;
   private int secondOrderIndex = 0;
-  private int[] gridPos = {0, 0};
+  private int[] gridPos = {0, 0, 0};
   
   private int firstOrderPos = 0;
   private int secondOrderPos = 0;  
@@ -194,6 +195,7 @@ public class Snake implements Iterator {
 
     gridPos[0] = loopdir?secondOrderPos:firstOrderPos;
     gridPos[1] = loopdir?firstOrderPos:secondOrderPos;
+    gridPos[2] = tileCountCur;
         
     return gridPos;
   }

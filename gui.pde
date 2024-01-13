@@ -41,7 +41,7 @@ int w = 180;
 int imgMapHeight = 0;
 int tickMarks = 11;
 int helpwidth = 330;
-int helpheight = ceil(68 * 9.6); //68 lines in help.txt
+int helpheight = ceil(69 * 9.6); //68 lines in help.txt
 int infoheight = 22;
 int scrollOffset = 0;
 float scrollbarWidth = 2;
@@ -74,7 +74,7 @@ Toggle pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle,
 Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
-Numberbox bgcolorSaveLabel, strokecolorSaveLabel, strokecolorAlphaSaveLabel, shapecolorSaveLabel, shapecolorAlphaSaveLabel, styleSaveLabel, loopDirectionSaveLabel, linebylineSaveLabel;
+Numberbox bgcolorSaveLabel, strokecolorSaveLabel, strokecolorAlphaSaveLabel, shapecolorSaveLabel, shapecolorAlphaSaveLabel, styleSaveLabel, loopDirectionSaveLabel, tileSelectionModeSaveLabel, linebylineSaveLabel;
 Slider offsetxSaveLabel, offsetySaveLabel;
 Label tmp;
 
@@ -524,7 +524,14 @@ void setupGUI() {
      .setGroup(main)
      .hide()
      ;
-     
+
+  tileSelectionModeSaveLabel = gui.addNumberbox("tileSelectionModeSaveLabel" )
+     .setPosition(0, 0)
+     .setValue((int(tileSelectionMode)))
+     .setGroup(main)
+     .hide()
+     ;
+   
   linebylineSaveLabel = gui.addNumberbox("linebylineSaveLabel" )
      .setPosition(0, 0)
      .setValue((int(linebyline)))
@@ -1288,6 +1295,11 @@ void controlEvent(ControlEvent theEvent) {
     //float to bool in 2 lines, otherwise won't work in processing 2.2.1
     int val = int(loopDirectionSaveLabel.getValue());
     loopDirection = boolean(val);
+  }
+  else if (theEvent.isFrom(tileSelectionModeSaveLabel)) {
+    //float to bool in 2 lines, otherwise won't work in processing 2.2.1
+    int val = int(tileSelectionModeSaveLabel.getValue());
+    tileSelectionMode = boolean(val);
   }
   else if (theEvent.isFrom(linebylineSaveLabel)) {
     //float to bool in 2 lines, otherwise won't work in processing 2.2.1
