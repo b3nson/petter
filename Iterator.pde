@@ -31,6 +31,7 @@ int iteratorIndex = 0;
 void setupIterators() {
   iteratorList.add(new Scanline());
   iteratorList.add(new Snake());
+  iteratorList.add(new Spiral());
 }
 
 void setIterator(int i) {
@@ -197,6 +198,112 @@ public class Snake implements Iterator {
     gridPos[1] = loopdir?firstOrderPos:secondOrderPos;
     gridPos[2] = tileCountCur;
         
+    return gridPos;
+  }
+}
+
+
+
+
+
+// ---------------------------------------------------------------------------
+//  Spiral Iterator
+// ---------------------------------------------------------------------------
+
+public class Spiral implements Iterator {
+
+  private int xnum;
+  private int ynum;
+  private boolean loopdir;
+  
+  private int tileCountAll;
+  private int tileCountCur;
+  
+  private int xIndex = 0;
+  private int yIndex = 0;
+  private int[] gridPos = {0, 0, 0};
+  
+  private int xPos = 0;
+  private int yPos = 0;  
+  
+  private int topMax, rightMax, bottomMax, leftMax;
+  private int dir = 0;
+  
+  public Spiral() {}
+  
+  public void setTileGrid(int xnum, int ynum, boolean loopdir) {
+    this.xnum = xnum;
+    this.ynum = ynum;
+    this.loopdir = loopdir;
+    tileCountAll = xnum * ynum;
+    tileCountCur = 0;
+    xIndex = 0;
+    yIndex = 0;
+    topMax = 0;
+    rightMax = xnum-1;
+    bottomMax = ynum-1;
+    leftMax = 0;
+    dir = 0;
+  }
+  
+  public boolean hasNext() {
+      if(tileCountCur < tileCountAll) {
+        return true;
+      }
+    return false;
+  }
+  
+  //SPIRAL x>y or y>x
+  public int[] next() { 
+    
+    tileCountCur++;    
+    
+    if(dir == 0) {  //L > R
+      xPos = xIndex;
+      yPos = yIndex;
+      xIndex++;
+      if(xIndex > rightMax) {
+        dir = 1;
+        xIndex--;
+        yIndex++;
+        topMax++;
+      }
+    } else if(dir == 1) {  // T > B
+      xPos = xIndex;
+      yPos = yIndex;
+      yIndex++;
+      if(yIndex > bottomMax) {
+        dir = 2;
+        yIndex--;
+        xIndex--;
+        rightMax--;
+      }
+    } else if(dir == 2) {  // R > L
+      xPos = xIndex;
+      yPos = yIndex;
+      xIndex--;
+      if(xIndex < leftMax) {
+        dir = 3;
+        xIndex++;
+        yIndex--;
+        bottomMax--;
+      }      
+    } else if(dir == 3) {  // B > T
+      xPos = xIndex;
+      yPos = yIndex;
+      yIndex--;
+      if(yIndex < topMax) {
+        dir = 0;
+        yIndex++;
+        xIndex++;
+        leftMax++;
+      }
+    }
+
+    gridPos[0] = xPos;
+    gridPos[1] = yPos;
+    gridPos[2] = tileCountCur;
+
     return gridPos;
   }
 }
