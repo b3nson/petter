@@ -40,7 +40,7 @@ Iterator iterator;
 Memento undo;
 PGraphics pdf; 
 
-String version = "0.6";
+String version = "0.7";
 String settingspath = "i/settings/";
 String outputpath = "o/";
 String tmppath = "tmp/";

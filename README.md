@@ -56,8 +56,11 @@ CTRL-SCROLL			- scale nfo-graphic
 CURSOR LEFT/RIGHT	- add/remove tiles in x-space (+SHIFT: 10)
 CURSOR UP/DOWN		- add/remove tiles in y-space (+SHIFT: 10)
 
-R	- randomize tile-order (when multiple different tiles are used)
+1   - apply previous Iterator
+2   - apply next Iterator
 X	- change cycle-order (L>R>T>B to T>B>L>R)
+R	- randomize tile-selection (when multiple different tiles are used)
+E	- change tile-selection-mode (gridorder or iteratororder)
 L	- change rel-transformations from tile-by-tile to line-by-line
 N	- show/hide NFO-Graphic
 B	- show/hide REF-Graphic
@@ -108,7 +111,7 @@ https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
 ```
 Petter - vector-graphic-based pattern generator.
 http://www.lafkon.net/petter/
-Copyright (C) 2021 LAFKON/Benjamin Stephan
+Copyright (C) 2024 LAFKON/Benjamin Stephan
  
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
