@@ -1,7 +1,7 @@
 /**
  * Petter - vector-graphic-based pattern generator.
  * http://www.lafkon.net/petter/
- * Copyright (C) 2021 LAFKON/Benjamin Stephan
+ * Copyright (C) 2024 LAFKON/Benjamin Stephan
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
 
 
 public interface Iterator {
+  String getName();
   void setTileGrid(int xnum, int ynum, boolean loopdir);
   boolean hasNext();
   int[] next();
@@ -29,9 +30,9 @@ ArrayList<Iterator> iteratorList = new ArrayList<Iterator>();
 int iteratorIndex = 0;
 
 void setupIterators() {
-  iteratorList.add(new Scanline());
-  iteratorList.add(new Snake());
-  iteratorList.add(new Spiral());
+  iteratorList.add(new Scanline("scanline"));
+  iteratorList.add(new Snake("snake"));
+  iteratorList.add(new Spiral("spiral"));
 }
 
 void setIterator(int i) {
@@ -69,6 +70,7 @@ void nextIterator() {
 
 public class Scanline implements Iterator {
 
+  private String name;
   private int firstOrderNum;
   private int secondOrderNum;
   private boolean loopdir;
@@ -83,7 +85,13 @@ public class Scanline implements Iterator {
   private int firstOrderPos = 0;
   private int secondOrderPos = 0;  
   
-  public Scanline() {}
+  public Scanline(String name) {
+    this.name = name;
+  }
+  
+  public String getName() {
+    return name;  
+  }
   
   public void setTileGrid(int xnum, int ynum, boolean loopdir) {
     this.firstOrderNum = loopdir?ynum:xnum;
@@ -132,12 +140,14 @@ public class Scanline implements Iterator {
 
 
 
+
 // ---------------------------------------------------------------------------
 //  Snake Iterator
 // ---------------------------------------------------------------------------
 
 public class Snake implements Iterator {
 
+  private String name;
   private int firstOrderNum;
   private int secondOrderNum;
   private boolean loopdir;
@@ -154,7 +164,13 @@ public class Snake implements Iterator {
   
   private boolean forwardDir = true;
   
-  public Snake() {}
+  public Snake(String name) {
+    this.name = name;
+  }
+  
+  public String getName() {
+    return name;  
+  }
   
   public void setTileGrid(int xnum, int ynum, boolean loopdir) {
     this.firstOrderNum = loopdir?ynum:xnum;
@@ -205,13 +221,13 @@ public class Snake implements Iterator {
 
 
 
-
 // ---------------------------------------------------------------------------
 //  Spiral Iterator
 // ---------------------------------------------------------------------------
 
 public class Spiral implements Iterator {
 
+  private String name;
   private int xnum;
   private int ynum;
   private boolean loopdir;
@@ -229,7 +245,13 @@ public class Spiral implements Iterator {
   private int topMax, rightMax, bottomMax, leftMax;
   private int dir = 0;
   
-  public Spiral() {}
+  public Spiral(String name) {
+    this.name = name;
+  }
+  
+  public String getName() {
+    return name;  
+  }
   
   public void setTileGrid(int xnum, int ynum, boolean loopdir) {
     this.xnum = xnum;

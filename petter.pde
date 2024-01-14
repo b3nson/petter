@@ -101,6 +101,7 @@ boolean nfoOnTop = true;
 boolean exportFormat = true; //true=PDF|false=SVG
 boolean guiExport = false;
 boolean guiExportNow = false;
+boolean showTmpInfoLabel = false;
 boolean showExportLabel = false;
 boolean sequencing = false;
 boolean shift = false;
@@ -516,6 +517,12 @@ void draw() {
     }
   }
 
+  if(showTmpInfoLabel) {
+    if(millis() - showTmpInfoLabelTimer >= 4000) {
+      showTmpInfoLabel(false, "");
+    }
+  }
+  
   if(showExportLabel) {
     if(millis() - showExportLabelTimer >= 4000) {
       showExportLabel(false);
@@ -667,14 +674,18 @@ void keyPressed() {
   } else if (keysDown['X']) {
     loopDirection = !loopDirection;
     loopDirectionSaveLabel.setValue((int(loopDirection)));
+    showTmpInfoLabel(true, "loopdirection: " +(loopDirection?"y –> x":"x –> y"));
   } else if (keysDown['R']) {
     toggleRandom();
+    showTmpInfoLabel(true, "random tile selection: " +(random?"on":"off"));
   } else if (keysDown['L']) {
     linebyline = !linebyline;
     linebylineSaveLabel.setValue((int(linebyline)));
+    showTmpInfoLabel(true, "linebyline: " +(linebyline?"on":"off"));
   } else if (keysDown['E']) {
     tileSelectionMode = !tileSelectionMode;
     tileSelectionModeSaveLabel.setValue((int(tileSelectionMode)));
+    showTmpInfoLabel(true, "tileSelectionMode: " +(tileSelectionMode?"iteratororder":"gridorder"));
   } else if (keysDown['B']) {
     showRef = !showRef;
     showRefToggle.setState(showRef);
@@ -717,8 +728,10 @@ void keyPressed() {
     loadDefaultSettings();
   } else if (keysDown['1']) {
     prevIterator();
+    showTmpInfoLabel(true, "iterator: " +iteratorIndex +" –>  " +iterator.getName());
   } else if (keysDown['2']) {
     nextIterator();
+    showTmpInfoLabel(true, "iterator: " +iteratorIndex +" –>  " +iterator.getName());
   }
 }
 

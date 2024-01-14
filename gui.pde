@@ -50,6 +50,7 @@ float scrollbarY = 0;
 
 float mapwidth = 0;
 float mapheight = 0;
+float showTmpInfoLabelTimer = 0;
 float showExportLabelTimer = 0;
   
 color c1 = color(16, 181, 198);    // blue
@@ -63,7 +64,7 @@ String renderer ="";
 Boolean shiftPressed = false;
 Boolean shiftProcessed = false;
 
-Group main, imgmapGroup, style, animate, help, helptextbox, info, exportinfo, styleLineGroup;
+Group main, imgmapGroup, style, animate, help, helptextbox, info, tmpinfo, exportinfo, styleLineGroup;
 Slider xTileNumSlider, yTileNumSlider, pageOffsetSlider, absTransXSlider, absTransYSlider, relTransXSlider, relTransYSlider, absRotSlider, relRotSlider, absScaSlider, relScaSlider, strokeWeightSlider, last;
 ScrollableListPlus penner_rot, penner_sca, penner_tra, settingsFilelist;
 ScrollableListPlus penner_anim, formatDropdown;
@@ -71,7 +72,7 @@ Button animSetInButton, animSetOutButton, animRunButton, animExportButton, animG
 RadioButton linecapRadioButton, linejoinRadioButton;
 Bang bgcolorBang, strokecolorBang, shapecolorBang, tileeditorBang, mapeditorBang;
 Toggle pageOrientationToggle, showRefToggle, showNfoToggle, showGuiExportToggle, strokeModeToggle, strokeToggle, fillToggle, nfoLayerToggle, exportFormatToggle;
-Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel;
+Textlabel dragOffset, zoomLabel, stylefillLabel, helptextLabel, fpsLabel, lastguielem, exportConfirmationLabel, tmpInfoLabel;
 Numberbox wBox, hBox, animFrameNumBox;
 //save values to hidden controllers to get saved in properties 
 Numberbox bgcolorSaveLabel, strokecolorSaveLabel, strokecolorAlphaSaveLabel, shapecolorSaveLabel, shapecolorAlphaSaveLabel, styleSaveLabel, loopDirectionSaveLabel, tileSelectionModeSaveLabel, linebylineSaveLabel;
@@ -820,7 +821,23 @@ void setupGUI() {
      .setText("ZOOM: 1.0")
      .setGroup(info)
      ;
-
+     
+  tmpinfo = gui.addGroup("tmpinfo")
+    .setSize(guiwidth, infoheight)
+    .setPosition(viewwidth, viewheight-2*infoheight)
+    .setBackgroundHeight(infoheight+2)
+    .setBackgroundColor(color(25))
+    .hideBar()
+    .hide()
+    .open()
+    ;
+    
+  tmpInfoLabel = gui.addTextlabel("infolabel" )
+    .setPosition(10, 7)
+    .setText("")
+    .setGroup(tmpinfo)
+    ;
+    
   exportinfo = gui.addGroup("exportinfo")
     .setSize(viewwidth, infoheight)
     .setPosition(0, viewheight-infoheight)
@@ -837,6 +854,7 @@ void setupGUI() {
     .setColor(0)
     .setGroup(exportinfo)
     ; 
+
    
 // ---------------------------------------------------------------------------
 //  GUI SETUP - HELP MENU
@@ -909,6 +927,7 @@ void setupGUI() {
   penner_tra.bringToFront();
   penner_anim.bringToFront();
   info.bringToFront();
+  tmpinfo.bringToFront();
   
   ControllerProperties cprop = gui.getProperties();
   cprop.remove(tileeditorBang);
@@ -937,7 +956,9 @@ void setupGUI() {
   cprop.remove(fpsLabel);
   cprop.remove(exportinfo);
   cprop.remove(exportConfirmationLabel);
-
+  cprop.remove(tmpinfo);
+  cprop.remove(tmpInfoLabel);
+  
   registerForAnimation(xTileNumSlider);
   registerForAnimation(yTileNumSlider);
   registerForAnimation(pageOffsetSlider);
@@ -1453,6 +1474,20 @@ void reorderGuiElements() {
   }
 }
 
+void showTmpInfoLabel(boolean state, String text) {
+  if(state) {
+    tmpInfoLabel.setText(text);
+    tmpinfo.show();
+    showTmpInfoLabel = true;
+    showTmpInfoLabelTimer = millis();
+  } else {
+    tmpInfoLabel.setText("");
+    tmpinfo.hide();
+    showTmpInfoLabel = false;
+    showTmpInfoLabelTimer = 0;
+  }
+}
+
 void showExportLabel(boolean state) {
   if(state) {
     exportConfirmationLabel.setText("EXPORTED:     " +filename);
@@ -1660,7 +1695,9 @@ void resizeFrame(int newW, int newH) {
   gui.getGroup("help").setSize(viewwidth, viewheight+1);
   gui.getGroup("helptextbox").setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
   gui.getGroup("info").setPosition(viewwidth, viewheight-infoheight);
-  
+
+  tmpinfo.setSize(guiwidth, infoheight);
+  tmpinfo.setPosition(viewwidth, viewheight-2*infoheight);
   exportinfo.setSize(viewwidth, infoheight);
   exportinfo.setPosition(0, viewheight-infoheight);
   
