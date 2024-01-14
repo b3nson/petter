@@ -56,8 +56,8 @@ CTRL-SCROLL			- scale nfo-graphic
 CURSOR LEFT/RIGHT	- add/remove tiles in x-space (+SHIFT: 10)
 CURSOR UP/DOWN		- add/remove tiles in y-space (+SHIFT: 10)
 
-1   - apply previous Iterator
-2   - apply next Iterator
+1	- apply previous Iterator
+2	- apply next Iterator
 X	- change cycle-order (L>R>T>B to T>B>L>R)
 R	- randomize tile-selection (when multiple different tiles are used)
 E	- change tile-selection-mode (gridorder or iteratororder)
