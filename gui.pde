@@ -25,6 +25,7 @@ boolean showHELP = false;
 boolean batchmode = false;
 boolean batchnow = false;
 boolean showScrollbar = false;
+boolean cp5BoundsChanged = false;
 int batchwait = 1;
 
 int c = 0;
@@ -1620,8 +1621,6 @@ void togglePageOrientation() {
   wBox.setValue(tmppdfwidth);
   hBox.setValue(tmppdfheight);
   
-  canvasResize();
-  
   int tmp = xtilenum;
   xtilenum = ytilenum;
   ytilenum = tmp;
@@ -1635,7 +1634,9 @@ void togglePageOrientation() {
   }
   
   xTileNumSlider.setValue(xtilenum);
-  yTileNumSlider.setValue(ytilenum); 
+  yTileNumSlider.setValue(ytilenum);
+  
+  canvasResize();
 }
 
 void nextImgMapFrame() {
@@ -1703,8 +1704,9 @@ void resizeFrame(int newW, int newH) {
   
   reorderGuiElements();
   
-  gui.setGraphics(this, 0, 0);
   gui.update();
+  gui.setGraphics(this, 0, 0);
+  cp5BoundsChanged = true;
 }
 
 void scaleGUI(float newzoom) {

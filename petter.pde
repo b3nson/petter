@@ -577,6 +577,11 @@ void draw() {
   if (showHELP) {
     fpsLabel.setText(renderer +" @ " +str((int)frameRate));
   }
+
+  if(cp5BoundsChanged) {
+    gui.setGraphics(this, 0, 0); //hack to prevent cp5-bounds-bug
+    cp5BoundsChanged = false;
+  }
 }//DRAW END
 
 
