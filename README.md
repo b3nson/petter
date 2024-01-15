@@ -1,21 +1,32 @@
-Petter
-======
-a vector-graphic-based pattern generator.
+# Petter
+an experimental vectorgraphic pattern generator.  
+[lafkon.net/petter](http://www.lafkon.net/petter/)
 
-### Description:
-Petter is a experimental [Processing](http://www.processing.org/)-application for experimental vector-based graphic design.    
-Use [SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)-Files as input to generate, influence and export graphic patterns as PDF.    
-JPEG/PNG/GIF (also animated ones) can be used as a "ImageMap" to alter the pattern.    
-Drag and Drop SVGs into the "TileEditor", use gui-controls to alter the pattern,    
-press 's' to export as PDF. Press 'h' for further help.    
+---
 
-See http://www.lafkon.net/petter/ for a gallery of outputs created with Petter.
+## Description:
+Petter is an experimental ui-based [Processing](http://www.processing.org/)-App to create and save experimental visual patterns. Input and output is strictly vector-based (svg/pdf).
+
+Use your own [svg](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)-files as input, alter the repetition and stacking of basic relative and absolute transformations, influence the resulting pattern with different effectors and export efficient vector-pdfs.
+
+See [lafkon.net/petter](http://www.lafkon.net/petter/) for a gallery of outputs created along the way with Petter.  
+Check [Installation](#installation) and [Basic instructions](#basic-instructions) below.
+
+## Screenshots:
+> Petter main-ui
 
 ![petter screenshot](http://www.lafkon.net/petter/ext/20150125-213016_595x842_Louise+GUI.gif "petter screenshot")
-![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
-Animated PDF-sequences with (bottom) and without (top) animated-gif as ImageMap.
 
-### Keyboard Shortcuts:
+> Animated PDF-sequences 
+
+![petter animated sequence](http://www.lafkon.net/petter/ext/Josh_30f-half.gif "petter animated sequence")![petter animated sequence with animated imagemap](http://www.lafkon.net/petter/ext/William-27f+GUI.gif "petter animated sequence with animated imagemap") 
+
+> Petter MapEditor and TileEditor
+
+<img src="http://www.lafkon.net/petter/ext/Petter_MapEditor-01a.png" width="49%"></src>
+<img src="http://www.lafkon.net/petter/ext/Petter_TileEditor-01a.png" width="49%"></src>
+
+## Keyboard shortcuts:
 ```
 SHORTCUTS
 ========================================================================
@@ -82,32 +93,28 @@ P	- view/testrun animation
 ========================================================================
 ```
 
-### Installation:
+## Installation:
 - Grab a copy of [Processing](http://www.processing.org/) for your OS, install it.
 - Download/clone Petter to your Processing Sketch-Directory.
 - Download and install external libraries (see below).
-- For **Processing 3**.x choose `master`-branch: [master](https://github.com/b3nson/petter/tree/master)
-- For **Processing 2**.x choose `processing-2.x`-branch: [processing-2.x](https://github.com/b3nson/petter/tree/processing-2.x)
 
+## Basic instructions:
+Check **Keyboard Shortcuts** above, as Petter relies heaviliy on shortcuts.
+- Start app, play around, read help <kbd>H</kbd>, open **TileEditor** <kbd>T</kbd> and **MapEditor** <kbd>M</kbd>.
+- Drag and drop svg-file(s) onto **TileEditor** to add tiles.
+- Hit <kbd>S</kbd> to save the current pattern as pdf anytime. You'll find it in the `o`-directory of your sketch.
+- Read help <kbd>H</kbd> again to find some new shortcuts and functions.
 
-### Use of contributed Libraries:
+## Required libraries:
 - `penner.easing` - http://github.com/jesusgollonet/processing-penner-easing
 - `controlP5` - http://github.com/sojamo/controlp5 (> v2.2.3)
 - `drop` - https://transfluxus.github.io/drop/
 - `gifAnimation` - http://extrapixel.github.io/gif-animation/ (>= [3.0](https://github.com/extrapixel/gif-animation/tree/3.0))
 
-### Command-Line-Options:
-soon...
+## Command-line-options:
+Implemented, not yet documented.
 
-
-### Known Issues:    
-DragAndDrop does not work with FileManager `pcmanfm` under GNU/Linux.    
-Use e.g. `Nautilus` instead.    
-"The root error is pcmanfm sends a null-terminated-string for file list"    
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=664205
-
-
-### License: 
+## License: 
 ```
 Petter - vector-graphic-based pattern generator.
 http://www.lafkon.net/petter/
