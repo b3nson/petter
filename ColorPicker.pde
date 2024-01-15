@@ -87,6 +87,8 @@ public class ColorPicker extends PApplet {
 
   void setup() {
     surface.setTitle(name);
+    surface.setIcon(pettericon);
+    
     frameRate(25);
 
     cp5 = new ControlP5(this);

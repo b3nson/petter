@@ -57,6 +57,7 @@ PShape ref;
 PShape nfo;
 PShape s;
 PImage checker;
+PImage pettericon;
 
 int mapIndex = 0;
 int absPageOffset = 25;
@@ -168,7 +169,7 @@ void setup() {
   surface.setTitle("petter " +version);
   sketchPath = sketchPath();
   
-  PImage pettericon = loadImage("i/assets/icon.png");
+  pettericon = loadImage("i/assets/icon.png");
   surface.setIcon(pettericon);
 
   checker = createCheckerboard(200, 200);

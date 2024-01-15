@@ -62,6 +62,8 @@ class MapEditor extends PApplet {
   // ---------------------------------------------------------------------------
 
   public void setup() {
+    surface.setIcon(pettericon);
+    
     cp5 = new ControlP5(this, font);
     cp5.setAutoDraw(false);
     

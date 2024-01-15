@@ -93,7 +93,9 @@ class TileEditor extends PApplet {
   // ---------------------------------------------------------------------------
 
   public void setup() {
+    surface.setIcon(pettericon);
     //surface.setLocation(10, 10);
+    
     shapeMode(CENTER);
     rectMode(CENTER);
     textMode(SHAPE);
