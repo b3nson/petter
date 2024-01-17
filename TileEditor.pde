@@ -38,6 +38,7 @@ class TileEditor extends PApplet {
   boolean typeEditorCreated = false;
   boolean fontlistLoaded = false;
   boolean showFPS = false;
+  boolean clipboard = false;
 
   int w, h;
   int svgindex = -1;
@@ -49,13 +50,17 @@ class TileEditor extends PApplet {
   int unlockColor = 255;
   int prevTypeColor = -1;
 
-  float offsetx, offsety, tmpx, tmpy;
+  float dragoffsetx, dragoffsety, offsetx, offsety;
   float scalex = 1f;
   float scaley = 1f;
   float rotation = 0f;
   float zoom = 1f;
   float baseline = 0f;
   float typeypos = 0f;
+
+  float clipboard_x, clipboard_y;
+  float clipboard_sx, clipboard_sy;
+  float clipboard_r;
 
   String fontname = "Monospaced";
   String renderer = "";
@@ -619,13 +624,13 @@ class TileEditor extends PApplet {
     svglength = tileeditorshapelist.size();
     if (mode == REPLACESVG) {
       svgindex = 0;
-      offsetx = 0;
-      offsety = 0;
+      dragoffsetx = 0;
+      dragoffsety = 0;
       scalex = 1;
       scaley = 1;
       rotation = 0;
-      tmpx = 0;
-      tmpy = 0;
+      offsetx = 0;
+      offsety = 0;
     }
     svg = tileeditorshapelist.get(svgindex);
     setCountLabel();
@@ -654,8 +659,8 @@ class TileEditor extends PApplet {
       if (svgindex == -1) svgindex = svglength-1;
       setCountLabel();
 
-      ((Tile)( svg )).setOffsetX(tmpx); //vorsichtshalber, wenn prev before dragrelease
-      ((Tile)( svg )).setOffsetY(tmpy);
+      ((Tile)( svg )).setOffsetX(offsetx); //vorsichtshalber, wenn prev before dragrelease
+      ((Tile)( svg )).setOffsetY(offsety);
 
       svg = tileeditorshapelist.get(svgindex);
       updateLocalValuesfromTile();
@@ -682,8 +687,8 @@ class TileEditor extends PApplet {
 
   private void resetTile(int index) {
     ((Tile)( tileeditorshapelist.get(index) )).resetTransform();
-    tmpx = 0;
-    tmpy = 0;
+    offsetx = 0;
+    offsety = 0;
     scalex = 1;
     scaley = 1;
     rotation = 0;
@@ -743,6 +748,28 @@ class TileEditor extends PApplet {
     setValueLabels();
   }
 
+  private void copyTransforms() {
+    clipboard_r = rotation;
+    clipboard_sx = scalex;
+    clipboard_sy = scaley;
+    clipboard_x = offsetx;
+    clipboard_y = offsety;
+    clipboard = true;
+  }
+  
+  private void pasteTransforms() {
+    if(clipboard) { //copied anything?
+      rotation = clipboard_r;
+      scalex = clipboard_sx;
+      scaley = clipboard_sy;
+      offsetx = clipboard_x;
+      offsety = clipboard_y;
+      updateRotation();
+      updateScale();
+      updateTranslate();     
+    }
+  }
+
   private void updateScale() {
     ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleX(scalex);
     ((Tile)( tileeditorshapelist.get(svgindex) )).setScaleY(scaley);
@@ -755,16 +782,14 @@ class TileEditor extends PApplet {
   }
 
   private void updateTranslate() {
-    float xo = ((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetX();
-    float yo = ((Tile)( tileeditorshapelist.get(svgindex) )).getOffsetY();
-    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetX( xo - offsetx);
-    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetY( yo - offsety);
-    pLabel.setText("P:  " +nf(xo - offsetx, 1, 0) +" X " +nf(yo - offsety, 1, 0));
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetX(offsetx);
+    ((Tile)( tileeditorshapelist.get(svgindex) )).setOffsetY(offsety);
+    pLabel.setText("P:  " +nf(offsetx, 1, 0) +" X " +nf(offsety, 1, 0));
   }
 
   private void updateLocalValuesfromTile() {
-    tmpx = ((Tile)( svg )).getOffsetX();
-    tmpy = ((Tile)( svg )).getOffsetY();
+    offsetx = ((Tile)( svg )).getOffsetX();
+    offsety = ((Tile)( svg )).getOffsetY();
     scalex = ((Tile)( svg )).getScaleX();
     scaley = ((Tile)( svg )).getScaleY();
     rotation = ((Tile)( svg )).getRotation();
@@ -1153,11 +1178,11 @@ class TileEditor extends PApplet {
   void mouseDragged ( ) {
     if (!typeEditorOpened) {
       drag = true;
-      offsetx = ((pmouseX - mouseX)/zoom);
-      offsety = ((pmouseY - mouseY)/zoom);
+      dragoffsetx = ((pmouseX - mouseX)/zoom);
+      dragoffsety = ((pmouseY - mouseY)/zoom);
 
-      tmpx -= offsetx;
-      tmpy -= offsety;
+      offsetx -= dragoffsetx;
+      offsety -= dragoffsety;
 
       updateTranslate();
     }
@@ -1218,7 +1243,11 @@ class TileEditor extends PApplet {
           if (!showNfo) {
             showNfo = true;
             showNfoToggle.setState(showNfo);
-          }
+          } 
+        } else if (key == 'c') {
+          copyTransforms();
+        } else if (key == 'v') {
+          pasteTransforms();
         } else if (keyCode == 93 || keyCode == 107) { //PLUS
           this.scaleGUI(true);
         } else if (keyCode == 47 || keyCode == 109) { //MINUS
