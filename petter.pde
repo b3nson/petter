@@ -195,6 +195,7 @@ void setup() {
   try { nfo = new TileSVG("i/_petter-nfo.svg");}        catch(NullPointerException e) {showNfo = false;}
   try { names = loadStrings("i/assets/names.txt");}   catch(NullPointerException e) {}
   try { helptext = loadStrings("i/assets/help.txt");} catch(NullPointerException e) {} 
+  try { outputpath = loadStrings("i/assets/outputpath.txt")[0];} catch(Exception e) {} //tmpsolution
 
   setupGUI();
 
