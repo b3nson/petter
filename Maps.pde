@@ -1127,6 +1127,7 @@ public class EraserMap implements EffectorMap {
   private float brushSize = 10;
   private float maxRectCornerX, maxRectCornerY, petRectCornerX, petRectCornerY;
   private boolean invBrush = false;
+  private boolean canvasEmpty = true;
 
   Slider brushSizeSlider;
   Bang clearBang;
@@ -1185,6 +1186,7 @@ public class EraserMap implements EffectorMap {
 
     //draw line to canvas
     if (p.mousePressed) {
+      canvasEmpty = false;
       canvas.beginDraw();
       canvas.stroke(invBrush?white:green);
       canvas.strokeWeight(brushSize);
@@ -1250,6 +1252,9 @@ public class EraserMap implements EffectorMap {
   }
 
   boolean getMapPermit(float tilex, float tiley) {
+    if(canvasEmpty) {
+      return true;
+    } else {
     try {
       int absScreenXPos = round(map(tilex, 0, petterw-1, 0, ww-1) +(float(maxw-ww)*0.5));
       int absScreenYPos = round(map(tiley, 0, petterh-1, 0, hh-1) +(float(maxh-hh)*0.5));
@@ -1262,6 +1267,7 @@ public class EraserMap implements EffectorMap {
       } catch(ArrayIndexOutOfBoundsException e) { return false; }
     } catch(Exception e) {} //IndexOutOfBoundsException | NullPointerException
     return true;
+    }
   }
 
   float getMapValue(float tilex, float tiley) {
@@ -1285,6 +1291,7 @@ public class EraserMap implements EffectorMap {
 
   void clearCanvas() {
     canvas.clear();
+    canvasEmpty = true;
   }
 
   void invertBrush(boolean flag) {
