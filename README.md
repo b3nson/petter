@@ -93,6 +93,14 @@ P	- view/testrun animation
 ========================================================================
 ```
 
+More shortcuts not mentioned in helpscreen <kbd>H</kbd>
+#### TileEditor
+```
+C	- copy current tile-transformations
+V	- paste tile-transformations
+N	- set current tile as NFO-Graphic
+```
+
 ## Installation:
 - Grab a copy of [Processing](http://www.processing.org/) for your OS, install it.
 - Download/clone Petter to your Processing Sketch-Directory.
