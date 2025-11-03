@@ -185,20 +185,30 @@ void setup() {
   
   undo = new Memento(gui, 50);
 
+  map = new ArrayList<PImage>();
   svg = new ArrayList<PShape>();
   svgpath = new ArrayList<String>();
-  map = new ArrayList<PImage>();
   
-  try { svg.add(new TileSVG("i/_petter-def.svg"));}  catch(NullPointerException e) {svg.add(new TileShape(createShape(RECT, 0, 0, 50, 50),50f,50f));}
-  try { svgpath.add(sketchPath() +"/i/_petter-def.svg");}  catch(NullPointerException e) {}
-  try { ref = loadShape("i/_petter-ref.svg");}         catch(NullPointerException e) {showRef = false;}
-  try { nfo = new TileSVG("i/_petter-nfo.svg");}        catch(NullPointerException e) {showNfo = false;}
-  try { names = loadStrings("i/assets/names.txt");}   catch(NullPointerException e) {}
-  try { helptext = loadStrings("i/assets/help.txt");} catch(NullPointerException e) {} 
-  try { outputpath = loadStrings("i/assets/outputpath.txt")[0];} catch(Exception e) {} //tmpsolution
+  try { svg.add(new TileSVG("i/_petter-def.svg"));}
+      catch(NullPointerException e) {svg.add(new TileShape(createShape(RECT, 0, 0, 50, 50),50f,50f));}
+  try { svgpath.add(sketchPath() +"/i/_petter-def.svg");}
+      catch(NullPointerException e) {}
+  try { ref = loadShape("i/_petter-ref.svg");}
+      catch(NullPointerException e) {showRef = false;}
+  try { nfo = new TileSVG("i/_petter-nfo.svg");}
+      catch(NullPointerException e) {showNfo = false;}
+  try { names = loadStrings("i/assets/names.txt");}
+      catch(NullPointerException e) {}
+  try { helptext = loadStrings("i/assets/help.txt");}
+      catch(NullPointerException e) {}
+  try { outputpath = loadStrings("i/assets/outputpath.txt")[0];}
+      catch(Exception e) {} //tmpsolution
 
   setupGUI();
 
+  seed = millis()*second();
+  generateName();
+  
   pageOffsetSlider.setValue(absPageOffset);
   formatDropdown.setValue(2);
   penner_rot.setValue(rotType);
@@ -673,7 +683,7 @@ void keyPressed() {
     undo.redo();
   } else if (keysDown['S']) {
     exportOnNextLoop = true;
-    generateName();
+    //generateName();
     generateTimestamp();
     if(showExportLabel) showExportLabel(false);
   } else if (keysDown['0']) {

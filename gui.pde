@@ -1203,6 +1203,7 @@ void controlEvent(ControlEvent theEvent) {
       if(ww != viewwidth || hh != viewheight) {
         wBox.setValue(ww);
         hBox.setValue(hh);
+        generateName();
         canvasResize();  
       }
     }
@@ -1244,6 +1245,7 @@ void controlEvent(ControlEvent theEvent) {
         togglePageOrientation();
       }      
     }
+    generateName();
   }
   else if (theEvent.isFrom(settingsFilelist)) {
     int val = (int)theEvent.getController().getValue();
@@ -1251,9 +1253,11 @@ void controlEvent(ControlEvent theEvent) {
   } 
   else if (theEvent.isFrom(wBox)) {
     canvasResize();
+    generateName();
   } 
   else if (theEvent.isFrom(hBox)) {
     canvasResize();
+    generateName();
   }
   else if (theEvent.isFrom(tileeditorBang)) {
     toggleTileEditor();
@@ -1828,6 +1832,7 @@ void loadDefaultSettings() {
   else {                   //reset all controllers
     gui.loadProperties();
     nfoscale = 1f;
+    generateName();
     println("Resetting all controllers ");
   }
   undo.setUndoStep();  
@@ -1883,7 +1888,7 @@ void checkArgs() {
 }
 
 void generateName() {
-    randomSeed(mouseX+mouseY+frameCount);
+    randomSeed(millis()*second());
     if(batchmode) {
       name = "petterbatch";
     } else if(names != null) {

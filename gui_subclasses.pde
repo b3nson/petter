@@ -112,6 +112,7 @@ class DropTargetSVG extends DropListener {
         print("ADDSVG: ");
       } else if (mode == REPLACESVG) {
         print("RPLSVG: ");
+        generateName();
         if (over) {
           svg = tmpsvg;
           svgpath = tmppath;
