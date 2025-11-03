@@ -137,7 +137,7 @@ public class ImageMap extends DropListener implements EffectorMap {
     gifseqGroup = cp5.addGroup("gifseq")
       .setPosition(20, 30)
       .hideBar()
-      .open()
+      .setOpen(true)
       .setVisible(false)
       .setGroup(tabgroup)
       ;

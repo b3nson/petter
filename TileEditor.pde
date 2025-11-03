@@ -125,7 +125,7 @@ class TileEditor extends PApplet {
       .hideBar()
       .setBackgroundHeight(h)
       .setWidth(w)
-      .open()
+      .setOpen(true)
       ;
 
     // ---------------------------------------------------
@@ -185,7 +185,7 @@ class TileEditor extends PApplet {
       .setWidth(259)
       .hideArrow()
       .disableCollapse()
-      .open()
+      .setOpen(true)
       .setBackgroundHeight(34)
       //.setBackgroundColor(color(50))
       .setColorBackground(color(60))
@@ -258,7 +258,7 @@ class TileEditor extends PApplet {
       .setWidth(64)
       .hideArrow()
       .disableCollapse()
-      .open()
+      .setOpen(true)
       .setBackgroundHeight(34)
       //.setBackgroundColor(color(50))
       .setColorBackground(color(60))
@@ -290,7 +290,7 @@ class TileEditor extends PApplet {
       .setWidth(30)
       .hideArrow()
       .disableCollapse()
-      .open()
+      .setOpen(true)
       .setBackgroundHeight(34)
       //.setBackgroundColor(color(50))
       .setColorBackground(color(60))
@@ -312,7 +312,7 @@ class TileEditor extends PApplet {
       .setPosition(0, this.h-22)
       .setSize(this.w, 22)
       .hideBar()
-      .open()
+      .setOpen(true)
       .setBackgroundHeight(24)
       .setBackgroundColor(color(45))
       .setGroup(mainGroup)
@@ -1046,7 +1046,7 @@ class TileEditor extends PApplet {
     }
     addTextButton.moveTo(typeGroup).setPosition(w-20-10-70, this.h-20-10-26)
       .setSize(70, 26).bringToFront().setLabel("CLOSE");
-    typeGroup.open();
+    typeGroup.setOpen(true);
     mainGroup.close();
     typeEditorOpened = true;
     if (fontlistLoaded) {
@@ -1061,7 +1061,7 @@ class TileEditor extends PApplet {
     setCountLabel();
     addTextButton.moveTo(mainAddGroup).setPosition(0, 4)
       .setSize(30, 26).bringToFront().setLabel("+T");
-    mainGroup.open();
+    mainGroup.setOpen(true);
     typeGroup.close();
     typeEditorOpened = false;
   }

@@ -571,7 +571,7 @@ void setupGUI() {
            .setGroup(main)
            .close()
            ;
-  if(globalStyle) style.open();
+  if(globalStyle) style.setOpen(true);
   else style.close();
 
   strokeToggle = gui.addToggle("customStroke")
@@ -643,7 +643,7 @@ void setupGUI() {
      .setBackgroundHeight(100)
      .setSize(0,0)
      .disableCollapse()
-     .open()
+     .setOpen(true)
      .setGroup(style)
      ;
      tmp = styleLineGroup.getCaptionLabel();
@@ -808,7 +808,7 @@ void setupGUI() {
     .setBackgroundHeight(infoheight+2)
     .setBackgroundColor(color(45))
     .hideBar()
-    .open()
+    .setOpen(true)
     ;
     
   dragOffset = gui.addTextlabel("dragoffset" )
@@ -830,7 +830,7 @@ void setupGUI() {
     .setBackgroundColor(color(25))
     .hideBar()
     .hide()
-    .open()
+    .setOpen(true)
     ;
     
   tmpInfoLabel = gui.addTextlabel("infolabel" )
@@ -845,7 +845,7 @@ void setupGUI() {
     .setBackgroundHeight(infoheight+2)
     .setBackgroundColor(230)
     .hideBar()
-    .open()
+    .setOpen(true)
     .hide()
     ;
     
@@ -1313,7 +1313,7 @@ void controlEvent(ControlEvent theEvent) {
         style.close();
       } else {
         enableGlobalStyle();
-        style.open(); 
+        style.setOpen(true); 
       }
     }
   }
@@ -1354,7 +1354,7 @@ void toggleMenu() {
   showMENU = !(gui.getGroup("main").isOpen());
   if (showMENU) {
     surface.setSize(viewwidth+guiwidth, viewheight);
-    gui.getGroup("main").open();
+    gui.getGroup("main").setOpen(true);
   } else {
     surface.setSize(viewwidth, viewheight);    
     gui.getGroup("main").close();
@@ -1366,7 +1366,7 @@ void toggleHelp() {
   if (showHELP) {
     helptextbox.setPosition((viewwidth-helpwidth)/2, (viewheight-helpheight)/2);
     renderer = getRenderer(this);
-    help.open();
+    help.setOpen(true);
   } else {
     help.close();
   }  
@@ -1389,7 +1389,7 @@ void toggleAnimate() {
 }
 
 void openAnimate() {
-  animate.open();
+  animate.setOpen(true);
   reorderGuiElements();
 }
 

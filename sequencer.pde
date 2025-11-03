@@ -126,8 +126,8 @@ void showInValues() {
 void showOutValues() {
   if(endValuesRegistered) {
     for (int i = 0; i < animctrls.size(); i++) {
-      float to = keyframeValues[i][1];
-      animctrls.get(i).setValue(to);
+      float ato = keyframeValues[i][1];
+      animctrls.get(i).setValue(ato);
       animctrls.get(i).setColorForeground(color(50));
     }
     //manual color-assignement. dirty hack.
@@ -150,10 +150,10 @@ void animate() {
     specImgMapFrame(fcount);
     
     for (int i = 0; i < animctrls.size(); i++) {
-      float from = keyframeValues[i][0];
-      float to =   keyframeValues[i][1];
-      if(from != to) {
-        float curval = ease(ANM, fcount, from, to-from, frames-1);
+      float afrom = keyframeValues[i][0];
+      float ato =   keyframeValues[i][1];
+      if(afrom != ato) {
+        float curval = ease(ANM, fcount, afrom, ato-afrom, frames-1);
         animctrls.get(i).setValue(curval);
         if(fcount == 1) {
           animctrls.get(i).setColorForeground(color(255, 0, 0));
